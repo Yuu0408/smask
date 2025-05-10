@@ -52,6 +52,7 @@
   "gender": "Gender",
   "occupation": "Occupation",
   "nationality": "Nationality",
+  "address": "Address",
 
   "medicalHistory": "Medical History",
   "chiefComplaint": "Chief Complaint",

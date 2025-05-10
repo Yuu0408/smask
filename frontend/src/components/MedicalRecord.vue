@@ -36,6 +36,7 @@ function formatDate(dateStr: string): string {
       <Info :label="t('medicalRecord.gender')" :value="record.patient_info.gender" />
       <Info :label="t('medicalRecord.occupation')" :value="record.patient_info.occupation" />
       <Info :label="t('medicalRecord.nationality')" :value="record.patient_info.nationality" />
+      <Info :label="t('medicalRecord.address')" :value="record.patient_info.address" />
     </CardSection>
 
     <CardSection :title="t('medicalRecord.medicalHistory')">
