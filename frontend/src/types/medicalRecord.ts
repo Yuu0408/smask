@@ -5,13 +5,14 @@ export interface MedicalRecord {
     gender: string;
     occupation: string;
     nationality: string;
+    address: string;
   };
   medical_history: {
     chief_complaint: string;
     medical_history: string;
     past_medical_history: string;
-    current_medications: string[];
-    allergies: string[];
+    current_medications: string;
+    allergies: string;
     family_medical_history: string;
   };
   social_information: {

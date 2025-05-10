@@ -53,6 +53,10 @@
               <Label class="py-1" for="nationality">{{ $t("patientForm.fields.nationality") }}</Label>
               <Input id="nationality" v-model="form.nationality" :placeholder="$t('patientForm.placeholder.nationality')" required />
             </div>
+            <div>
+              <Label class="py-1" for="address">{{ $t("patientForm.fields.address") }}</Label>
+              <Input id="address" v-model="form.address" :placeholder="$t('patientForm.placeholder.address')" required />
+            </div>
           </div>
         </section>
 
@@ -141,10 +145,108 @@
             </div>
           </div>
         </section>
+<!-- Medical History -->
+<section>
+  <h3 class="text-lg font-semibold mb-4">{{ $t("patientForm.sections.medicalHistory") }}</h3>
+  <div class="flex flex-col gap-6">
+
+    <!-- Past Medical History -->
+    <div>
+      <Label class="py-1" for="has_past_medical_history">{{ $t("patientForm.fields.pastMedicalHistory") }}</Label>
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <select
+          id="has_past_medical_history"
+          v-model="form.has_past_medical_history"
+          class="md:w-1/3 w-full border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm"
+        >
+          <option value="">{{ $t('patientForm.options.select') }}</option>
+          <option value="yes">{{ $t('patientForm.options.yes') }}</option>
+          <option value="no">{{ $t('patientForm.options.no') }}</option>
+        </select>
+        <Input
+          v-if="form.has_past_medical_history === 'yes'"
+          v-model="form.past_medical_history"
+          :placeholder="$t('patientForm.placeholder.pastMedicalHistory')"
+          class="flex-1 w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Current Medications -->
+    <div>
+      <Label class="py-1" for="has_current_medications">{{ $t("patientForm.fields.currentMedications") }}</Label>
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <select
+          id="has_current_medications"
+          v-model="form.has_current_medications"
+          class="md:w-1/3 w-full border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm"
+        >
+          <option value="">{{ $t('patientForm.options.select') }}</option>
+          <option value="yes">{{ $t('patientForm.options.yes') }}</option>
+          <option value="no">{{ $t('patientForm.options.no') }}</option>
+        </select>
+        <Input
+          v-if="form.has_current_medications === 'yes'"
+          v-model="form.current_medications"
+          :placeholder="$t('patientForm.placeholder.medication')"
+          class="flex-1 w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Allergies -->
+    <div>
+      <Label class="py-1" for="has_allergies">{{ $t("patientForm.fields.allergies") }}</Label>
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <select
+          id="has_allergies"
+          v-model="form.has_allergies"
+          class="md:w-1/3 w-full border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm"
+        >
+          <option value="">{{ $t('patientForm.options.select') }}</option>
+          <option value="yes">{{ $t('patientForm.options.yes') }}</option>
+          <option value="no">{{ $t('patientForm.options.no') }}</option>
+        </select>
+        <Input
+          v-if="form.has_allergies === 'yes'"
+          v-model="form.allergies"
+          :placeholder="$t('patientForm.placeholder.allergy')"
+          class="flex-1 w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Family Medical History -->
+    <div>
+      <Label class="py-1" for="has_family_medical_history">{{ $t("patientForm.fields.familyMedicalHistory") }}</Label>
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <select
+          id="has_family_medical_history"
+          v-model="form.has_family_medical_history"
+          class="md:w-1/3 w-full border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm"
+        >
+          <option value="">{{ $t('patientForm.options.select') }}</option>
+          <option value="yes">{{ $t('patientForm.options.yes') }}</option>
+          <option value="no">{{ $t('patientForm.options.no') }}</option>
+        </select>
+        <Input
+          v-if="form.has_family_medical_history === 'yes'"
+          v-model="form.family_medical_history"
+          :placeholder="$t('patientForm.placeholder.familyMedicalHistory')"
+          class="flex-1 w-full"
+        />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
 
         <!-- Reason for Visit -->
         <section>
-          <div class="grid grid-cols-1 gap-4">
+          <div class="grid grid-cols-1 gap-4 pb-5">
             <div>
               <Label class="py-1" for="chief_complaint">{{ $t("patientForm.fields.chiefComplaint") }}</Label>
               <textarea
@@ -155,6 +257,17 @@
                 class="w-full resize-x border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
               ></textarea>
             </div>
+          </div>
+          <!-- Symptom Progression -->
+          <div class="col-span-1 md:col-span-2">
+            <Label class="py-1" for="medical_history">{{ $t("patientForm.fields.medicalHistory") }}</Label>
+            <textarea
+              id="medical_history"
+              v-model="form.medical_history"
+              :placeholder="$t('patientForm.placeholder.medicalHistory')"
+              rows="3"
+              class="w-full border rounded-md px-3 py-2 text-sm shadow-sm"
+            ></textarea>
           </div>
         </section>
 
@@ -191,6 +304,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { submitPatientInfo } from '@/api/patientApi'
+import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['submitted', 'failed'])
 
@@ -205,7 +322,13 @@ const form = ref({
   gender: '',
   occupation: '',
   nationality: '',
+  address: '',
   chief_complaint: '',
+  medical_history: '',
+  past_medical_history: '',
+  current_medications: '',
+  allergies: '',
+  family_medical_history: '',
 
   alcohol_consumption: '',
   smoking_habit: '',
@@ -216,6 +339,35 @@ const form = ref({
   menstruation_status: '',
   menstrual_cycle: '',
   recent_sexual_activity: null,
+
+  has_past_medical_history: '',
+  has_current_medications: '',
+  has_allergies: '',
+  has_family_medical_history: '',
+})
+
+watch(() => form.value.has_past_medical_history, (newVal) => {
+  if (newVal === 'no') {
+    form.value.past_medical_history = t('patientForm.options.no')
+  }
+})
+
+watch(() => form.value.has_current_medications, (newVal) => {
+  if (newVal === 'no') {
+    form.value.current_medications = t('patientForm.options.no')
+  }
+})
+
+watch(() => form.value.has_allergies, (newVal) => {
+  if (newVal === 'no') {
+    form.value.allergies = t('patientForm.options.no')
+  }
+})
+
+watch(() => form.value.has_family_medical_history, (newVal) => {
+  if (newVal === 'no') {
+    form.value.family_medical_history = t('patientForm.options.no')
+  }
 })
 
 function isFormValid() {
@@ -225,12 +377,18 @@ function isFormValid() {
     'gender',
     'occupation',
     'nationality',
+    'address',
     'chief_complaint',
     'alcohol_consumption',
     'smoking_habit',
     'living_situation',
     'daily_activity_independence',
     'recent_travel_history',
+    'past_medical_history',
+    'current_medications',
+    'allergies',
+    'family_medical_history',
+    'medical_history'
   ]
 
   // Include OB/GYN fields if gender is Female
@@ -270,8 +428,16 @@ async function submitForm() {
         gender: form.value.gender,
         occupation: form.value.occupation,
         nationality: form.value.nationality,
+        address: form.value.address,
       },
-      chief_complaint: form.value.chief_complaint,
+      medical_history: {
+        chief_complaint: form.value.chief_complaint,
+        medical_history: form.value.medical_history,
+        past_medical_history: form.value.past_medical_history,
+        current_medications: form.value.current_medications,
+        allergies: form.value.allergies,
+        family_medical_history: form.value.family_medical_history,
+      },
       social_information: {
         alcohol_consumption: form.value.alcohol_consumption,
         smoking_habit: form.value.smoking_habit,
@@ -287,6 +453,7 @@ async function submitForm() {
         },
       }),
     }
+
 
     await submitPatientInfo(payload)
     submitted.value = true

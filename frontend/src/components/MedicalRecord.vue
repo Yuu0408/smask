@@ -44,10 +44,10 @@ function formatDate(dateStr: string): string {
       <Info :label="t('medicalRecord.pastMedicalHistory')" :value="record.medical_history.past_medical_history" />
       <Info
         :label="t('medicalRecord.currentMedications')"
-        :value="record.medical_history.current_medications.length ? record.medical_history.current_medications.join(', ') : t('medicalRecord.none')" />
+        :value="record.medical_history.current_medications || t('medicalRecord.none')" />
       <Info
         :label="t('medicalRecord.allergies')"
-        :value="record.medical_history.allergies.length ? record.medical_history.allergies.join(', ') : t('medicalRecord.none')" />
+        :value="record.medical_history.allergies || t('medicalRecord.none')" />
       <Info :label="t('medicalRecord.familyHistory')" :value="record.medical_history.family_medical_history" />
     </CardSection>
 

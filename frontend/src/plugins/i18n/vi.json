@@ -77,27 +77,53 @@
     "title": "Phiếu Khai Thông Tin Bệnh Nhân",
     "description": "Vui lòng cung cấp thông tin cá nhân và y tế trước khi bắt đầu.",
     "sections": {
-      "patientInfo": "Thông Tin Bệnh Nhân",
-      "obgynHistory": "Tiền Sử Sản Phụ Khoa",
-      "socialInfo": "Thông Tin Xã Hội",
-      "reasonForVisit": "Mô tả triệu chứng hoặc lý do đến khám"
-    },
-    "fields": {
-      "fullName": "Họ và Tên",
-      "birthday": "Ngày Sinh",
-      "gender": "Giới Tính",
-      "occupation": "Nghề Nghiệp",
-      "nationality": "Quốc Tịch",
-      "menstruationStatus": "Tình Trạng Kinh Nguyệt",
-      "menstrualCycle": "Chu Kỳ Kinh",
-      "recentSexualActivity": "Hoạt động tình dục gần đây",
-      "alcoholConsumption": "Bạn có uống rượu không?",
-      "smokingHabit": "Bạn có hút thuốc không?",
-      "livingSituation": "Tình trạng sinh sống hiện tại của bạn là gì?",
-      "dailyActivityIndependence": "Bạn có thể tự thực hiện các hoạt động hàng ngày không?",
-      "recentTravelHistory": "Bạn có đi du lịch quốc tế gần đây không?",
-      "chiefComplaint": "Mô tả triệu chứng hoặc lý do đến khám"
-    },
+  "patientInfo": "Thông Tin Bệnh Nhân",
+  "obgynHistory": "Tiền Sử Sản Phụ Khoa",
+  "socialInfo": "Thông Tin Xã Hội",
+  "reasonForVisit": "Mô tả triệu chứng hoặc lý do đến khám",
+  "medicalHistory": "Tiền Sử Bệnh Lý"
+},
+"fields": {
+  "fullName": "Họ và Tên",
+  "birthday": "Ngày Sinh",
+  "gender": "Giới Tính",
+  "occupation": "Nghề Nghiệp",
+  "nationality": "Quốc Tịch",
+  "address": "Địa chỉ",
+  "menstruationStatus": "Tình Trạng Kinh Nguyệt",
+  "menstrualCycle": "Chu Kỳ Kinh",
+  "recentSexualActivity": "Hoạt động tình dục gần đây",
+  "alcoholConsumption": "Bạn có uống rượu không?",
+  "smokingHabit": "Bạn có hút thuốc không?",
+  "livingSituation": "Tình trạng sinh sống hiện tại của bạn là gì?",
+  "dailyActivityIndependence": "Bạn có thể tự thực hiện các hoạt động hàng ngày không?",
+  "recentTravelHistory": "Bạn có đi du lịch quốc tế gần đây không?",
+  "chiefComplaint": "Mô tả triệu chứng hoặc lý do đến khám",
+  "medicalHistory": "Mô tả sự phát triển của các triệu chứng",
+  "pastMedicalHistory": "Bạn có bệnh lý nào trong quá khứ không?",
+  "currentMedications": "Thuốc đang sử dụng",
+  "allergies": "Dị ứng",
+  "familyMedicalHistory": "Tiền sử bệnh gia đình"
+},
+"placeholder": {
+  "fullName": "ví dụ: Nguyễn Văn A",
+  "address": "Xã, Phường, Thành Phố,...",
+  "occupation": "ví dụ: Giáo viên",
+  "nationality": "ví dụ: Việt Nam",
+  "menstruationStatus": "ví dụ: Có kinh, mãn kinh",
+  "menstrualCycle": "ví dụ: Đều, không đều",
+  "chiefComplaint": "ví dụ: Tôi bị đau họng và ho trong 3 ngày.",
+  "medicalHistory": "ví dụ: Bắt đầu với sốt nhẹ, sau đó đau nhức cơ thể.",
+  "pastMedicalHistory": "ví dụ: Tiểu đường, cao huyết áp",
+  "medication": "ví dụ: Paracetamol 500mg",
+  "allergy": "ví dụ: Dị ứng Penicillin",
+  "familyMedicalHistory": "ví dụ: Gia đình có người mắc bệnh tim"
+},
+"actions": {
+  "addMedication": "Thêm Thuốc",
+  "addAllergy": "Thêm Dị Ứng"
+},
+
     "options": {
       "select": "Chọn",
       "male": "Nam",
@@ -118,14 +144,6 @@
       "otherLiving": "Khác",
       "travel14": "Có, trong vòng 14 ngày qua",
       "travelMonth": "Có, trong vòng một tháng qua"
-    },
-    "placeholder": {
-      "fullName": "ví dụ: Nguyễn Văn A",
-      "occupation": "ví dụ: Giáo viên",
-      "nationality": "ví dụ: Việt Nam",
-      "menstruationStatus": "ví dụ: Có kinh, mãn kinh",
-      "menstrualCycle": "ví dụ: Đều, không đều",
-      "chiefComplaint": "ví dụ: Tôi bị đau họng và ho trong 3 ngày."
     },
     "warning": "Vui lòng điền đầy đủ các trường bắt buộc trước khi đóng biểu mẫu.",
     "submit": {

@@ -96,15 +96,16 @@ async def receive_patient_info(
             birthday=info.patient_info.birthday,  # Extract year from birthday string
             gender=info.patient_info.gender,
             occupation=info.patient_info.occupation,
-            nationality=info.patient_info.nationality
+            nationality=info.patient_info.nationality,
+            address=info.patient_info.address
         ),
         medical_history=MedicalRecord.MedicalHistory(
-            chief_complaint=info.chief_complaint,
-            medical_history="",
-            past_medical_history="",
-            current_medications=[],
-            allergies=[],
-            family_medical_history=""
+            chief_complaint=info.medical_history.chief_complaint,
+            medical_history=info.medical_history.medical_history,
+            past_medical_history=info.medical_history.past_medical_history,
+            current_medications=info.medical_history.current_medications,
+            allergies=info.medical_history.allergies,
+            family_medical_history=info.medical_history.family_medical_history
         ),
         social_information=MedicalRecord.SocialInformation(**info.social_information.dict()),
         obstetric_gynecological_history=(

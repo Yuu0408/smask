@@ -12,6 +12,7 @@ class PatientInfo(BaseModel):
     gender: str
     occupation: str
     nationality: str
+    address: str = Field(..., description="Address of patient")
 
 class SocialInformation(BaseModel):
     alcohol_consumption: Optional[str]
@@ -25,9 +26,17 @@ class ObstetricGynecologicalHistory(BaseModel):
     menstrual_cycle: Optional[str]
     recent_sexual_activity: Optional[bool]
 
+class MedicalHistory(BaseModel):
+    chief_complaint: str = Field(..., description="Main reason for the patient's visit.")
+    medical_history: str = Field(..., description="Description of symptom progression.")
+    past_medical_history: str = Field(..., description="Previous illnesses and medical conditions.")
+    current_medications: str = Field(default_factory=list, description="List of medications the patient is currently taking.")
+    allergies: str = Field(default_factory=list, description="List of allergies the patient has.")
+    family_medical_history: str = Field(..., description="Medical conditions present in the patient's family.")
+
 class MedicalRecordRequest(BaseModel):
     patient_info: PatientInfo
-    chief_complaint: str
+    medical_history: MedicalHistory
     social_information: SocialInformation
     obstetric_gynecological_history: Optional[ObstetricGynecologicalHistory] = None
 

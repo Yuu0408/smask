@@ -9,13 +9,14 @@ class MedicalRecord(BaseModel):
         gender: str = Field(..., description="Gender of the patient.")
         occupation: str = Field(..., description="Occupation of the patient.")
         nationality: str = Field(..., description="Nationality of the patient.")
+        address: str = Field(..., description="Address of patient")
     
     class MedicalHistory(BaseModel):
         chief_complaint: str = Field(..., description="Main reason for the patient's visit.")
         medical_history: str = Field(..., description="Description of symptom progression.")
         past_medical_history: str = Field(..., description="Previous illnesses and medical conditions.")
-        current_medications: List[str] = Field(default_factory=list, description="List of medications the patient is currently taking.")
-        allergies: List[str] = Field(default_factory=list, description="List of allergies the patient has.")
+        current_medications: str = Field(default_factory=list, description="medications the patient is currently taking.")
+        allergies: str = Field(default_factory=list, description="allergies the patient has.")
         family_medical_history: str = Field(..., description="Medical conditions present in the patient's family.")
     
     class SocialInformation(BaseModel):
