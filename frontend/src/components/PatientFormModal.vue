@@ -38,9 +38,9 @@
                 class="w-full border border-input bg-background text-foreground rounded-md px-3 py-2 text-sm shadow-sm"
               >
                 <option value="" disabled>{{ $t("patientForm.options.select") }}</option>
-                <option>{{ $t("patientForm.options.male") }}</option>
-                <option>{{ $t("patientForm.options.female") }}</option>
-                <option>{{ $t("patientForm.options.other") }}</option>
+                <option value="Male">{{ $t("patientForm.options.male") }}</option>
+                <option value="Female">{{ $t("patientForm.options.female") }}</option>
+                <option value="Other">{{ $t("patientForm.options.other") }}</option>
               </select>
             </div>
 
