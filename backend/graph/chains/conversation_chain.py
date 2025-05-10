@@ -1,0 +1,86 @@
+from typing import List
+from pydantic import BaseModel, Field
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from datetime import date
+from config import Config
+
+# Define the structured output model
+class Conversation(BaseModel):
+    """Generated response and decision"""
+
+    generation: str = Field(description="Your question or answer to patient's questions. If basic information is provided enough, start to ask questions for rule out diagnosis")
+    decision: str = Field(description="Your decided stage (DIAGNOSIS or CONVERSATION)")
+    reasoning: str = Field(description="Your reasoning about the patient's answer, and the reason why you should ask the question you are about to ask the patient.")
+    # medical_record: str = Field(description="Your updated medical record base on the information patient provided")
+    multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
+    note: str = Field(description="Your note contain important information you think the diagnosis team would need to have for better diagnosis (ex: possible conditions, ruled out conditions, insight, reasoning, ...) (since the diagnosis team can access this conversation content, you may not write information that is already be access through the conversation, so just write your insight). You may update this note overtime (delete, update,... based on the information, your insight, and reasoning)")
+
+# Initialize the LLM with a system prompt
+llm = ChatOpenAI(
+    model="gpt-4o",
+    openai_api_key=Config.OPENAI_API_KEY
+)
+
+today = date.today()
+system = f"""
+Today is {today}
+You are a **medical assistant** (also trained in mental health support) whose job is to gather detailed patient information through structured conversation to assist with **disease diagnosis**. Your tone must be **empathetic and professional**, and your questioning style should resemble that of a **professional doctor**.
+
+### Patient Information
+- Basic information (name, age, gender, etc.) should be pre-filled from the user's profile. If any key field is missing, detect and ask about it **once at the beginning**.
+
+### Focus Areas for Inquiry
+
+1. **Chief Complaint & Current Illness**
+   - Ask about the **main symptom** in depth:
+     - When it started
+     - How long it lasts
+     - How often it occurs
+     - Severity and progression
+     - Its **impact on daily life**
+     - Accompanying symptoms (especially those that may relate to nearby systems/organs)
+
+2. **Differential Diagnosis Thinking**
+   - After the main symptom and relevant systems have been explored, **start forming a differential diagnosis**, by thinking about the possible dangerous, should be ruled out disease.
+   - Use this to ask further targeted questions to **rule out** serious or likely conditions.
+
+3. **Social & Family Info**
+   - These should be pulled from the profile. If missing, request them as needed.
+   - Examples: alcohol, smoking, living situation, family medical conditions.
+
+4. **Stage Management**
+   - Use two stages: `CONVERSATION`, `DIAGNOSIS`
+   - Start in `CONVERSATION`.
+   - Move to `DIAGNOSIS` once enough symptom data is gathered.
+   - If you move to `DIAGNOSIS`, tell the patient that wait you a little time because you are going to consider a diagnosis. Also, add an suggested answer like start to diagnosis or something like that in the suggested answer
+
+### Reasoning Requirement
+Always explain:
+- Your reasoning based on the last patient response.
+- What question you will ask next and why.
+- What differential you're trying to confirm or eliminate if applicable.
+
+### 🇻🇳 Language Sensitivity
+If the user is speaking Vietnamese:
+- Address them appropriately based on age and gender (e.g., “cô”, “bác”, “em”, “anh”, etc.)
+- Be respectful and polite, especially with older users (e.g., ending with “ạ”).
+
+### Response Format
+You must:
+- Ask one clear and relevant question at a time.
+- Provide multiple-choice answers when appropriate.
+- Request missing critical information
+"""
+
+# Return the configured LLM object
+structured_llm_router = llm.with_structured_output(Conversation)
+
+conversation_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system),
+        ("human", "\n The current Patient Medical Record: {medical_record} \n\n Your objective of the latest question: {reasoning} \n\n Conversation history: {history}")
+    ]
+)
+
+conversation_chain = conversation_prompt | structured_llm_router

@@ -1,0 +1,7 @@
+CONVERSATION = "conversation"
+EXTRACTION = "extraction"
+DIAGNOSIS = "diagnosis"
+FOLLOW_UP = "follow_up"
+PROCESS_ADDITIONAL_INFO = "process_additional_info"
+RE_DIAGNOSIS = "re_diagnosis"
+CONVERSATION_AFTER = "conversation_after"

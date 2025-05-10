@@ -1,0 +1,77 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Python files
+**/__pycache__/*
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.env
+.env
+
+# Ignore node.js files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore compiled files
+*.o
+*.out
+*.class
+*.exe
+*.dll
+
+# Ignore build artifacts
+dist/
+build/
+target/
+*.jar
+*.war
+*.ear
+
+# Ignore dependency directories
+vendor/
+venv/
+.env/
+.venv/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.iml
+
+# Ignore Docker files
+docker-compose.override.yml
+docker-compose.override.*.yml
+
+# Ignore database files
+*.sqlite
+*.db
+
+# Ignore environment-specific config
+config/local_settings.py
+config/settings_local.py
+
+# Ignore cache files
+.cache/
+*.swp
+*.swo
+
+# Ignore generated files
+*.bak
+*.orig
+*.tmp
+*.~*
+
+# Ignore Terraform files
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# Ignore all files inside vosk-model-small-en-us-0.15
+vosk-model-small-en-us-0.15/*

@@ -1,0 +1,154 @@
+{
+    "patientForm": {
+      "title": "Patient Information",
+      "fullName": "Full name",
+      "yearOfBirth": "Year of birth",
+      "age": "Age",
+      "gender": "Gender",
+      "occupation": "Occupation",
+      "nationality": "Nationality",
+      "submit": "Continue"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "chatInput": {
+      "placeholder": "Type your message…"
+  },
+  "chatPage": {
+  "viewDiagnosis": "Click to view your diagnosis",
+  "sessionNotInitialized": "Session not initialized.",
+  "typing": "Typing...",
+  "error": "Something went wrong. Please try again."
+},
+"diagnosisPage": {
+  "title": "Diagnosis Summary",
+  "notAvailable": "Diagnosis is not yet available.",
+  "notAvailableShort": "N/A",
+  "reasoning": "Reasoning",
+  "mostLikely": "Most Likely Diagnosis",
+  "possible": "Possible Diagnoses",
+  "ruleOut": "Rule-Out Conditions",
+  "furtherTests": "Recommended Further Tests",
+  "differentiating": "Differentiating factor",
+  "supporting": "Supporting evidence",
+  "urgency": "Urgency",
+  "routine": "routine"
+},
+"medicalRecord": {
+  "title": "Medical Record",
+  "notAvailableShort": "N/A",
+  "none": "None",
+  "yes": "Yes",
+  "no": "No",
+
+  "patientInfo": "Patient Information",
+  "fullName": "Full Name",
+  "birthday": "Birthday",
+  "gender": "Gender",
+  "occupation": "Occupation",
+  "nationality": "Nationality",
+
+  "medicalHistory": "Medical History",
+  "chiefComplaint": "Chief Complaint",
+  "symptomProgression": "Symptom Progression",
+  "pastMedicalHistory": "Past Medical History",
+  "currentMedications": "Current Medications",
+  "allergies": "Allergies",
+  "familyHistory": "Family Medical History",
+
+  "socialInfo": "Social Information",
+  "alcohol": "Alcohol Consumption",
+  "smoking": "Smoking Habit",
+  "livingSituation": "Living Situation",
+  "dailyActivity": "Daily Activity Independence",
+  "travelHistory": "Recent Travel History",
+
+  "obstetric": "Obstetric & Gynecological History",
+  "menstruationStatus": "Menstruation Status",
+  "menstrualCycle": "Menstrual Cycle",
+  "sexualActivity": "Recent Sexual Activity"
+},
+
+  "patientForm": {
+    "title": "Patient Intake Form",
+    "description": "Please provide your personal and medical information before starting.",
+    "sections": {
+      "patientInfo": "Patient Information",
+      "obgynHistory": "Obstetric & Gynecological History",
+      "socialInfo": "Social Information",
+      "reasonForVisit": "Describe your symptoms or reason for visiting"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "birthday": "Birthday",
+      "gender": "Gender",
+      "occupation": "Occupation",
+      "nationality": "Nationality",
+      "menstruationStatus": "Menstruation Status",
+      "menstrualCycle": "Menstrual Cycle",
+      "recentSexualActivity": "Recent Sexual Activity",
+      "alcoholConsumption": "Do you consume alcohol?",
+      "smokingHabit": "Do you smoke?",
+      "livingSituation": "What is your living situation?",
+      "dailyActivityIndependence": "Can you perform daily activities independently?",
+      "recentTravelHistory": "Have you recently traveled internationally?",
+      "chiefComplaint": "Describe your symptoms or reason for visiting"
+    },
+    "options": {
+      "select": "Select",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "never": "Never",
+      "occasionally": "Occasionally",
+      "frequently": "Frequently",
+      "usedToQuit": "Used to, but quit",
+      "daily": "Yes, daily",
+      "yes": "Yes",
+      "no": "No",
+      "partially": "Partially",
+      "needsAssistance": "No, I need assistance",
+      "liveAlone": "Live alone",
+      "liveWithFamily": "Live with family",
+      "assistedLiving": "Assisted living",
+      "otherLiving": "Other",
+      "travel14": "Yes, within the last 14 days",
+      "travelMonth": "Yes, within the last month"
+    },
+    "placeholder": {
+      "fullName": "e.g., John Doe",
+      "occupation": "e.g., Teacher",
+      "nationality": "e.g., Vietnamese",
+      "menstruationStatus": "e.g., Menstruating, Menopausal",
+      "menstrualCycle": "e.g., Regular, Irregular",
+      "chiefComplaint": "e.g., I’ve had a sore throat and cough for 3 days."
+    },
+    "warning": "Please fill out all required fields before closing the form.",
+    "submit": {
+      "default": "Submit",
+      "submitting": "Submitting..."
+    }
+  },
+  
+  "sidebar": {
+    "chat": "Chat",
+    "medicalRecord": "Medical Record",
+    "diagnosis": "Diagnosis",
+    "todoList": "To-Do List",
+    "selectLanguage": "Select language"
+  },
+  "todo": {
+    "title": "To-Do List",
+    "noTasks": "No tasks available."
+  }
+
+
+
+
+}
+  
