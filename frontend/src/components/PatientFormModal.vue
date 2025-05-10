@@ -191,9 +191,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { submitPatientInfo } from '@/api/patientApi'
-import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n()
 const emit = defineEmits(['submitted', 'failed'])
 
 const submitting = ref(false)

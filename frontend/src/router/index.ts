@@ -18,7 +18,7 @@ const router = createRouter({
 })
 
 // navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   if (!hasSubmittedForm && to.path !== '/chat') {
     next('/chat') // redirect non-submitted user to /chat
   } else {
