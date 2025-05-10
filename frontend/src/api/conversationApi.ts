@@ -10,7 +10,9 @@ export interface ConversationRequest {
 }
   
 export async function sendMessageToServer(payload: ConversationRequest): Promise<ConversationResponse> {
-  const response = await fetch('http://localhost:8000/conversation', {
+  const API_BASE = import.meta.env.VITE_API_BASE
+
+  const response = await fetch(`${API_BASE}/conversation`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

@@ -25,7 +25,8 @@ export interface MedicalRecordRequest {
 
 export async function submitPatientInfo(medicalRecord: MedicalRecordRequest): Promise<void> {
   try {
-    const response = await fetch('http://localhost:8000/patient_info', {
+    const API_BASE = import.meta.env.VITE_API_BASE
+    const response = await fetch(`${API_BASE}/patient_info`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
