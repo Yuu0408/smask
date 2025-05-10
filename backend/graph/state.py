@@ -1,4 +1,5 @@
-from typing import List, TypedDict, Optional
+from typing import List, Optional
+from typing_extensions import TypedDict
 from entities.medical_record_entity import MedicalRecord
 from entities.predicted_diseases_entity import DiagnosisPaper, DiagnosisResponse
 

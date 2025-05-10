@@ -1,6 +1,7 @@
 from uuid import UUID
 from pydantic import BaseModel, Field
-from typing import Any, Dict, List, TypedDict, Optional
+from typing import Any, Dict, List, Optional
+from typing_extensions import TypedDict
 from entities.medical_record_entity import MedicalRecord
 from entities.predicted_diseases_entity import DiagnosisPaper, DiagnosisResponse
 from datetime import date
