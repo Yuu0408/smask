@@ -30,8 +30,8 @@ class FurtherTest(BaseModel):
 
 class DiagnosisResponse(BaseModel):
     # generation: str = Field(..., description="What you would tell the patient after diagnosis")
-    todo: Optional[List[str]] = Field(description="List of things patient should do (further test, things to do,...) in detailed. Must be writen in the same language as the conversation between patient")
-    medical_record: Optional[MedicalRecord] = Field(None, description="Your updated completed medical record based on the conversation between patient. The medical record content should be in the same language with the conversation with patient")
+    todo: Optional[List[str]] = Field(description="List of things patient should do (further test, things to do,...) in detailed. Must be writen in the same language as the conversation between patient.")
+    medical_record: Optional[MedicalRecord] = Field(None, description="Your updated completed medical record based on the conversation between patient. The medical record content should be in the same language with the conversation with patient. You may need to translate the the medical record content to the same language with the conversation with patient")
     reasoning_process: str = Field(..., description="Your reasoning process")
     diagnosis: Diagnosis = Field(..., description="Categorized potential conditions based on likelihood and differentiating factors.")
     further_test: List[FurtherTest] = Field(..., description="Detailed recommended further tests with purpose and urgency")
