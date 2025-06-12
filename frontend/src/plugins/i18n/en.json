@@ -1,128 +1,119 @@
 {
-    "patientForm": {
-      "title": "Patient Information",
-      "fullName": "Full name",
-      "yearOfBirth": "Year of birth",
-      "age": "Age",
-      "gender": "Gender",
-      "occupation": "Occupation",
-      "nationality": "Nationality",
-      "submit": "Continue"
-    },
-    "settings": {
-      "title": "Settings",
-      "language": "Language",
-      "theme": "Theme",
-      "light": "Light",
-      "dark": "Dark"
-    },
-    "chatInput": {
-      "placeholder": "Type your message…"
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "chatInput": {
+    "placeholder": "Type your message…"
   },
   "chatPage": {
-  "viewDiagnosis": "Click to view your diagnosis",
-  "sessionNotInitialized": "Session not initialized.",
-  "typing": "Typing...",
-  "error": "Something went wrong. Please try again."
-},
-"diagnosisPage": {
-  "title": "Diagnosis Summary",
-  "notAvailable": "Diagnosis is not yet available.",
-  "notAvailableShort": "N/A",
-  "reasoning": "Reasoning",
-  "mostLikely": "Most Likely Diagnosis",
-  "possible": "Possible Diagnoses",
-  "ruleOut": "Rule-Out Conditions",
-  "furtherTests": "Recommended Further Tests",
-  "differentiating": "Differentiating factor",
-  "supporting": "Supporting evidence",
-  "urgency": "Urgency",
-  "routine": "routine"
-},
-"medicalRecord": {
-  "title": "Medical Record",
-  "notAvailableShort": "N/A",
-  "none": "None",
-  "yes": "Yes",
-  "no": "No",
+    "viewDiagnosis": "Click to view your diagnosis",
+    "sessionNotInitialized": "Session not initialized.",
+    "typing": "Typing...",
+    "error": "Something went wrong. Please try again."
+  },
+  "diagnosisPage": {
+    "title": "Diagnosis Summary",
+    "notAvailable": "Diagnosis is not yet available.",
+    "notAvailableShort": "N/A",
+    "reasoning": "Reasoning",
+    "mostLikely": "Most Likely Diagnosis",
+    "possible": "Possible Diagnoses",
+    "ruleOut": "Rule-Out Conditions",
+    "furtherTests": "Recommended Further Tests",
+    "differentiating": "Differentiating factor",
+    "supporting": "Supporting evidence",
+    "urgency": "Urgency",
+    "routine": "routine"
+  },
+  "medicalRecord": {
+    "title": "Medical Record",
+    "notAvailableShort": "N/A",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
 
-  "patientInfo": "Patient Information",
-  "fullName": "Full Name",
-  "birthday": "Birthday",
-  "gender": "Gender",
-  "occupation": "Occupation",
-  "nationality": "Nationality",
-  "address": "Address",
+    "patientInfo": "Patient Information",
+    "fullName": "Full Name",
+    "birthday": "Birthday",
+    "gender": "Gender",
+    "occupation": "Occupation",
+    "nationality": "Nationality",
+    "address": "Address",
 
-  "medicalHistory": "Medical History",
-  "chiefComplaint": "Chief Complaint",
-  "symptomProgression": "Symptom Progression",
-  "pastMedicalHistory": "Past Medical History",
-  "currentMedications": "Current Medications",
-  "allergies": "Allergies",
-  "familyHistory": "Family Medical History",
+    "medicalHistory": "Medical History",
+    "chiefComplaint": "Chief Complaint",
+    "symptomProgression": "Symptom Progression",
+    "pastMedicalHistory": "Past Medical History",
+    "currentMedications": "Current Medications",
+    "allergies": "Allergies",
+    "familyHistory": "Family Medical History",
 
-  "socialInfo": "Social Information",
-  "alcohol": "Alcohol Consumption",
-  "smoking": "Smoking Habit",
-  "livingSituation": "Living Situation",
-  "dailyActivity": "Daily Activity Independence",
-  "travelHistory": "Recent Travel History",
+    "socialInfo": "Social Information",
+    "alcohol": "Alcohol Consumption",
+    "smoking": "Smoking Habit",
+    "livingSituation": "Living Situation",
+    "dailyActivity": "Daily Activity Independence",
+    "travelHistory": "Recent Travel History",
 
-  "obstetric": "Obstetric & Gynecological History",
-  "menstruationStatus": "Menstruation Status",
-  "menstrualCycle": "Menstrual Cycle",
-  "sexualActivity": "Recent Sexual Activity"
-},
+    "obstetric": "Obstetric & Gynecological History",
+    "menstruationStatus": "Menstruation Status",
+    "menstrualCycle": "Menstrual Cycle",
+    "sexualActivity": "Recent Sexual Activity"
+  },
 
   "patientForm": {
     "title": "Patient Intake Form",
     "description": "Please provide your personal and medical information before starting.",
+    "language": "Language",
     "sections": {
-  "patientInfo": "Patient Information",
-  "obgynHistory": "Obstetric & Gynecological History",
-  "socialInfo": "Social Information",
-  "reasonForVisit": "Describe your symptoms or reason for visiting",
-  "medicalHistory": "Medical History"
-},
-"fields": {
-  "fullName": "Full Name",
-  "birthday": "Birthday",
-  "gender": "Gender",
-  "occupation": "Occupation",
-  "nationality": "Nationality",
-  "menstruationStatus": "Menstruation Status",
-  "menstrualCycle": "Menstrual Cycle",
-  "recentSexualActivity": "Recent Sexual Activity",
-  "alcoholConsumption": "Do you consume alcohol?",
-  "smokingHabit": "Do you smoke?",
-  "livingSituation": "What is your living situation?",
-  "dailyActivityIndependence": "Can you perform daily activities independently?",
-  "recentTravelHistory": "Have you recently traveled internationally?",
-  "chiefComplaint": "Describe your symptoms or reason for visiting",
-  "medicalHistory": "Describe how your symptoms have developed",
-  "pastMedicalHistory": "Do you have any past medical conditions?",
-  "currentMedications": "Current Medications",
-  "allergies": "Allergies",
-  "familyMedicalHistory": "Family Medical History"
-},
-"placeholder": {
-  "fullName": "e.g., John Doe",
-  "occupation": "e.g., Teacher",
-  "nationality": "e.g., Vietnamese",
-  "menstruationStatus": "e.g., Menstruating, Menopausal",
-  "menstrualCycle": "e.g., Regular, Irregular",
-  "chiefComplaint": "e.g., I’ve had a sore throat and cough for 3 days.",
-  "medicalHistory": "e.g., Started with mild fever and developed into body aches.",
-  "pastMedicalHistory": "e.g., Diabetes, hypertension",
-  "medication": "e.g., Paracetamol 500mg",
-  "allergy": "e.g., Penicillin",
-  "familyMedicalHistory": "e.g., Family history of heart disease"
-},
-"actions": {
-  "addMedication": "Add Medication",
-  "addAllergy": "Add Allergy"
-},
+      "patientInfo": "Patient Information",
+      "obgynHistory": "Obstetric & Gynecological History",
+      "socialInfo": "Social Information",
+      "reasonForVisit": "Describe your symptoms or reason for visiting",
+      "medicalHistory": "Medical History"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "birthday": "Birthday",
+      "gender": "Gender",
+      "occupation": "Occupation",
+      "nationality": "Nationality",
+      "menstruationStatus": "Menstruation Status",
+      "menstrualCycle": "Menstrual Cycle",
+      "recentSexualActivity": "Recent Sexual Activity",
+      "alcoholConsumption": "Do you consume alcohol?",
+      "smokingHabit": "Do you smoke?",
+      "livingSituation": "What is your living situation?",
+      "dailyActivityIndependence": "Can you perform daily activities independently?",
+      "recentTravelHistory": "Have you recently traveled internationally?",
+      "chiefComplaint": "Describe your symptoms or reason for visiting",
+      "medicalHistory": "Describe how your symptoms have developed",
+      "pastMedicalHistory": "Do you have any past medical conditions?",
+      "currentMedications": "Current Medications",
+      "allergies": "Allergies",
+      "familyMedicalHistory": "Family Medical History"
+    },
+    "placeholder": {
+      "fullName": "e.g., John Doe",
+      "occupation": "e.g., Teacher",
+      "nationality": "e.g., Vietnamese",
+      "menstruationStatus": "e.g., Menstruating, Menopausal",
+      "menstrualCycle": "e.g., Regular, Irregular",
+      "chiefComplaint": "e.g., I’ve had a sore throat and cough for 3 days.",
+      "medicalHistory": "e.g., Started with mild fever and developed into body aches.",
+      "pastMedicalHistory": "e.g., Diabetes, hypertension",
+      "medication": "e.g., Paracetamol 500mg",
+      "allergy": "e.g., Penicillin",
+      "familyMedicalHistory": "e.g., Family history of heart disease"
+    },
+    "actions": {
+      "addMedication": "Add Medication",
+      "addAllergy": "Add Allergy"
+    },
 
     "options": {
       "select": "Select",
@@ -151,7 +142,7 @@
       "submitting": "Submitting..."
     }
   },
-  
+
   "sidebar": {
     "chat": "Chat",
     "medicalRecord": "Medical Record",
@@ -163,9 +154,4 @@
     "title": "To-Do List",
     "noTasks": "No tasks available."
   }
-
-
-
-
 }
-  

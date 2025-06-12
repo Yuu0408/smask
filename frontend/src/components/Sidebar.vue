@@ -8,12 +8,26 @@
       <ul class="space-y-1">
         <li>
           <button
+            @click="navigateTo('/conversation')"
+            :class="[
+              'w-full flex items-center gap-2 text-left px-4 py-2 rounded-md transition-colors duration-200 font-medium active:scale-[0.98]',
+              currentRoute === '/conversation'
+                ? 'bg-gray-300 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700',
+            ]"
+          >
+            <PhoneCall class="w-5 h-5" />
+            {{ $t("sidebar.conversation") }}
+          </button>
+        </li>
+        <li>
+          <button
             @click="navigateTo('/chat')"
             :class="[
               'w-full flex items-center gap-2 text-left px-4 py-2 rounded-md transition-colors duration-200 font-medium active:scale-[0.98]',
               currentRoute === '/chat'
                 ? 'bg-gray-300 dark:bg-gray-600'
-                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700',
             ]"
           >
             <MessageSquare class="w-5 h-5" />
@@ -27,7 +41,7 @@
               'w-full flex items-center gap-2 text-left px-4 py-2 rounded-md transition-colors duration-200 font-medium active:scale-[0.98]',
               currentRoute === '/record'
                 ? 'bg-gray-300 dark:bg-gray-600'
-                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700',
             ]"
           >
             <FileText class="w-5 h-5" />
@@ -41,7 +55,7 @@
               'w-full flex items-center gap-2 text-left px-4 py-2 rounded-md transition-colors duration-200 font-medium active:scale-[0.98]',
               currentRoute === '/diagnosis'
                 ? 'bg-gray-300 dark:bg-gray-600'
-                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700',
             ]"
           >
             <HeartPulse class="w-5 h-5" />
@@ -55,7 +69,7 @@
               'w-full flex items-center gap-2 text-left px-4 py-2 rounded-md transition-colors duration-200 font-medium active:scale-[0.98]',
               currentRoute === '/todo'
                 ? 'bg-gray-300 dark:bg-gray-600'
-                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700',
             ]"
           >
             <ListTodo class="w-5 h-5" />
@@ -80,12 +94,16 @@
   </aside>
 </template>
 
-
-
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { MessageSquare, FileText, HeartPulse, ListTodo } from 'lucide-vue-next';
+import { computed, ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import {
+  MessageSquare,
+  FileText,
+  HeartPulse,
+  ListTodo,
+  PhoneCall,
+} from "lucide-vue-next";
 
 import {
   Select,
@@ -93,8 +111,8 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { useI18n } from 'vue-i18n';
+} from "@/components/ui/select";
+import { useI18n } from "vue-i18n";
 
 defineProps<{ isOpen: boolean }>();
 
@@ -108,12 +126,12 @@ function navigateTo(path: string) {
 
 const currentRoute = computed(() => route.path);
 
-const selectedLanguage = ref<'en' | 'vi'>(
-  (localStorage.getItem('lang') as 'en' | 'vi') || (locale.value as 'en' | 'vi')
+const selectedLanguage = ref<"en" | "vi">(
+  (localStorage.getItem("lang") as "en" | "vi") || (locale.value as "en" | "vi")
 );
 
 watch(selectedLanguage, (newLang) => {
   locale.value = newLang;
-  localStorage.setItem('lang', newLang);
+  localStorage.setItem("lang", newLang);
 });
 </script>

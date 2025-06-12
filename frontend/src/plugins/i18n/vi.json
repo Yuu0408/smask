@@ -1,129 +1,120 @@
 {
-    "patientForm": {
-      "title": "Patient Information",
-      "fullName": "Full name",
-      "yearOfBirth": "Year of birth",
-      "age": "Age",
-      "gender": "Gender",
-      "occupation": "Occupation",
-      "nationality": "Nationality",
-      "submit": "Continue"
-    },
-    "settings": {
-      "title": "Settings",
-      "language": "Language",
-      "theme": "Theme",
-      "light": "Light",
-      "dark": "Dark"
-    },
-    "chatInput": {
-      "placeholder": "Nhập tin nhắn của bạn…"
-    },
-    "chatPage": {
-  "viewDiagnosis": "Nhấn để xem chẩn đoán của bạn",
-  "sessionNotInitialized": "Phiên chưa được khởi tạo.",
-  "typing": "Đang nhập...",
-  "error": "Đã xảy ra lỗi. Vui lòng thử lại."
-},
-"diagnosisPage": {
-  "title": "Tóm tắt chẩn đoán",
-  "notAvailable": "Hiện chưa có chẩn đoán.",
-  "notAvailableShort": "Không có",
-  "reasoning": "Lý luận",
-  "mostLikely": "Chẩn đoán có khả năng cao nhất",
-  "possible": "Các chẩn đoán có thể",
-  "ruleOut": "Loại trừ các bệnh",
-  "furtherTests": "Xét nghiệm bổ sung được khuyến nghị",
-  "differentiating": "Yếu tố phân biệt",
-  "supporting": "Bằng chứng hỗ trợ",
-  "urgency": "Độ khẩn cấp",
-  "routine": "thường quy"
-},
-"medicalRecord": {
-  "title": "Hồ sơ y tế",
-  "notAvailableShort": "Không có",
-  "none": "Không có",
-  "yes": "Có",
-  "no": "Không",
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "theme": "Chủ đề",
+    "light": "Sáng",
+    "dark": "Tối"
+  },
+  "chatInput": {
+    "placeholder": "Nhập tin nhắn của bạn…"
+  },
+  "chatPage": {
+    "viewDiagnosis": "Nhấn để xem chẩn đoán của bạn",
+    "sessionNotInitialized": "Phiên chưa được khởi tạo.",
+    "typing": "Đang nhập...",
+    "error": "Đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "diagnosisPage": {
+    "title": "Tóm tắt chẩn đoán",
+    "notAvailable": "Hiện chưa có chẩn đoán.",
+    "notAvailableShort": "Không có",
+    "reasoning": "Lý luận",
+    "mostLikely": "Chẩn đoán có khả năng cao nhất",
+    "possible": "Các chẩn đoán có thể",
+    "ruleOut": "Loại trừ các bệnh",
+    "furtherTests": "Xét nghiệm bổ sung được khuyến nghị",
+    "differentiating": "Yếu tố phân biệt",
+    "supporting": "Bằng chứng hỗ trợ",
+    "urgency": "Độ khẩn cấp",
+    "routine": "thường quy"
+  },
+  "medicalRecord": {
+    "title": "Hồ sơ y tế",
+    "notAvailableShort": "Không có",
+    "none": "Không có",
+    "yes": "Có",
+    "no": "Không",
 
-  "patientInfo": "Thông tin bệnh nhân",
-  "fullName": "Họ và tên",
-  "birthday": "Ngày sinh",
-  "gender": "Giới tính",
-  "occupation": "Nghề nghiệp",
-  "nationality": "Quốc tịch",
-  "address": "Địa chỉ",
+    "patientInfo": "Thông tin bệnh nhân",
+    "fullName": "Họ và tên",
+    "birthday": "Ngày sinh",
+    "gender": "Giới tính",
+    "occupation": "Nghề nghiệp",
+    "nationality": "Quốc tịch",
+    "address": "Địa chỉ",
 
-  "medicalHistory": "Tiền sử bệnh",
-  "chiefComplaint": "Vấn đề chính",
-  "symptomProgression": "Diễn tiến triệu chứng",
-  "pastMedicalHistory": "Tiền sử bệnh tật",
-  "currentMedications": "Thuốc đang sử dụng",
-  "allergies": "Dị ứng",
-  "familyHistory": "Tiền sử bệnh gia đình",
+    "medicalHistory": "Tiền sử bệnh",
+    "chiefComplaint": "Vấn đề chính",
+    "symptomProgression": "Diễn tiến triệu chứng",
+    "pastMedicalHistory": "Tiền sử bệnh tật",
+    "currentMedications": "Thuốc đang sử dụng",
+    "allergies": "Dị ứng",
+    "familyHistory": "Tiền sử bệnh gia đình",
 
-  "socialInfo": "Thông tin xã hội",
-  "alcohol": "Uống rượu",
-  "smoking": "Hút thuốc",
-  "livingSituation": "Hoàn cảnh sống",
-  "dailyActivity": "Khả năng hoạt động hàng ngày",
-  "travelHistory": "Lịch sử đi lại gần đây",
+    "socialInfo": "Thông tin xã hội",
+    "alcohol": "Uống rượu",
+    "smoking": "Hút thuốc",
+    "livingSituation": "Hoàn cảnh sống",
+    "dailyActivity": "Khả năng hoạt động hàng ngày",
+    "travelHistory": "Lịch sử đi lại gần đây",
 
-  "obstetric": "Lịch sử sản phụ khoa",
-  "menstruationStatus": "Tình trạng kinh nguyệt",
-  "menstrualCycle": "Chu kỳ kinh nguyệt",
-  "sexualActivity": "Hoạt động tình dục gần đây"
-},
+    "obstetric": "Lịch sử sản phụ khoa",
+    "menstruationStatus": "Tình trạng kinh nguyệt",
+    "menstrualCycle": "Chu kỳ kinh nguyệt",
+    "sexualActivity": "Hoạt động tình dục gần đây"
+  },
   "patientForm": {
     "title": "Phiếu Khai Thông Tin Bệnh Nhân",
     "description": "Vui lòng cung cấp thông tin cá nhân và y tế trước khi bắt đầu.",
+    "language": "Ngôn ngữ",
     "sections": {
-  "patientInfo": "Thông Tin Bệnh Nhân",
-  "obgynHistory": "Tiền Sử Sản Phụ Khoa",
-  "socialInfo": "Thông Tin Xã Hội",
-  "reasonForVisit": "Mô tả triệu chứng hoặc lý do đến khám",
-  "medicalHistory": "Tiền Sử Bệnh Lý"
-},
-"fields": {
-  "fullName": "Họ và Tên",
-  "birthday": "Ngày Sinh",
-  "gender": "Giới Tính",
-  "occupation": "Nghề Nghiệp",
-  "nationality": "Quốc Tịch",
-  "address": "Địa chỉ",
-  "menstruationStatus": "Tình Trạng Kinh Nguyệt",
-  "menstrualCycle": "Chu Kỳ Kinh",
-  "recentSexualActivity": "Hoạt động tình dục gần đây",
-  "alcoholConsumption": "Bạn có uống rượu không?",
-  "smokingHabit": "Bạn có hút thuốc không?",
-  "livingSituation": "Tình trạng sinh sống hiện tại của bạn là gì?",
-  "dailyActivityIndependence": "Bạn có thể tự thực hiện các hoạt động hàng ngày không?",
-  "recentTravelHistory": "Bạn có đi du lịch quốc tế gần đây không?",
-  "chiefComplaint": "Mô tả triệu chứng hoặc lý do đến khám",
-  "medicalHistory": "Mô tả sự phát triển của các triệu chứng",
-  "pastMedicalHistory": "Bạn có bệnh lý nào trong quá khứ không?",
-  "currentMedications": "Thuốc đang sử dụng",
-  "allergies": "Dị ứng",
-  "familyMedicalHistory": "Tiền sử bệnh gia đình"
-},
-"placeholder": {
-  "fullName": "ví dụ: Nguyễn Văn A",
-  "address": "Xã, Phường, Thành Phố,...",
-  "occupation": "ví dụ: Giáo viên",
-  "nationality": "ví dụ: Việt Nam",
-  "menstruationStatus": "ví dụ: Có kinh, mãn kinh",
-  "menstrualCycle": "ví dụ: Đều, không đều",
-  "chiefComplaint": "ví dụ: Tôi bị đau họng và ho trong 3 ngày.",
-  "medicalHistory": "ví dụ: Bắt đầu với sốt nhẹ, sau đó đau nhức cơ thể.",
-  "pastMedicalHistory": "ví dụ: Tiểu đường, cao huyết áp",
-  "medication": "ví dụ: Paracetamol 500mg",
-  "allergy": "ví dụ: Dị ứng Penicillin",
-  "familyMedicalHistory": "ví dụ: Gia đình có người mắc bệnh tim"
-},
-"actions": {
-  "addMedication": "Thêm Thuốc",
-  "addAllergy": "Thêm Dị Ứng"
-},
+      "patientInfo": "Thông Tin Bệnh Nhân",
+      "obgynHistory": "Tiền Sử Sản Phụ Khoa",
+      "socialInfo": "Thông Tin Xã Hội",
+      "reasonForVisit": "Mô tả triệu chứng hoặc lý do đến khám",
+      "medicalHistory": "Tiền Sử Bệnh Lý"
+    },
+    "fields": {
+      "fullName": "Họ và Tên",
+      "birthday": "Ngày Sinh",
+      "gender": "Giới Tính",
+      "occupation": "Nghề Nghiệp",
+      "nationality": "Quốc Tịch",
+      "address": "Địa chỉ",
+      "menstruationStatus": "Tình Trạng Kinh Nguyệt",
+      "menstrualCycle": "Chu Kỳ Kinh",
+      "recentSexualActivity": "Hoạt động tình dục gần đây",
+      "alcoholConsumption": "Bạn có uống rượu không?",
+      "smokingHabit": "Bạn có hút thuốc không?",
+      "livingSituation": "Tình trạng sinh sống hiện tại của bạn là gì?",
+      "dailyActivityIndependence": "Bạn có thể tự thực hiện các hoạt động hàng ngày không?",
+      "recentTravelHistory": "Bạn có đi du lịch quốc tế gần đây không?",
+      "chiefComplaint": "Mô tả triệu chứng hoặc lý do đến khám",
+      "medicalHistory": "Mô tả sự phát triển của các triệu chứng",
+      "pastMedicalHistory": "Bạn có bệnh lý nào trong quá khứ không?",
+      "currentMedications": "Thuốc đang sử dụng",
+      "allergies": "Dị ứng",
+      "familyMedicalHistory": "Tiền sử bệnh gia đình"
+    },
+    "placeholder": {
+      "fullName": "ví dụ: Nguyễn Văn A",
+      "address": "Xã, Phường, Thành Phố,...",
+      "occupation": "ví dụ: Giáo viên",
+      "nationality": "ví dụ: Việt Nam",
+      "menstruationStatus": "ví dụ: Có kinh, mãn kinh",
+      "menstrualCycle": "ví dụ: Đều, không đều",
+      "chiefComplaint": "ví dụ: Tôi bị đau họng và ho trong 3 ngày.",
+      "medicalHistory": "ví dụ: Bắt đầu với sốt nhẹ, sau đó đau nhức cơ thể.",
+      "pastMedicalHistory": "ví dụ: Tiểu đường, cao huyết áp",
+      "medication": "ví dụ: Paracetamol 500mg",
+      "allergy": "ví dụ: Dị ứng Penicillin",
+      "familyMedicalHistory": "ví dụ: Gia đình có người mắc bệnh tim"
+    },
+    "actions": {
+      "addMedication": "Thêm Thuốc",
+      "addAllergy": "Thêm Dị Ứng"
+    },
 
     "options": {
       "select": "Chọn",
@@ -146,7 +137,7 @@
       "travel14": "Có, trong vòng 14 ngày qua",
       "travelMonth": "Có, trong vòng một tháng qua"
     },
-    "warning": "Vui lòng điền đầy đủ các trường bắt buộc trước khi đóng biểu mẫu.",
+    "warning": "Vui lòng điền đầy đủ thông tin trước khi đóng biểu mẫu.",
     "submit": {
       "default": "Gửi",
       "submitting": "Đang gửi..."
@@ -163,13 +154,4 @@
     "title": "Danh sách cần làm",
     "noTasks": "Hiện không có việc cần làm."
   }
-
-
-
-
-
-
-
-
-  }
-  
+}

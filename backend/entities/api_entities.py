@@ -61,3 +61,9 @@ class ConversationResponse(BaseModel):
     ai_response: str
     state: GraphState
     multiple_choices: List[str]
+
+class AudioResponse(BaseModel):
+    ai_response: str
+    state: GraphState
+    multiple_choices: List[str]
+    audio_base64: str

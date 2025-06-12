@@ -65,6 +65,7 @@ async function sendMessage(text: string) {
       user_message: text,
       session_id: userStore.sessionId
     })
+    
 
     userStore.setMedicalRecord(result.state.medical_record)
     userStore.setTodo(result.state.todo)
