@@ -5,7 +5,7 @@ export interface sendChatMessageRequest {
 }
 
 export interface sendChatMessageResponse {
-    response: string;
+    message: string;
     multiple_choices?: string[];
 }
 

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     PG_HOST: str = Field(alias="PG_HOST", default="postgres")
     PG_PORT: int = Field(alias="PG_PORT", default=5432)
     PG_USER: str = Field(alias="PG_USER", default="postgres")
-    PG_PASSWORD: str = Field(alias="PG_PASSWORD", default="123456")
+    PG_PASSWORD: str = Field(alias="PG_PASSWORD", default="Furina13102003!")
     PG_DB: str = Field(alias="PG_DB", default="postgres")
     
     # For debugging only

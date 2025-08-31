@@ -4,7 +4,7 @@ import ChatInputBar from '@/components/ChatInputBar.vue';
 import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Message } from '@/types/message';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/user';
 import { computed, ref, watch } from 'vue';
 import { sendMessageToServer } from '@/api/conversationApi';
 import { useRouter } from 'vue-router';

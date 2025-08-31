@@ -70,7 +70,6 @@ const handleNewChat = async () => {
         component: MedicalRecordDialog,
         // optional initial props
     });
-    console.log(`test`);
 };
 </script>
 

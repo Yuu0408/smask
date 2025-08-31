@@ -10,10 +10,22 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarRail,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from '@/components/ui/sidebar';
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-vue-next';
 
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import SidebarHeader from './ui/sidebar/SidebarHeader.vue';
 
 const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: 'icon',
@@ -106,6 +118,13 @@ const navMain = [
 
 <template>
     <Sidebar v-bind="props">
+        <SidebarHeader>
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton> Smask </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
+        </SidebarHeader>
         <SidebarContent>
             <NavMain :items="navMain" :main-items="navMainItem" />
         </SidebarContent>

@@ -1,9 +1,11 @@
+# repositories/ai_state_repo.py
 from sqlmodel import Session, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy import literal_column
 from models.entities.model import AIState
 from fastapi import HTTPException
 import logging
-import datetime
 from typing import Dict, Any
 from uuid import UUID
 
@@ -14,10 +16,6 @@ class AIStateRepo:
         self.db = db
 
     def get_ai_state(self, record_id: UUID, user_id: UUID) -> AIState:
-        """
-        Fetch a record by id, scoped to the owner (user_id).
-        Raises 404 if not found and 500 on DB errors.
-        """
         try:
             stmt = select(AIState).where(
                 AIState.record_id == record_id,
@@ -35,26 +33,26 @@ class AIStateRepo:
                 detail="Database error occurred while retrieving the state.",
             ) from e
 
+    # repositories/ai_state_repo.py
     def add_ai_state(self, *, user_id: UUID, record_id: UUID, data: Dict[str, Any]) -> AIState:
-        """
-        Create a new record. Timestamps are handled by the model (server defaults).
-        Returns the created record.
-        """
-        try:
-            state = AIState(user_id=user_id, record_id=record_id, data=data)
-            self.db.add(state)
-            self.db.commit()
-            self.db.refresh(state)
-            logger.info("AIState created: %s (user=%s)", state.record_id, user_id)
-            return state
-        except SQLAlchemyError as e:
-            self.db.rollback()
-            logger.exception("DB error creating record for user %s", user_id)
-            raise HTTPException(
-                status_code=500,
-                detail="Database error occurred while creating the record.",
-            ) from e
-    
+        table = AIState.__table__
+        stmt = (
+            pg_insert(table)
+            .values(record_id=record_id, user_id=user_id, data=data)
+            .on_conflict_do_update(
+                index_elements=[table.c.record_id, table.c.user_id],
+                set_={"data": literal_column("EXCLUDED.data")}
+            )
+            .returning(*table.c)
+        )
+        # Avoid autoflush surprises during raw SQL
+        with self.db.no_autoflush:
+            row = self.db.exec(stmt).first()
+        # No commit here. Let the service do it.
+        # If you want an ORM instance, refetch with the same session (still no commit):
+        return self.get_ai_state(record_id=record_id, user_id=user_id)
+
+
     def update_state(self, state: AIState):
         try:
             self.db.add(state)

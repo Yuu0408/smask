@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from database import get_session
 from services.chat.chat_service import ChatService
-from models.dto.modelDto import AddMedicalRecordRequest, AddMedicalRecordResponse, GetChatHistoryRequest
+from models.dto.modelDto import AddMedicalRecordRequest, AddMedicalRecordResponse, ChatTextRequest, ChatTextResponse, GetChatHistoryRequest
 
 router = APIRouter(prefix="/v1/chat")
 
@@ -15,7 +15,13 @@ async def create_record(request: AddMedicalRecordRequest, db: Session = Depends(
     return result
 
 @router.get("")
-async def get_chat_history(request: GetChatHistoryRequest, db: Session = Depends(get_session)):
+async def get_chat_history(request: GetChatHistoryRequest = Depends(), db: Session = Depends(get_session)):
     service = ChatService(db)
     result = await service.get_history(request)
+    return result
+
+@router.post("/chat", response_model=ChatTextResponse)
+async def send_message(request: ChatTextRequest, db: Session = Depends(get_session)):
+    service = ChatService(db)
+    result = await service.process_chat_message(request)
     return result

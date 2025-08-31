@@ -24,8 +24,12 @@ class MedicalRecordCreate(MedicalRecordBase):
 class MedicalRecordRead(MedicalRecordBase):
     record_id: PyUUID
     user_id: PyUUID
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    )
 
 
 # --- DB model ---
@@ -71,8 +75,12 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
     id: PyUUID = Field(primary_key=True)
     email: Optional[str] = None
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    )
 
 class ChatHistory(SQLModel, table=True):
     __tablename__ = "chat_history"
@@ -82,7 +90,9 @@ class ChatHistory(SQLModel, table=True):
     user_id: PyUUID = Field(index=True)
     role: str                           # "user" | "AI" | "system"
     content: str
-    created_at: datetime
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    )
 
 class AIStateBase(SQLModel):
     data: Dict[str, Any] = Field(default_factory=dict, description="Raw form payload")

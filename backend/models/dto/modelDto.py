@@ -76,7 +76,7 @@ class AddMedicalRecordResponse(BaseModel):
 
 class ChatMessageDto(BaseModel):
     id: str
-    role: Literal["user", "assistant", "system"]
+    role: Literal["user", "AI", "system"]
     content: str
     created_at: datetime
 
@@ -91,3 +91,12 @@ class AIStateData(BaseModel):
     reasoning: str
     note: str
     decision: str
+
+class ChatTextRequest(BaseModel):
+    user_id: str
+    record_id: str
+    message: str
+
+class ChatTextResponse(BaseModel):
+    message: str
+    multiple_choices: Optional[List[str]] = None

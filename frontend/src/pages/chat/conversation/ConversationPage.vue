@@ -43,9 +43,12 @@ async function handleSend(text: string) {
         message: text,
     });
 
+    console.log('Received response:', res);
+
     // add bot response
-    messages.value.push({ from: 'bot', text: res.data.response });
+    messages.value.push({ from: 'bot', text: res.data.message });
     multipleChoices.value = res.data.multiple_choices ?? [];
+    console.log('Multiple choices:', multipleChoices.value);
 }
 
 function handleChoice(choice: string) {
