@@ -1,0 +1,31 @@
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
+
+# Set the working directory to /app inside the container
+WORKDIR /app
+
+# Install system dependencies required by FastAPI and Poetry
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the poetry lock files into the container at /app
+COPY pyproject.toml poetry.lock /app/
+
+# Install Poetry - this is the Python dependency manager
+RUN pip install --no-cache-dir poetry
+
+# Install dependencies with Poetry (this also handles dependencies from poetry.lock)
+RUN poetry install --only main --no-root
+
+# Copy the rest of the application code into the container
+COPY . /app/
+
+# Expose port 8081 to be able to access the server outside the container
+EXPOSE 8080
+
+# Set the default command to run the app
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

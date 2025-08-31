@@ -1,34 +1,63 @@
-import { createRouter, createWebHistory } from "vue-router";
-import ChatPage from '@/components/ChatPage.vue'
-import TodoPage from '@/components/TodoPage.vue'
-import MedicalRecord from "@/components/MedicalRecord.vue"
-import DiagnosisPage from "@/components/DiagnosisPage.vue"
+import chatRoute from '@/pages/chat/router';
+import contactRoute from '@/pages/contact/router';
+import diagnosisRoute from '@/pages/diagnosis/router';
+import historyRoute from '@/pages/history/router';
 
-let hasSubmittedForm = false
+import {
+    createRouter,
+    createWebHistory,
+    type RouteRecordRaw,
+} from 'vue-router';
+
+const routes: readonly RouteRecordRaw[] = [
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/pages/LoginPage.vue'),
+    },
+    {
+        path: '/',
+        name: 'home',
+        component: () => import('@/layouts/AppLayout.vue'),
+        children: [
+            {
+                path: '/chat',
+                name: 'chat',
+                component: () => import('@/pages/chat/ChatLayout.vue'),
+                children: chatRoute,
+            },
+            {
+                path: '/new-chat',
+                name: 'new-chat',
+                component: () =>
+                    import('../pages/chat/conversation/ConversationPage.vue'),
+            },
+            {
+                path: '/contact',
+                name: 'contact',
+                component: () => import('@/pages/contact/ContactLayout.vue'),
+                children: contactRoute,
+            },
+            {
+                path: '/diagnosis',
+                name: 'diagnosis',
+                component: () =>
+                    import('@/pages/diagnosis/DiagnosisLayout.vue'),
+                children: diagnosisRoute,
+            },
+            {
+                path: '/history',
+                name: 'history',
+                component: () => import('@/pages/history/HistoryLayout.vue'),
+                children: historyRoute,
+            },
+        ],
+    },
+];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    { path: '/', redirect: '/chat' },
-    { path: '/chat', component: ChatPage },
-    { path: '/todo', component: TodoPage },
-    { path: '/record', component: MedicalRecord },
-    { path: '/diagnosis', component: DiagnosisPage },
-  ],
-})
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: routes,
+});
 
-// navigation guard
-router.beforeEach((to, _, next) => {
-  if (!hasSubmittedForm && to.path !== '/chat') {
-    next('/chat') // redirect non-submitted user to /chat
-  } else {
-    next()
-  }
-})
-
-// utility to mark form as submitted
-export function markFormAsSubmitted() {
-  hasSubmittedForm = true
-}
-
-export default router
+export default router;
