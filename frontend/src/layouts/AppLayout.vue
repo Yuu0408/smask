@@ -73,9 +73,9 @@ onBeforeMount(async () => {
                 />
 
                 <!-- Only this area scrolls -->
-                <div class="flex-1 min-h-0 overflow-auto">
+                <main class="flex h-[calc(100vh-3rem)] flex-col bg-background">
                     <RouterView />
-                </div>
+                </main>
             </main>
         </SidebarProvider>
     </div>

@@ -14,6 +14,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarTrigger,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarGroup,
+    useSidebar,
 } from '@/components/ui/sidebar';
 
 import {
@@ -28,114 +32,131 @@ import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import SidebarHeader from './ui/sidebar/SidebarHeader.vue';
 import { Separator } from '@/components/ui/separator';
+import { useDialog } from '@/plugins/dialog-manager/use-dialog';
+import MedicalRecordDialog from '@/pages/chat/medical-record/MedicalRecordDialog.vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/stores/auth';
+
+// const store = useMeStore();
+// // const azure = useAzureStore();
+const router = useRouter();
+// const { me: user } = storeToRefs(store);
+
+const logout = async () => {
+    try {
+        // await azure.logout();
+        // store.me = null;
+        // await router.push({
+        //     name: 'login',
+        // });
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+};
+
+const { isMobile } = useSidebar();
 
 const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: 'icon',
 });
+const { openDialog } = useDialog();
 const { t } = useI18n();
 
-const route = useRoute();
 // Create computed navigation items with active state based on current route
-const navMainItem = [
-    {
-        title: t('sidebar.main.new-chat'),
-        icon: User,
-        type: 'single',
-        url: '/new-chat',
-        isActive: route.path.startsWith('/new-chat'),
-    },
-] satisfies SidebarItem[];
-const navMain = [
-    {
-        title: t('sidebar.group.users'),
-        icon: User,
-        type: 'group',
-        url: '/chat',
-        isActive: route.path.startsWith('/chat'),
-        items: [
-            {
-                title: t('sidebar.group.users.members'),
-                url: '/chat/medical-record',
-                isActive: route.path.includes('/chat/medical-record'),
-            },
-            {
-                title: t('sidebar.group.users.admins'),
-                url: '/users/admins',
-                isActive: route.path.includes('/users/admins'),
-            },
-        ],
-    },
-    {
-        title: t('sidebar.group.models-n-prompts'),
-        icon: Sparkles,
-        type: 'group',
-        url: '/models-n-prompts/',
-        isActive: route.path.startsWith('/models-n-prompts'),
-        items: [
-            {
-                title: t('sidebar.group.models-n-prompts.models'),
-                url: '/models-n-prompts/models',
-                isActive: route.path.includes('/models-n-prompts/models'),
-            },
-            {
-                title: t('sidebar.group.models-n-prompts.prompts'),
-                url: '/models-n-prompts/prompts',
-                isActive: route.path.includes('/models-n-prompts/prompts'),
-            },
-            {
-                title: t('sidebar.group.models-n-prompts.prompt-templates'),
-                url: '/models-n-prompts/prompt-templates',
-                isActive: route.path.includes(
-                    '/models-n-prompts/prompt-templates'
-                ),
-            },
-        ],
-    },
-    {
-        title: t('sidebar.group.kaigi'),
-        icon: AudioLines,
-        type: 'group',
-        url: '/kaigi',
-        isActive: route.path.startsWith('/kaigi'),
-        items: [
-            {
-                title: t('sidebar.group.kaigi.app-prompts'),
-                url: '/kaigi/app-prompts',
-                isActive: route.path.includes('/kaigi/app-prompts'),
-            },
-            {
-                title: t('sidebar.group.kaigi.summary-templates'),
-                url: '/kaigi/summary-templates',
-                isActive: route.path.includes('/kaigi/summary-templates'),
-            },
-            // {
-            //     title: t('sidebar.group.kaigi.summary-templates.messages'),
-            //     url: '/kaigi/summary-messages',
-            //     isActive: route.path.includes('/kaigi/summary-messages'),
-            // },
-        ],
-    },
-] satisfies SidebarItem[];
+
+const handleNewChat = async () => {
+    openDialog({
+        component: MedicalRecordDialog,
+        // optional initial props
+    });
+};
+
+const auth = useAuthStore();
+
+async function handleLogout() {
+    try {
+        await auth.logout();
+        await router.push({
+            name: 'login',
+        });
+        // Optional: redirect to login page
+        // router.push({ name: 'login' })
+    } catch (e) {
+        console.error('Logout failed', e);
+    }
+}
 </script>
 
 <template>
-    <aside class="h-screen border-r bg-card/50">
-        <Sidebar v-bind="props">
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton> Smask </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <NavMain :items="navMain" :main-items="navMainItem" />
-            </SidebarContent>
-            <SidebarFooter>
-                <NavUser />
-            </SidebarFooter>
-            <SidebarRail />
-        </Sidebar>
+    <Sidebar collapsible="icon">
+        <SidebarHeader class="px-2 py-4">
+            <div class="flex items-center gap-2 px-2">
+                <div class="size-8 rounded-md bg-primary/10" />
+                <span class="font-semibold">{{
+                    t('sidebar.header.app.name')
+                }}</span>
+            </div>
+        </SidebarHeader>
+
+        <SidebarContent>
+            <nav class="px-2">
+                <SidebarGroup>
+                    <SidebarGroupLabel>{{
+                        t('sidebar.content.label.conversations')
+                    }}</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton as-child>
+                                    <button
+                                        type="button"
+                                        class="truncate cursor-pointer hover:bg-muted"
+                                        @click="handleNewChat"
+                                    >
+                                        {{
+                                            t('sidebar.content.button.new-chat')
+                                        }}
+                                    </button>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </nav>
+        </SidebarContent>
         <Separator />
-    </aside>
+
+        <SidebarFooter>
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <SidebarMenuButton
+                                size="lg"
+                                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            >
+                            </SidebarMenuButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                            :side="isMobile ? 'bottom' : 'right'"
+                            align="end"
+                            :side-offset="4"
+                        >
+                            <DropdownMenuItem
+                                @click="logout"
+                                class="text-destructive"
+                            >
+                                <LogOut class="text-destructive" />
+                                Log out
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </SidebarMenuItem>
+            </SidebarMenu>
+        </SidebarFooter>
+
+        <SidebarRail />
+    </Sidebar>
 </template>
