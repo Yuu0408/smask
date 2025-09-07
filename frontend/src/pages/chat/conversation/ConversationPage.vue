@@ -16,39 +16,41 @@ const { user } = storeToRefs(userStore);
 
 const messages = ref<Message[]>([]);
 const multipleChoices = ref<string[]>([]);
+const userId = ref(user.value.id);
+const recordId = ref(user.value.currentRecordId);
 
-const userId = user.value.id;
-const recordId = user.value.currentRecordId;
-
+console.log(
+    'ConversationPage userId:',
+    userId.value,
+    'recordId:',
+    recordId.value
+);
 async function loadHistory() {
     const res = await chatStore.getChatHistory({
-        user_id: userId,
-        record_id: recordId,
+        user_id: userId.value,
+        record_id: recordId.value,
     });
     // Map backend shape -> frontend Message type
     messages.value = res.history.map((h) => ({
-        from: h.role === 'assistant' ? 'bot' : 'user',
+        from: h.role,
         text: h.content,
     }));
 }
 
 async function handleSend(text: string) {
     // push optimistic user message
-    messages.value.push({ from: 'user', text, isPlaceholder: false });
+    messages.value.push({ from: 'human', text, isPlaceholder: false });
 
     // send to backend
     const res = await chatStore.sendChatMessage({
-        user_id: userId,
-        record_id: recordId,
+        user_id: userId.value,
+        record_id: recordId.value,
         message: text,
     });
 
-    console.log('Received response:', res);
-
     // add bot response
-    messages.value.push({ from: 'bot', text: res.data.message });
+    messages.value.push({ from: 'ai', text: res.data.message });
     multipleChoices.value = res.data.multiple_choices ?? [];
-    console.log('Multiple choices:', multipleChoices.value);
 }
 
 function handleChoice(choice: string) {
@@ -61,16 +63,19 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="w-full max-w-2xl flex flex-col flex-1 min-h-[calc(100vh-64px)]">
-        <ScrollArea class="flex-1">
+    <!-- Full width scroll host -->
+    <div class="flex-1 min-h-0 overflow-auto">
+        <!-- Centered content inside -->
+        <div class="mx-auto flex h-full w-full max-w-2xl flex-col">
+            <!-- Messages just fill available space in this column -->
             <ChatWindow :messages="messages" class="flex-1" />
-        </ScrollArea>
-        <ChatMultipleChoice
-            v-if="multipleChoices.length"
-            :choices="multipleChoices"
-            @select="handleChoice"
-        />
 
-        <ChatInputBar :sidebarOpen="false" @send="handleSend" />
+            <ChatMultipleChoice
+                v-if="multipleChoices.length"
+                :choices="multipleChoices"
+                @select="handleChoice"
+            />
+            <ChatInputBar :sidebarOpen="false" @send="handleSend" />
+        </div>
     </div>
 </template>

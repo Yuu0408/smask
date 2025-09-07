@@ -23,6 +23,7 @@ import {
 import { useRoute, RouterView, useRouter } from 'vue-router';
 // import { computed } from 'vue';
 import { computed, onBeforeMount } from 'vue';
+import MainNavBar from '@/components/MainNavBar.vue';
 
 // const route = useRoute();
 const route = useRoute();
@@ -56,42 +57,26 @@ onBeforeMount(async () => {
     }
 });
 </script>
-
+<!-- AppLayout.vue (updated template section) -->
 <template>
-    <SidebarProvider>
-        <AppSideBar />
-        <SidebarInset class="overflow-auto">
-            <header
-                class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"
-            >
-                <div class="flex items-center gap-2 px-4">
-                    <SidebarTrigger class="-ml-1" />
-                    <Separator orientation="vertical" class="mr-2 h-4" />
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem
-                                v-for="(item, index) in breadcrumbItems"
-                                :key="item.path"
-                            >
-                                <template
-                                    v-if="index < breadcrumbItems.length - 1"
-                                >
-                                    <BreadcrumbLink :href="item.path">
-                                        {{ item.title }}
-                                    </BreadcrumbLink>
-                                    <BreadcrumbSeparator />
-                                </template>
-                                <template v-else>
-                                    <BreadcrumbPage>{{
-                                        item.title
-                                    }}</BreadcrumbPage>
-                                </template>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+    <!-- Make the viewport non-scrolling and height-bound -->
+    <div class="h-dvh w-full overflow-hidden">
+        <!-- Ensure the flex chain allows shrinking -->
+        <SidebarProvider class="flex h-full min-h-0">
+            <AppSideBar />
+
+            <!-- Main column does NOT scroll -->
+            <main class="flex flex-1 min-h-0 flex-col">
+                <!-- Stays put; page won't scroll anymore -->
+                <MainNavBar
+                    class="sticky top-0 z-20 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                />
+
+                <!-- Only this area scrolls -->
+                <div class="flex-1 min-h-0 overflow-auto">
+                    <RouterView />
                 </div>
-            </header>
-            <RouterView />
-        </SidebarInset>
-    </SidebarProvider>
+            </main>
+        </SidebarProvider>
+    </div>
 </template>

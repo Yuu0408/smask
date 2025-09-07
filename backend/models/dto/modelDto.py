@@ -76,7 +76,7 @@ class AddMedicalRecordResponse(BaseModel):
 
 class ChatMessageDto(BaseModel):
     id: str
-    role: Literal["user", "AI", "system"]
+    role: Literal["human", "ai", "system"]
     content: str
     created_at: datetime
 

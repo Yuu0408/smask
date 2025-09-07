@@ -16,7 +16,7 @@ export interface getChatHistoryRequest {
 
 export interface ChatMessage {
     id: string;
-    role: 'user' | 'assistant' | 'system';
+    role: 'ai' | 'human';
     content: string;
     created_at: string;
 }

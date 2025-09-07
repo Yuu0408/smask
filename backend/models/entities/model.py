@@ -88,7 +88,7 @@ class ChatHistory(SQLModel, table=True):
     id: PyUUID = Field(default_factory=uuid4, primary_key=True, index=True)
     record_id: PyUUID = Field(foreign_key="medical_records.record_id", index=True)
     user_id: PyUUID = Field(index=True)
-    role: str                           # "user" | "AI" | "system"
+    role: str                           # "user" | "ai" | "system"
     content: str
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())

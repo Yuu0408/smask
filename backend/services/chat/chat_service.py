@@ -20,31 +20,31 @@ class ChatService:
         
         record = self.medical_record_repo.add_record(user_id=user_id, data=data)
 
-        if record:
-            record_id = record.record_id
-            self.ai_state_repo.add_ai_state(
-                user_id=user_id, 
-                record_id=record_id, 
-                data=AIStateData(reasoning="", note="", decision="CONVERSATION").model_dump(mode="json")
-            )
-            
-            ai_response = get_ai_response("", record, "", "")
-            
-            self.ai_state_repo.add_ai_state(
-                user_id=user_id, 
-                record_id=record_id, 
-                data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision="CONVERSATION").model_dump(mode="json")
-            )
-            self.chat_history_repo.add_message(user_id=user_id, record_id=record_id, role="AI", content=ai_response.generation)
+        record_id = record.record_id
+        self.ai_state_repo.add_ai_state(
+            user_id=user_id, 
+            record_id=record_id, 
+            data=AIStateData(reasoning="", note="", decision="CONVERSATION").model_dump(mode="json")
+        )
+        
+        ai_response = get_ai_response(record, "", [], "")
+        
+        self.ai_state_repo.add_ai_state(
+            user_id=user_id, 
+            record_id=record_id, 
+            data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision="CONVERSATION").model_dump(mode="json")
+        )
+        messages = [{"role": "ai", "content": ai_response.generation}]
+        self.chat_history_repo.add_messages(user_id=user_id, record_id=record_id, messages=messages)
 
-            self.db.refresh(record)
+        self.db.refresh(record)
 
-            return AddMedicalRecordResponse(
-                message=ai_response.generation,
-                record_id=str(record_id),
-                created_at=record.created_at,
-                updated_at=record.updated_at
-            )
+        return AddMedicalRecordResponse(
+            message=ai_response.generation,
+            record_id=str(record_id),
+            created_at=record.created_at,
+            updated_at=record.updated_at
+        )
         
     
     async def get_history(self, request: GetChatHistoryRequest):
@@ -90,21 +90,20 @@ class ChatService:
             record_id=record_id,
         )
 
-        history_str = "\n".join([f"{chat.role}: {chat.content}" for chat in chat_history])
         ai_state = self.ai_state_repo.get_ai_state(user_id=user_id, record_id=record_id)
         medical_record = self.medical_record_repo.get_medical_record_by_id(user_id=user_id, record_id=record_id)
 
-        ai_response = get_ai_response(history_str, medical_record, ai_state.data["reasoning"] if ai_state else "", message)
+        ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else "", chat_history, message)
 
-        self.chat_history_repo.add_message(user_id=user_id, record_id=record_id, role="user", content=message)
-        self.chat_history_repo.add_message(user_id=user_id, record_id=record_id, role="AI", content=ai_response.generation)
+        messages = [{"role": "human", "content": message}, {"role": "ai", "content": ai_response.generation}]
+
+        self.chat_history_repo.add_messages(user_id=user_id, record_id=record_id, messages=messages)
+
         self.ai_state_repo.add_ai_state(
             user_id=user_id, 
             record_id=record_id, 
             data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
         )
-
-        print("Multiple choices:", ai_response.multiple_choices)
 
         return ChatTextResponse(
             message=ai_response.generation,

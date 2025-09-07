@@ -201,6 +201,7 @@ const onSubmit = form.handleSubmit(async (values) => {
         const response = await chatStore.createNewRecord(userId, payload);
 
         user.value.currentRecordId = response.data.record_id;
+        console.log('Set currentRecordId to', user.value.currentRecordId);
 
         toast.success(t('patientForm.toast.success.title'), {
             description: t('patientForm.toast.success.description'),

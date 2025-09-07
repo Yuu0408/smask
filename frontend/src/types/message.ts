@@ -1,5 +1,5 @@
 export interface Message {
-    from: 'user' | 'bot';
+    from: 'ai' | 'human';
     text: string;
     isPlaceholder?: boolean;
     multiple_choices?: string[];

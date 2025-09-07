@@ -13,6 +13,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from '@/components/ui/sidebar';
 
 import {
@@ -26,6 +27,7 @@ import { ChevronDown } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import SidebarHeader from './ui/sidebar/SidebarHeader.vue';
+import { Separator } from '@/components/ui/separator';
 
 const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: 'icon',
@@ -117,20 +119,23 @@ const navMain = [
 </script>
 
 <template>
-    <Sidebar v-bind="props">
-        <SidebarHeader>
-            <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton> Smask </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-            <NavMain :items="navMain" :main-items="navMainItem" />
-        </SidebarContent>
-        <SidebarFooter>
-            <NavUser />
-        </SidebarFooter>
-        <SidebarRail />
-    </Sidebar>
+    <aside class="h-screen border-r bg-card/50">
+        <Sidebar v-bind="props">
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton> Smask </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
+            <SidebarContent>
+                <NavMain :items="navMain" :main-items="navMainItem" />
+            </SidebarContent>
+            <SidebarFooter>
+                <NavUser />
+            </SidebarFooter>
+            <SidebarRail />
+        </Sidebar>
+        <Separator />
+    </aside>
 </template>
