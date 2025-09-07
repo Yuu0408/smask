@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.build/
+
+# Virtual envs
+.venv/
+venv/
+
+# Git & IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Env & local data
+.env
+.env.*
+*.sqlite*
+*.db
+data/
+pgdata/
+docker-volume*/
+**/logs/
+**/*.log
+
+# Node / others (if any)
+node_modules/
+dist/
+build/

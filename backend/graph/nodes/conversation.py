@@ -1,8 +1,6 @@
 from entities.api_entities import GraphState
 from typing import Any, Dict
 from graph.chains.conversation_chain import conversation_chain
-from rich import print
-from rich.prompt import Prompt
 
 def conversation(state: GraphState, user_message):
     print("\n---CONVERSATION---")
