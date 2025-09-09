@@ -4,6 +4,7 @@ from sqlmodel import create_engine
 from sqlalchemy import Engine
 from functools import cached_property
 from urllib.parse import quote_plus
+import os
 
 class Settings(BaseSettings):
     PG_HOST: str = Field(alias="PG_HOST", default="postgres")
@@ -14,6 +15,14 @@ class Settings(BaseSettings):
     
     # For debugging only
     PG_ECHO: bool = Field(alias="PG_ECHO", default=False)
+
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "change-me")
+    ACCESS_TOKEN_EXPIRE: int = int(os.getenv("ACCESS_TOKEN_EXPIRE", 15))  # minutes
+    REFRESH_TOKEN_EXPIRE: int = int(os.getenv("REFRESH_TOKEN_EXPIRE", 60 * 24 * 14))  # minutes (14d)
+    COOKIE_NAME: str = "refresh_token"
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+    COOKIE_SAMESITE: str = os.getenv("COOKIE_SAMESITE", "lax")  # lax/strict/none
+    CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 
     @computed_field
     @cached_property

@@ -45,6 +45,17 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = data;
     }
 
+    async function register(email: string, password: string) {
+        const { data } = await axios.post(
+            '/auth/register',
+            { email, password },
+            { withCredentials: true }
+        );
+        accessToken.value = data.accessToken;
+        user.value = data.user;
+        status.value = 'authenticated';
+    }
+
     async function logout() {
         try {
             await axios.post('/auth/logout', null, { withCredentials: true });
@@ -64,5 +75,6 @@ export const useAuthStore = defineStore('auth', () => {
         refresh,
         getMe,
         logout,
+        register,
     };
 });

@@ -7,7 +7,7 @@ from uuid import UUID as PyUUID, uuid4
 import uuid
 
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, DateTime, func, JSON, PrimaryKeyConstraint
+from sqlalchemy import Column, DateTime, func, JSON, PrimaryKeyConstraint, String, Boolean, Integer
 # If you're on Postgres and want native UUID + FK, you can optionally use:
 # from sqlalchemy.dialects.postgresql import UUID as pgUUID
 
@@ -74,12 +74,24 @@ class MedicalRecord(MedicalRecordBase, table=True):
 class User(SQLModel, table=True):
     __tablename__ = "users"
     id: PyUUID = Field(primary_key=True)
-    email: Optional[str] = None
+    username: str = Field(sa_column=Column(String(255), unique=True, index=True, nullable=False))
+    hashed_password: str = Field(sa_column=Column(String(255), nullable=False))
+    is_active: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="1"))
+    token_version: int = Field(sa_column=Column(Integer, nullable=False, server_default="0"))
     created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+        sa_column=Column(
+            DateTime(timezone=True),
+            nullable=False,
+            server_default=func.now(),
+        )
     )
     updated_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+        sa_column=Column(
+            DateTime(timezone=True),
+            nullable=False,
+            server_default=func.now(),
+            onupdate=func.now(),
+        )
     )
 
 class ChatHistory(SQLModel, table=True):
