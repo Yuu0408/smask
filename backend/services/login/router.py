@@ -40,7 +40,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_s
     access = create_access_token(user.id, user.token_version)
     return TokenResponse(
         accessToken=access,
-        user=UserPublic(id=user.id, username=user.username, is_active=user.is_active),
+        user=UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
     )
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -57,7 +57,7 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_sess
     if payload.get("type") != "refresh":
         raise HTTPException(status_code=401, detail="Invalid token type")
 
-    user = db.get(User, int(payload["sub"]))
+    user = db.get(User, payload["sub"])
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="User not found or inactive")
 
@@ -75,7 +75,7 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_sess
     new_access = create_access_token(user.id, user.token_version)
     return TokenResponse(
         accessToken=new_access,
-        user=UserPublic(id=user.id, username=user.username, is_active=user.is_active),
+        user=UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
     )
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -104,7 +104,7 @@ def register(payload: RegisterRequest, response: Response, db: Session = Depends
     access = create_access_token(user.id, user.token_version)
     return {
         "accessToken": access,
-        "user": UserPublic(id=user.id, username=user.username, is_active=user.is_active),
+        "user": UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
     }
 
 @router.post("/logout")

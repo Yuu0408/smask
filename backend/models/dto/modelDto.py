@@ -103,7 +103,7 @@ class ChatTextResponse(BaseModel):
 
 
 class UserPublic(BaseModel):
-    id: int
+    id: str
     username: str
     is_active: bool
 

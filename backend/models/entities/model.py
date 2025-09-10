@@ -8,6 +8,8 @@ import uuid
 
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime, func, JSON, PrimaryKeyConstraint, String, Boolean, Integer
+from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 # If you're on Postgres and want native UUID + FK, you can optionally use:
 # from sqlalchemy.dialects.postgresql import UUID as pgUUID
 
@@ -73,7 +75,14 @@ class MedicalRecord(MedicalRecordBase, table=True):
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
-    id: PyUUID = Field(primary_key=True)
+    id: Optional[uuid.UUID] = Field(
+        default=None,
+        sa_column=Column(
+            PGUUID(as_uuid=True),
+            primary_key=True,  # PK goes here
+            server_default=text("gen_random_uuid()"),
+        ),
+    )
     username: str = Field(sa_column=Column(String(255), unique=True, index=True, nullable=False))
     hashed_password: str = Field(sa_column=Column(String(255), nullable=False))
     is_active: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="1"))

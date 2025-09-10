@@ -1,10 +1,10 @@
 // src/stores/auth.ts
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import axios from 'axios';
-
 import type { User } from '@/types/user'; // define your own type
+import $backend from '@/lib/backend';
 
+const URL_PREFIX = '/auth';
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null);
     const accessToken = ref<string | null>(null);
@@ -14,12 +14,12 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAuthed = computed(() => !!user.value && !!accessToken.value);
 
-    async function login(email: string, password: string) {
+    async function login(username: string, password: string) {
         status.value = 'authenticating';
         try {
-            const { data } = await axios.post(
-                '/auth/login',
-                { email, password },
+            const { data } = await $backend.post(
+                `${URL_PREFIX}/login`,
+                { username, password },
                 { withCredentials: true }
             );
             accessToken.value = data.accessToken;
@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function refresh() {
-        const { data } = await axios.post('/auth/refresh', null, {
+        const { data } = await $backend.post(`${URL_PREFIX}/refresh`, null, {
             withCredentials: true,
         });
         accessToken.value = data.accessToken;
@@ -41,14 +41,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function getMe() {
-        const { data } = await axios.get('/me');
+        const { data } = await $backend.get('/me');
         user.value = data;
     }
 
-    async function register(email: string, password: string) {
-        const { data } = await axios.post(
-            '/auth/register',
-            { email, password },
+    async function register(username: string, password: string) {
+        const { data } = await $backend.post(
+            `${URL_PREFIX}/register`,
+            { username, password },
             { withCredentials: true }
         );
         accessToken.value = data.accessToken;
@@ -58,7 +58,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function logout() {
         try {
-            await axios.post('/auth/logout', null, { withCredentials: true });
+            await $backend.post(`${URL_PREFIX}/logout`, null, {
+                withCredentials: true,
+            });
         } finally {
             user.value = null;
             accessToken.value = null;
