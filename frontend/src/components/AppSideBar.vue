@@ -26,7 +26,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-vue-next';
+import { MessageCirclePlus } from 'lucide-vue-next';
 
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -41,6 +41,7 @@ import { useAuthStore } from '@/stores/auth';
 // const store = useMeStore();
 // // const azure = useAzureStore();
 const router = useRouter();
+const route = useRoute();
 // const { me: user } = storeToRefs(store);
 
 const logout = async () => {
@@ -86,6 +87,16 @@ async function handleLogout() {
         console.error('Logout failed', e);
     }
 }
+
+const navMain = [
+    {
+        title: t('sidebar.main.conversation.button.new-chat'),
+        icon: MessageCirclePlus,
+        type: 'single',
+        url: '/chat/new-chat',
+        isActive: route.path.startsWith('/chat/new-chat'),
+    },
+] satisfies SidebarItem[];
 </script>
 
 <template>
@@ -98,33 +109,10 @@ async function handleLogout() {
                 }}</span>
             </div>
         </SidebarHeader>
-
         <SidebarContent>
-            <nav class="px-2">
-                <SidebarGroup>
-                    <SidebarGroupLabel>{{
-                        t('sidebar.content.label.conversations')
-                    }}</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton as-child>
-                                    <button
-                                        type="button"
-                                        class="truncate cursor-pointer hover:bg-muted"
-                                        @click="handleNewChat"
-                                    >
-                                        {{
-                                            t('sidebar.content.button.new-chat')
-                                        }}
-                                    </button>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </nav>
+            <NavMain :items="navMain" />
         </SidebarContent>
+
         <Separator />
 
         <SidebarFooter>

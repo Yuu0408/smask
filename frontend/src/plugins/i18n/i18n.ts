@@ -10,13 +10,13 @@ const messages = {
 
 // Always default to Vietnamese
 const getDefaultLocale = (): string => {
-    return 'vi';
+    return 'en';
 };
 
 export default createI18n({
     legacy: false,
     locale: getDefaultLocale(), // always "vi"
-    fallbackLocale: 'vi',
+    fallbackLocale: 'en',
     messages,
     globalInjection: true,
 });
