@@ -1,4 +1,4 @@
-from services.chat.chat_utils import get_ai_response
+from services.chat.chat_utils import get_ai_response, get_information
 from sqlmodel import Session
 from fastapi import HTTPException
 from repositories import MedicalRecordRepo, ChatHistoryRepo, AIStateRepo
@@ -19,20 +19,14 @@ class ChatService:
             raise HTTPException(status_code=400, detail=f'Invalid user id')
         
         record = self.medical_record_repo.add_record(user_id=user_id, data=data)
-
         record_id = record.record_id
-        self.ai_state_repo.add_ai_state(
-            user_id=user_id, 
-            record_id=record_id, 
-            data=AIStateData(reasoning="", note="", decision="CONVERSATION").model_dump(mode="json")
-        )
         
-        ai_response = get_ai_response(record, "", [], "")
+        ai_response = get_information(record, [], "")
         
         self.ai_state_repo.add_ai_state(
             user_id=user_id, 
             record_id=record_id, 
-            data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision="CONVERSATION").model_dump(mode="json")
+            data=AIStateData(reasoning="", note="", decision=ai_response.decision).model_dump(mode="json")
         )
         messages = [{"role": "ai", "content": ai_response.generation}]
         self.chat_history_repo.add_messages(user_id=user_id, record_id=record_id, messages=messages)
@@ -93,17 +87,25 @@ class ChatService:
         ai_state = self.ai_state_repo.get_ai_state(user_id=user_id, record_id=record_id)
         medical_record = self.medical_record_repo.get_medical_record_by_id(user_id=user_id, record_id=record_id)
 
-        ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else "", chat_history, message)
+        if ai_state.data["decision"] == "INFORMATION_COLLECTION":
+            ai_response = get_information(medical_record, chat_history, message)
+            self.ai_state_repo.add_ai_state(
+            user_id=user_id, 
+            record_id=record_id, 
+            data=AIStateData(reasoning="", note="", decision=ai_response.decision).model_dump(mode="json")
+        )
+        elif ai_state.data["decision"] == "MAIN_QUESTIONING":
+            ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else "", ai_state.data["note"] if ai_state else "", chat_history, message)
+            self.ai_state_repo.add_ai_state(
+            user_id=user_id, 
+            record_id=record_id, 
+            data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
+        )
 
         messages = [{"role": "human", "content": message}, {"role": "ai", "content": ai_response.generation}]
 
         self.chat_history_repo.add_messages(user_id=user_id, record_id=record_id, messages=messages)
 
-        self.ai_state_repo.add_ai_state(
-            user_id=user_id, 
-            record_id=record_id, 
-            data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
-        )
 
         return ChatTextResponse(
             message=ai_response.generation,
