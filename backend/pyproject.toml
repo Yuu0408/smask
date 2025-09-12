@@ -82,7 +82,9 @@ dependencies = [
     "watchfiles (==1.0.5)",
     "websockets (==15.0.1)",
     "yarl (==1.18.3)",
-    "psycopg2-binary (>=2.9.10,<3.0.0)"
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "pyjwt (>=2.10.1,<3.0.0)",
+    "passlib[bcrypt] (>=1.7.4,<2.0.0)"
 ]
 
 

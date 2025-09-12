@@ -7,16 +7,19 @@ BEGIN;
 
 -- Minimal users table (only if you don't already have one)
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY,                -- app can supply; no default needed
-  email TEXT UNIQUE,                  -- optional
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username TEXT UNIQUE NOT NULL,
+  hashed_password TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  token_version INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Seed (example)
-INSERT INTO users (id, email)
-VALUES ('3f3c8b7e-6b1a-4dc1-9d7a-2e7a9a9d7b11', 'demo@example.com')
-ON CONFLICT (id) DO NOTHING;
+-- INSERT INTO users (id, email)
+-- VALUES ('3f3c8b7e-6b1a-4dc1-9d7a-2e7a9a9d7b11', 'demo@example.com')
+-- ON CONFLICT (id) DO NOTHING;
 
 -- Shared trigger function to manage updated_at
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$

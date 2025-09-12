@@ -100,3 +100,21 @@ class ChatTextRequest(BaseModel):
 class ChatTextResponse(BaseModel):
     message: str
     multiple_choices: Optional[List[str]] = None
+
+
+class UserPublic(BaseModel):
+    id: str
+    username: str
+    is_active: bool
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class TokenResponse(BaseModel):
+    accessToken: str
+    user: UserPublic
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str = Field(min_length=8, max_length=128)
