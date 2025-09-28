@@ -4,6 +4,7 @@ from sqlmodel import create_engine
 from sqlalchemy import Engine
 from functools import cached_property
 from urllib.parse import quote_plus
+from config import Config
 import os
 
 class Settings(BaseSettings):
@@ -27,10 +28,12 @@ class Settings(BaseSettings):
     @computed_field
     @cached_property
     def SQL_ENGINE(self) -> Engine:
-        DATABASE_URL = f"postgresql+psycopg2://{self.PG_USER}:{quote_plus(self.PG_PASSWORD)}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
+        # DATABASE_URL = f"postgresql+psycopg2://{self.PG_USER}:{quote_plus(self.PG_PASSWORD)}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
+        DATABASE_URL = Config.DATABASE_URL
         return create_engine(DATABASE_URL, echo=self.PG_ECHO)
     
     def SQL_URL(self) -> str:
-        return f"postgresql+psycopg2://{self.PG_USER}:{quote_plus(self.PG_PASSWORD)}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
+        return Config.DATABASE_URL
+        # return f"postgresql+psycopg2://{self.PG_USER}:{quote_plus(self.PG_PASSWORD)}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
 
 settings = Settings()
