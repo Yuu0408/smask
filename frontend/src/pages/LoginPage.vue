@@ -203,10 +203,15 @@ async function handleSubmit() {
                         <CardContent class="space-y-6">
                             <!-- Role (Patient / Doctor) -->
                             <div class="space-y-2">
-                                <Label
-                                    class="text-sm font-medium text-gray-700"
-                                >
-                                    {{ t('page.login.label.role') || 'Role' }}
+                                <Label class="text-sm font-medium text-gray-700">
+                                    {{
+                                        mode === 'login'
+                                            ? (t('page.login.label.role_login') ||
+                                              t('page.login.label.role') ||
+                                              'Login as')
+                                            : (t('page.login.label.role_register') ||
+                                              'Register as')
+                                    }}
                                 </Label>
                                 <Tabs v-model="role" class="w-full">
                                     <TabsList class="grid w-full grid-cols-2">

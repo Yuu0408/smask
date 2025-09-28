@@ -192,6 +192,8 @@
     "sidebar.content.label.contacts": "Contacts",
     "badge.beta": "Beta",
     "page.login.label.role": "Login as",
+    "page.login.label.role_login": "Login as",
+    "page.login.label.role_register": "Register as",
     "page.login.role.patient": "Patient",
     "page.login.role.doctor": "Doctor",
     "page.login.title": "Welcome to Medee",
