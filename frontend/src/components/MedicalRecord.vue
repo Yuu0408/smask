@@ -1,15 +1,15 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
 import CardSection from './CardSection.vue';
 import Info from './Info.vue';
 import { useI18n } from 'vue-i18n';
 
-const store = useUserStore();
+// Legacy component; data wiring disabled
 const router = useRouter();
-const record = computed(() => store.medicalRecord);
-const { t } = useI18n();
+const record = computed(() => null);
+const { t, locale } = useI18n();
 
 onMounted(() => {
     if (!record.value) router.push('/chat');
@@ -18,11 +18,74 @@ onMounted(() => {
 function formatDate(dateStr: string): string {
     if (!dateStr) return t('medicalRecord.notAvailableShort');
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
+    const loc = locale.value === 'vi' ? 'vi-VN' : 'en-US';
+    return date.toLocaleDateString(loc, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
     });
+}
+
+function translateGender(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        Male: 'male',
+        Female: 'female',
+        Other: 'other',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
+}
+
+function translateAlcohol(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        never: 'never',
+        occasionally: 'occasionally',
+        frequently: 'frequently',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
+}
+
+function translateSmoking(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        never: 'never',
+        used_to_quit: 'usedToQuit',
+        occasionally: 'occasionally',
+        daily: 'daily',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
+}
+
+function translateLivingSituation(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        alone: 'liveAlone',
+        family: 'liveWithFamily',
+        assisted: 'assistedLiving',
+        other: 'otherLiving',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
+}
+
+function translateDailyIndependence(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        yes: 'yes',
+        partially: 'partially',
+        needs_assistance: 'needsAssistance',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
+}
+
+function translateTravel(value?: string): string {
+    if (!value) return t('medicalRecord.notAvailableShort');
+    const map: Record<string, string> = {
+        no: 'no',
+        '14_days': 'travel14',
+        '1_month': 'travelMonth',
+    };
+    return map[value] ? t(`patientForm.options.${map[value]}`) : value;
 }
 </script>
 
@@ -46,7 +109,7 @@ function formatDate(dateStr: string): string {
             />
             <Info
                 :label="t('medicalRecord.gender')"
-                :value="record.patient_info.gender"
+                :value="translateGender(record.patient_info.gender)"
             />
             <Info
                 :label="t('medicalRecord.occupation')"
@@ -98,36 +161,39 @@ function formatDate(dateStr: string): string {
             <Info
                 :label="t('medicalRecord.alcohol')"
                 :value="
-                    record.social_information.alcohol_consumption ||
-                    t('medicalRecord.notAvailableShort')
+                    translateAlcohol(
+                        record.social_information.alcohol_consumption
+                    )
                 "
             />
             <Info
                 :label="t('medicalRecord.smoking')"
                 :value="
-                    record.social_information.smoking_habit ||
-                    t('medicalRecord.notAvailableShort')
+                    translateSmoking(record.social_information.smoking_habit)
                 "
             />
             <Info
                 :label="t('medicalRecord.livingSituation')"
                 :value="
-                    record.social_information.living_situation ||
-                    t('medicalRecord.notAvailableShort')
+                    translateLivingSituation(
+                        record.social_information.living_situation
+                    )
                 "
             />
             <Info
                 :label="t('medicalRecord.dailyActivity')"
                 :value="
-                    record.social_information.daily_activity_independence ||
-                    t('medicalRecord.notAvailableShort')
+                    translateDailyIndependence(
+                        record.social_information.daily_activity_independence
+                    )
                 "
             />
             <Info
                 :label="t('medicalRecord.travelHistory')"
                 :value="
-                    record.social_information.recent_travel_history ||
-                    t('medicalRecord.notAvailableShort')
+                    translateTravel(
+                        record.social_information.recent_travel_history
+                    )
                 "
             />
         </CardSection>

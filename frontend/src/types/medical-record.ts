@@ -1,4 +1,3 @@
-// The actual form payload you already collect in the UI
 export interface MedicalRecordData {
     patient_info: {
         full_name: string;
@@ -21,6 +20,7 @@ export interface MedicalRecordData {
     social_information: {
         alcohol_consumption: string;
         smoking_habit: string;
+        latest_alcohol_smoking_intake?: string;
         living_situation: string;
         daily_activity_independence: string;
         recent_travel_history: string;
@@ -43,6 +43,19 @@ export interface AddMedicalRecordRequest {
 export interface AddMedicalRecordResponse {
     message: boolean;
     record_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface getCurrentRecordRequest {
+    user_id: string;
+    record_id: string;
+}
+
+export interface GetCurrentRecordResponse {
+    user_id: string;
+    record_id: string;
+    data: MedicalRecordData;
     created_at: string;
     updated_at: string;
 }

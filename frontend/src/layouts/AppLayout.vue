@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 export const description = 'A sidebar that collapses to icons.';
 export const iframeHeight = '800px';
 export const containerClass = 'w-full h-full';
@@ -6,56 +6,9 @@ export const containerClass = 'w-full h-full';
 
 <script setup lang="ts">
 import AppSideBar from '@/components/AppSideBar.vue';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from '@/components/ui/sidebar';
-import { useRoute, RouterView, useRouter } from 'vue-router';
-// import { computed } from 'vue';
-import { computed, onBeforeMount } from 'vue';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { RouterView } from 'vue-router';
 import MainNavBar from '@/components/MainNavBar.vue';
-
-// const route = useRoute();
-const route = useRoute();
-const router = useRouter();
-
-// TODO: I18n breadcrumbs
-const breadcrumbItems = computed(() => {
-    const segments = route.path.split('/').filter(Boolean);
-    return segments.map((segment, index) => {
-        const path = '/' + segments.slice(0, index + 1).join('/');
-
-        if (segment === 'models-n-prompts') {
-            return {
-                title: 'Models & Prompts',
-                path,
-            };
-        }
-
-        return {
-            title: segment.charAt(0).toUpperCase() + segment.slice(1),
-            path,
-        };
-    });
-});
-
-onBeforeMount(async () => {
-    if (router.currentRoute.value.name === 'home') {
-        await router.push({
-            name: 'users',
-        });
-    }
-});
 </script>
 <!-- AppLayout.vue (updated template section) -->
 <template>

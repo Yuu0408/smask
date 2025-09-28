@@ -23,6 +23,7 @@ class MedicalRecord(BaseModel):
         alcohol_consumption: Optional[str] = Field(None, description="Does the patient consume alcohol? If so, how frequently and how much?")
         smoking_habit: Optional[str] = Field(None, description="Does the patient smoke? If so, how many cigarettes per day and for how long?")
         living_situation: Optional[str] = Field(None, description="Does the patient live alone or with others?")
+        latest_alcohol_smoking_intake: Optional[str] = Field(None, description="If the patient does smoke or drink, when was the latest time they consumed alcohol or smoked?")
         daily_activity_independence: Optional[str] = Field(None, description="Can the patient independently perform daily activities, or do they require assistance?")
         recent_travel_history: Optional[str] = Field(None, description="Has the patient traveled internationally recently?")
     

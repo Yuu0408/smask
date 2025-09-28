@@ -1,11 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-const historyRoute: RouteRecordRaw[] = [
+const todoRoute: RouteRecordRaw[] = [
     {
-        path: 'todo-list',
-        name: 'todo.todo-list',
+        path: 'todo',
+        name: 'todo',
         component: () => import('./TodoPage.vue'),
     },
 ];
 
-export default historyRoute;
+export default todoRoute;

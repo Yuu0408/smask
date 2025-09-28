@@ -24,7 +24,7 @@ function onSubmit() {
     >
         <Textarea
             v-model="text"
-            placeholder="Message..."
+            :placeholder="t('chatInput.placeholder')"
             class="min-h-[44px] max-h-40 w-full resize-y rounded-xl bg-muted/40 px-4 py-3 text-sm focus-visible:ring-0"
             :disabled="loading"
             @keydown.enter.exact.prevent="onSubmit"

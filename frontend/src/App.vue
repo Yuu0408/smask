@@ -1,5 +1,4 @@
-<script setup lang="ts">
-// import { useRouter } from 'vue-router';
+﻿<script setup lang="ts">
 import { RouterView } from 'vue-router';
 import DialogManager from './plugins/dialog-manager/components/DialogManager.vue';
 import { useDialog } from './plugins/dialog-manager/use-dialog';
@@ -8,7 +7,6 @@ import { Toaster } from './components/ui/sonner';
 import 'vue-sonner/style.css';
 
 const { closeAllDialogs } = useDialog();
-// const router = useRouter();
 
 onUnmounted(() => {
     // Close all dialogs when the app is unmounted

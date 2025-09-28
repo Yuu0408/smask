@@ -1,44 +1,44 @@
 <script setup lang="ts">
+// Legacy ChatPage updated to use current stores and message shape
 import ChatWindow from '@/components/ChatWindow.vue';
 import ChatInputBar from '@/components/ChatInputBar.vue';
 import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Message } from '@/types/message';
-import { useUserStore } from '@/stores/user';
-import { computed, ref, watch } from 'vue';
-import { sendMessageToServer } from '@/api/conversationApi';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useChatStore } from '@/stores/chat';
+import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
 
-defineProps<{
-    sidebarOpen: boolean;
-}>();
+defineProps<{ sidebarOpen: boolean }>();
 
 const { t } = useI18n();
-const userStore = useUserStore();
-const messages = computed(() => userStore.messages);
-
-const toastVisible = ref(false);
+const chatStore = useChatStore();
+const { user } = storeToRefs(useAuthStore());
 const router = useRouter();
 
+const messages = ref<Message[]>([]);
+const multipleChoices = ref<string[]>([]);
+
+const userId = computed(() => user.value?.id ?? '');
+const recordId = computed(() => user.value?.currentRecordId ?? '');
+
+const toastVisible = ref(false);
 const filteredChoices = computed(() => {
-    const lastMessage = messages.value[messages.value.length - 1];
     if (
-        lastMessage?.multiple_choices?.length === 1 &&
-        lastMessage.multiple_choices[0] === '%medical_record%'
+        multipleChoices.value.length === 1 &&
+        multipleChoices.value[0] === '%medical_record%'
     ) {
         toastVisible.value = true;
         return [];
     }
-    return lastMessage?.multiple_choices || [];
+    return multipleChoices.value;
 });
 
 watch(toastVisible, (visible) => {
-    if (visible) {
-        setTimeout(() => {
-            toastVisible.value = false;
-        }, 4000);
-    }
+    if (visible) setTimeout(() => (toastVisible.value = false), 4000);
 });
 
 function goToDiagnosis() {
@@ -47,48 +47,41 @@ function goToDiagnosis() {
 }
 
 async function sendMessage(text: string) {
-    if (!userStore.sessionId) {
+    if (!userId.value || !recordId.value) {
         alert(t('chatPage.sessionNotInitialized'));
         return;
     }
 
-    userStore.addMessage({ from: 'user', text });
-
-    const placeholder: Message = {
-        from: 'bot',
-        text: t('chatPage.typing'),
-        isPlaceholder: true,
-    };
-    userStore.addMessage(placeholder);
-
-    const placeholderIndex = messages.value.length - 1;
+    messages.value.push({
+        id: crypto.randomUUID(),
+        role: 'human',
+        content: text,
+    });
+    const aiId = crypto.randomUUID();
+    messages.value.push({ id: aiId, role: 'ai', content: '' });
+    await nextTick();
 
     try {
-        const result = await sendMessageToServer({
-            user_message: text,
-            session_id: userStore.sessionId,
+        const res = await chatStore.sendChatMessage({
+            user_id: userId.value,
+            record_id: recordId.value,
+            message: text,
         });
-
-        userStore.setMedicalRecord(result.state.medical_record);
-        userStore.setTodo(result.state.todo);
-        userStore.setDiagnosis(result.state.diagnosis_paper);
-        messages.value[placeholderIndex] = {
-            from: 'bot',
-            text: result.ai_response,
-            multiple_choices: result.multiple_choices || [],
-        };
+        const idx = messages.value.findIndex((m) => m.id === aiId);
+        if (idx !== -1) messages.value[idx].content = res.data.message;
+        multipleChoices.value = res.data.multiple_choices ?? [];
+        if (res.data.decision === 'DIAGNOSIS') {
+            // Optionally navigate or show toast
+            toastVisible.value = true;
+        }
     } catch (error) {
         console.error(error);
-        messages.value[placeholderIndex] = {
-            from: 'bot',
-            text: t('chatPage.error'),
-        };
+        const idx = messages.value.findIndex((m) => m.id === aiId);
+        if (idx !== -1) messages.value[idx].content = t('chatPage.error');
     }
 }
 
-defineExpose({
-    sendMessage,
-});
+defineExpose({ sendMessage });
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="choices?.length"
-        class="w-full max-w-2xl px-4 pb-20 flex flex-wrap gap-2 justify-center"
+        class="w-full max-w-2xl px-4 pb-10 flex flex-wrap gap-2 justify-center"
     >
         <button
             v-for="(choice, index) in choices"

@@ -7,3 +7,4 @@ load_dotenv(dotenv_path=env_path, override=True)
 
 class Config:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")

@@ -36,21 +36,15 @@ watch(
                 v-for="(m, i) in messages"
                 :key="i"
                 class="w-full flex"
-                :class="m.from === 'human' ? 'justify-end' : 'justify-start'"
+                :class="m.role === 'human' ? 'justify-end' : 'justify-start'"
             >
                 <div
                     :class="[
-                        m.isPlaceholder
-                            ? 'bg-muted text-muted-foreground opacity-60 italic animate-pulse px-4 py-2 rounded-lg text-sm sm:text-base max-w-[75%] break-words'
-                            : m.from === 'human'
-                              ? 'bg-primary text-primary-foreground text-left px-4 py-2 rounded-lg text-sm sm:text-base max-w-[75%] break-words'
-                              : 'bg-muted text-muted-foreground text-left max-w-[80%] prose prose-sm sm:prose-base dark:prose-invert p-4 rounded-xl',
+                        m.role === 'human'
+                            ? 'bg-primary text-primary-foreground text-left px-4 py-2 rounded-lg text-sm sm:text-base max-w-[75%] break-words'
+                            : 'bg-muted text-muted-foreground text-left max-w-[80%] prose prose-sm sm:prose-base dark:prose-invert p-4 rounded-xl',
                     ]"
-                    v-html="
-                        m.from === 'ai' && !m.isPlaceholder
-                            ? md.render(m.text)
-                            : m.text
-                    "
+                    v-html="m.role === 'ai' ? md.render(m.content) : m.content"
                 />
             </div>
 

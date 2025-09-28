@@ -11,7 +11,7 @@ import type { User } from '@/types/user';
 const URL_PREFIX = '/v1/user';
 export const useUserStore = defineStore('user', () => {
     const user = ref<User>({
-        id: `3f3c8b7e-6b1a-4dc1-9d7a-2e7a9a9d7b11`,
+        id: ``,
         currentRecordId: ``,
     });
     async function createNewRecord(userId: string, form: MedicalRecordData) {

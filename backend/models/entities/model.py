@@ -85,6 +85,12 @@ class User(SQLModel, table=True):
     )
     username: str = Field(sa_column=Column(String(255), unique=True, index=True, nullable=False))
     hashed_password: str = Field(sa_column=Column(String(255), nullable=False))
+    role_type: str = Field(sa_column=Column(String(50), nullable=False, server_default="patient"))  # "patient" | "doctor"
+    user_metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON, nullable=False, server_default="{}"),
+        description="Additional user metadata",
+    )
     is_active: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="1"))
     token_version: int = Field(sa_column=Column(Integer, nullable=False, server_default="0"))
     created_at: datetime = Field(
@@ -129,4 +135,32 @@ class AIState(AIStateBase, table=True):
     data: Dict[str, Any] = Field(
         default_factory=dict,
         sa_column=Column(JSON, nullable=False, server_default="{}"),
+    )
+
+# --- TODO model ---
+class Todo(SQLModel, table=True):
+    __tablename__ = "todos"
+
+    id: PyUUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    user_id: PyUUID = Field(foreign_key="users.id", index=True)
+    record_id: PyUUID = Field(foreign_key="medical_records.record_id", index=True)
+    text: str = Field(sa_column=Column(String(1024), nullable=False))
+    is_check: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="0"))
+    position: int = Field(sa_column=Column(Integer, nullable=False, server_default="0"))
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    )
+
+# --- Diagnosis model ---
+class Diagnosis(SQLModel, table=True):
+    __tablename__ = "diagnoses"
+
+    id: PyUUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    user_id: PyUUID = Field(foreign_key="users.id", index=True)
+    record_id: PyUUID = Field(foreign_key="medical_records.record_id", index=True)
+    reasoning_process: str = Field(sa_column=Column(String(4096), nullable=False))
+    diagnosis: Dict[str, Any] = Field(sa_column=Column(JSON, nullable=False, server_default="{}"))
+    further_test: Dict[str, Any] = Field(sa_column=Column(JSON, nullable=False, server_default="{}"))
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     )

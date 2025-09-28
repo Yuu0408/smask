@@ -1,8 +1,9 @@
-// src/stores/auth.ts
+﻿// src/stores/auth.ts
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import type { User } from '@/types/user'; // define your own type
 import $backend from '@/lib/backend';
+import type { loginRequest, registerRequest } from '@/types/auth';
 
 const URL_PREFIX = '/auth';
 export const useAuthStore = defineStore('auth', () => {
@@ -14,8 +15,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAuthed = computed(() => !!user.value && !!accessToken.value);
 
-    async function login(username: string, password: string) {
+    async function login(payload: loginRequest) {
         status.value = 'authenticating';
+        const username = payload.username;
+        const password = payload.password;
         try {
             const { data } = await $backend.post(
                 `${URL_PREFIX}/login`,
@@ -41,14 +44,29 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function getMe() {
-        const { data } = await $backend.get('/me');
-        user.value = data;
+        if (!accessToken.value) throw new Error('No access token');
+        const { data } = await $backend.get(`${URL_PREFIX}/me`, {
+            headers: {
+                Authorization: `Bearer ${accessToken.value}`,
+            },
+        });
+        if (user.value) {
+            user.value.id = data.id;
+            user.value.currentRecordId = data.record_id;
+            user.value.username = data.username;
+            user.value.is_active = data.is_active;
+            user.value.role = data.role;
+        }
     }
 
-    async function register(username: string, password: string) {
+    async function register(payload: registerRequest) {
+        const username = payload.username;
+        const password = payload.password;
+        const role = payload.role;
+        const metadata = payload.metadata ?? {};
         const { data } = await $backend.post(
             `${URL_PREFIX}/register`,
-            { username, password },
+            { username, password, role, metadata },
             { withCredentials: true }
         );
         accessToken.value = data.accessToken;

@@ -1,38 +1,55 @@
-<script setup lang="ts">
-import { ChevronRight, User, type LucideIcon } from 'lucide-vue-next';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+﻿<script setup lang="ts">
+import { Phone, MessageSquareDot, type LucideIcon } from 'lucide-vue-next';
 import {
     SidebarGroup,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarGroupContent,
     SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
-import { cn } from '@/lib/utils';
+import { useRouter } from 'vue-router';
 import { useDialog } from '@/plugins/dialog-manager/use-dialog';
 import MedicalRecordDialog from '@/pages/chat/medical-record/MedicalRecordDialog.vue';
 import { useI18n } from 'vue-i18n';
-import { Button } from '@/components/ui/button';
 import {
     MessageCirclePlus,
     BookText,
     ListTodo,
     History,
 } from 'lucide-vue-next';
-const route = useRoute();
+import Separator from '../ui/separator/Separator.vue';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useContactStore } from '@/stores/contact';
+import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
+
 const router = useRouter();
 const { openDialog } = useDialog();
 const { t } = useI18n();
+
+const contactStore = useContactStore();
+const { user } = storeToRefs(useAuthStore());
+const myDoctors = ref<
+    { doctor_id: string; contact_id: string; username: string }[]
+>([]);
+let _timer: number | null = null;
+
+async function refreshDoctors() {
+    if (!user.value?.id) return;
+    try {
+        const res = await contactStore.listMyDoctors(user.value.id);
+        myDoctors.value = res.doctors || [];
+    } catch {}
+}
+
+onMounted(async () => {
+    await refreshDoctors();
+    _timer = window.setInterval(refreshDoctors, 8000);
+});
+
+onUnmounted(() => {
+    if (_timer) clearInterval(_timer);
+});
 
 type SidebarItemGroup = {
     title: string;
@@ -40,11 +57,7 @@ type SidebarItemGroup = {
     type: 'group';
     icon?: LucideIcon;
     isActive?: boolean;
-    items?: {
-        title: string;
-        url: string;
-        isActive?: boolean;
-    }[];
+    items?: { title: string; url: string; isActive?: boolean }[];
 };
 
 type SidebarItemSingle = {
@@ -54,47 +67,27 @@ type SidebarItemSingle = {
     icon?: LucideIcon;
     isActive?: boolean;
 };
-
-// const newChatItem: SidebarItemSingle = {
-//     title: t('sidebar.main.new-chat'),
-//     icon: User,
-//     type: 'single',
-//     url: '/new-chat',
-//     isActive: route.path.startsWith('/new-chat'),
-// };
 export type SidebarItem = SidebarItemGroup | SidebarItemSingle;
 
-defineProps<{
-    items: SidebarItem[];
-}>();
-
-// function isActive(url: string) {
-//     return computed(() => route.path.startsWith(url));
-// }
+defineProps<{ items: SidebarItem[] }>();
 
 const handleNewChat = async () => {
-    openDialog({
-        component: MedicalRecordDialog,
-        // optional initial props
-    });
+    openDialog({ component: MedicalRecordDialog });
 };
-
+const handleNewCall = async () => {
+    openDialog({ component: MedicalRecordDialog, props: { mode: 'voice' } });
+};
 const handleRecord = async () => {
-    await router.push({
-        name: 'record',
-    });
+    await router.push({ name: 'record' });
 };
-
 const handleTodo = async () => {
-    await router.push({
-        name: 'todo',
-    });
+    await router.push({ name: 'todo' });
 };
-
 const handleHistory = async () => {
-    await router.push({
-        name: 'history',
-    });
+    await router.push({ name: 'history' });
+};
+const handleCurrentConversation = async () => {
+    await router.push({ name: 'current-conversation' });
 };
 </script>
 
@@ -103,10 +96,7 @@ const handleHistory = async () => {
         <SidebarMenu>
             <!-- Flat, non-collapsible mainItems -->
 
-            <SidebarGroupLabel>{{
-                t('sidebar.content.label.conversations')
-            }}</SidebarGroupLabel
-            ><SidebarMenuItem>
+            <SidebarMenuItem>
                 <SidebarMenuButton as-child>
                     <button
                         type="button"
@@ -115,6 +105,35 @@ const handleHistory = async () => {
                     >
                         <MessageCirclePlus />
                         <span>{{ t('sidebar.content.button.new-chat') }}</span>
+                    </button>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                    <button
+                        type="button"
+                        class="truncate cursor-pointer hover:bg-muted"
+                        @click="handleNewCall"
+                    >
+                        <Phone />
+                        <span>{{ t('sidebar.content.button.new-call') }}</span>
+                        <!-- <Badge variant="outline" class="ml-2">{{ t('badge.beta') }}</Badge> -->
+                    </button>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <Separator />
+            <SidebarGroupLabel>{{
+                t('sidebar.content.label.conversations')
+            }}</SidebarGroupLabel>
+            <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                    <button
+                        type="button"
+                        class="truncate cursor-pointer hover:bg-muted"
+                        @click="handleCurrentConversation"
+                    >
+                        <MessageSquareDot />
+                        {{ t('sidebar.content.button.current-conversation') }}
                     </button>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -154,18 +173,22 @@ const handleHistory = async () => {
                     </button>
                 </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarGroup>
-                <SidebarGroupLabel>{{
-                    t('sidebar.content.label.conversations')
-                }}</SidebarGroupLabel>
-                <SidebarGroupContent>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton> Test </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroupContent>
-            </SidebarGroup>
+            <Separator />
+            <SidebarGroupLabel>{{
+                t('sidebar.content.label.contacts')
+            }}</SidebarGroupLabel>
+            <SidebarMenuItem v-for="d in myDoctors" :key="d.contact_id">
+                <SidebarMenuButton as-child>
+                    <router-link
+                        :to="{
+                            name: 'contact.chat',
+                            params: { id: d.contact_id },
+                        }"
+                    >
+                        {{ d.username }}
+                    </router-link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarMenu>
     </SidebarGroup>
 </template>

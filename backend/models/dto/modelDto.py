@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import date
 from datetime import datetime
@@ -31,6 +31,7 @@ class MedicalHistory(BaseModel):
 class SocialInformation(BaseModel):
     alcohol_consumption: str
     smoking_habit: str
+    latest_alcohol_smoking_intake: str | None
     living_situation: str
     daily_activity_independence: str
     recent_travel_history: str
@@ -88,7 +89,7 @@ class GetChatHistoryResponse(BaseModel):
     history: List[ChatMessageDto]
 
 class AIStateData(BaseModel):
-    reasoning: str
+    reasoning: str 
     note: str
     decision: str
 
@@ -100,12 +101,20 @@ class ChatTextRequest(BaseModel):
 class ChatTextResponse(BaseModel):
     message: str
     multiple_choices: Optional[List[str]] = None
+    decision: Optional[str] = None
+
+
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: Optional[str] = None
 
 
 class UserPublic(BaseModel):
     id: str
+    record_id: str
     username: str
     is_active: bool
+    role: Literal["patient", "doctor"]
 
 class LoginRequest(BaseModel):
     username: str
@@ -118,3 +127,106 @@ class TokenResponse(BaseModel):
 class RegisterRequest(BaseModel):
     username: str
     password: str = Field(min_length=8, max_length=128)
+    role: Literal["patient", "doctor"] = "patient"
+    metadata: Optional[dict] = None
+
+class GetCurrentRecordRequest(BaseModel):
+    user_id: Optional[str] = None
+    record_id: Optional[str] = None
+
+class GetCurrentRecordResponse(BaseModel):
+    user_id: str
+    record_id: str
+    created_at: datetime
+    updated_at: datetime
+    data: MedicalRecordData
+
+class GetAllChatHistoryRequest(BaseModel):
+    user_id: str
+
+# --- TODO DTOs ---
+class GetCurrentTodoRequest(BaseModel):
+    user_id: Optional[str] = None
+    record_id: Optional[str] = None
+
+class TodoItem(BaseModel):
+    text: str
+    is_check: bool = False
+
+class GetCurrentTodoResponse(BaseModel):
+    user_id: str
+    record_id: str
+    items: List[TodoItem]
+
+class UpdateTodoItemRequest(BaseModel):
+    user_id: str
+    record_id: Optional[str] = None
+    index: int
+    is_check: bool
+
+class UpdateTodoItemResponse(GetCurrentTodoResponse):
+    pass
+
+# --- Contact DTOs ---
+class SendContactRequest(BaseModel):
+    user_id: str
+    record_id: str
+    include_conversation: bool
+    address: str
+    facility: str
+
+class SendContactResponse(BaseModel):
+    ok: bool
+    contact_id: str
+
+class PatientCard(BaseModel):
+    contact_id: str
+    patient_user_id: str
+    full_name: str
+    age: int
+    address: str
+
+class ListPatientsRequest(BaseModel):
+    doctor_id: str
+
+class ListPatientsResponse(BaseModel):
+    patients: List[PatientCard]
+
+class GetContactDetailRequest(BaseModel):
+    contact_id: str
+
+class ContactDetailResponse(BaseModel):
+    contact_id: str
+    patient_user_id: str
+    record_id: str
+    address: str
+    facility: str
+    medical_record: MedicalRecordData | dict
+    diagnosis: Optional[dict] = None
+    reasoning_process: Optional[str] = None
+    further_test: Optional[list] = None
+    todos: List[TodoItem] = []
+    conversation: Optional[List[ChatMessageDto]] = None
+
+class ContactMessageRequest(BaseModel):
+    contact_id: str
+    sender_id: str
+    content: str
+
+class ContactMessageDto(BaseModel):
+    id: str
+    role: Literal["doctor", "patient"]
+    content: str
+    created_at: datetime
+
+class ContactMessagesResponse(BaseModel):
+    messages: List[ContactMessageDto]
+
+class MyDoctor(BaseModel):
+    doctor_id: str
+    contact_id: str
+    username: str
+    
+class MyDoctorsResponse(BaseModel):
+    doctors: List[MyDoctor]
+

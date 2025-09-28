@@ -34,6 +34,29 @@ class MedicalRecordRepo:
                 status_code=500,
                 detail="Database error occurred while retrieving the record.",
             ) from e
+        
+    def get_latest_record_id(self, user_id: UUID) -> UUID | None:
+        """
+        Return the most recently created record_id for a given user.
+        Returns None if no records exist.
+        """
+        try:
+            stmt = (
+                select(MedicalRecord.record_id)
+                .where(MedicalRecord.user_id == user_id)
+                .order_by(MedicalRecord.created_at.desc())
+                .limit(1)
+            )
+            result = self.db.exec(stmt).first()
+            return result  # will be None if no rows
+        except SQLAlchemyError as e:
+            logger.exception("DB error fetching latest record for user %s", user_id)
+            raise HTTPException(
+                status_code=500,
+                detail="Database error occurred while fetching latest record.",
+            ) from e
+
+
 
     def add_record(self, *, user_id: UUID, data: Dict[str, Any]) -> MedicalRecord:
         """

@@ -7,8 +7,8 @@ from config import Config
 
 # Define the structured output model
 class Conversation(BaseModel):
-    missing_information: Optional[List[str]] = Field(description="List of missing required patient information fields that need to be collected (e.g., full name, birthday,...). If patient does smoke and alcohol, but you still havent ask about their latest habit (latest time consuming), you must put that in")
-    generation: str = Field(description="Your question or answer to patient's questions. If patient does smoke or alcohol, you **MUST** always ask about the latest habit, like the latest time they do them. If basic information is provided enough, start to ask questions for rule out diagnosis")
+    missing_information: Optional[List[str]] = Field(description="List of missing required patient information fields that need to be collected (e.g., full name, birthday,...). If patient does smoke and alcohol, but you still havent ask about their latest habit (latest time consuming), you must put that in. Only put in the fields that are missing. If no required information is missing, let it be []")
+    generation: str = Field(description="Your question or answer to patient's questions. You must say in the same language as patient's nationality. If patient does smoke or alcohol, you **MUST** always ask about the latest habit, like the latest time they do them. (only if they does smoke or drink, if not, you must not ask about the latest habit). If no required information is missing, let it be empty string")
     multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
     decision: str = Field(description="Your decided stage (INFORMATION_COLLECTION or MAIN_QUESTIONING)")
 
@@ -25,7 +25,7 @@ def create_information_chain(conversation_history, message):
     today = date.today()
     system = (f"""
     Today is {today}
-    You are a **medical assistant** (also trained in mental health support) whose job is to gather detailed patient information through structured conversation to assist with **disease diagnosis**. Your tone must be **empathetic and professional**, and your questioning style should resemble that of a **professional doctor**, but dont say thank you all the time, just keep your response as clear as possible.
+    You are a 30 years old male **medical assistant** (also trained in mental health support) whose job is to gather detailed patient information through structured conversation to assist with **disease diagnosis**. Your tone must be **empathetic and professional**, and your questioning style should resemble that of a **professional doctor**, but dont say thank you all the time, just keep your response as clear as possible.
 
     ### Patient Information
     - Basic information (name, age, gender, etc.) should be pre-filled from the user's profile. If any key field is missing, detect and ask about it **once at the beginning**.
@@ -75,12 +75,21 @@ def create_information_chain(conversation_history, message):
 
     <! IMPORTANT>
     - Dont say thank you or sorry in every your response. Only say that if necessary
+    - Dont ask any questions related to the symptom!
+    - Only ask about the "missing information", nothing more!
     - Do not thank the user every time they provide information. Only do so if the information is especially sensitive or emotionally heavy.
     - Do not make your answer seem redundant and too long. Only say things clearly without saying thank or sorry most of the time
     - Dont ask unrelated questions that are not in the required patient information I told you above (e.g: only ask about the symptom if the symptom is missing or incomplete)
     - If patient does smoke or drink, you MUST ask about any recent changes about smoking or drink, like the latest time the patient do that, e.t.c.
     - Avoid repeating "Cảm ơn bạn đã chia sẻ" or "Thank you for letting me know" unless it adds empathetic value to the conversation (e.g., after a painful or difficult disclosure).
-"""
+
+    <!!! ESPECIALLY IMPORTANT>
+    - Always ask about the latest habit (latest time consuming) if the patient does smoke or drink, no matter what stage you are in. This is VERY IMPORTANT
+    - If patient does not smoke or drink, you dont need to ask about the latest habit
+    - If no required information is missing, you can directly move to MAIN_QUESTIONING stage and return empty string for missing_information, generation, multiple_choices, and let decision be MAIN_QUESTIONING
+    - Answer appropriately based on the patient's age and gender. For example, use "cô", "bác", "em", "anh", e.t.c in Vietnamese
+    - You must say in the same language as patient's nationality.
+    """
     + "\nThe current Patient Medical Record: {medical_record} \n")
 
     # Return the configured LLM object

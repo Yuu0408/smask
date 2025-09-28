@@ -27,6 +27,21 @@ class ChatHistoryRepo:
                 status_code=500,
                 detail="Database error occurred while retrieving the record.",
             ) from e
+        
+    def get_all_chat_history(self, user_id: UUID) -> ChatHistory:
+        try:
+            stmt = (
+                select(ChatHistory)
+                .where(ChatHistory.user_id == user_id)
+                .order_by(ChatHistory.created_at.asc())
+            )
+            return self.db.exec(stmt).all()
+        except SQLAlchemyError as e:
+            logger.exception("DB error retrieving chat history for user %s", user_id)
+            raise HTTPException(
+                status_code=500,
+                detail="Database error occurred while retrieving the chat history.",
+            ) from e
     
     def add_messages(
         self,

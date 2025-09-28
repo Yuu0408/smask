@@ -82,7 +82,7 @@
             "patientInfo": "Patient Information",
             "obgynHistory": "Obstetric & Gynecological History",
             "socialInfo": "Social Information",
-            "reasonForVisit": "Describe your symptoms or reason for visiting",
+            "reasonForVisit": "Reason for Visit",
             "medicalHistory": "Medical History"
         },
         "fields": {
@@ -91,6 +91,7 @@
             "gender": "Gender",
             "occupation": "Occupation",
             "nationality": "Nationality",
+            "address": "Address",
             "menstruationStatus": "Menstruation Status",
             "menstrualCycle": "Menstrual Cycle",
             "recentSexualActivity": "Recent Sexual Activity",
@@ -108,6 +109,7 @@
         },
         "placeholder": {
             "fullName": "e.g., John Doe",
+            "address": "Street, Ward, City...",
             "occupation": "e.g., Teacher",
             "nationality": "e.g., Vietnamese",
             "menstruationStatus": "e.g., Menstruating, Menopausal",
@@ -149,6 +151,21 @@
         "submit": {
             "default": "Submit",
             "submitting": "Submitting..."
+        },
+        "validation": { "required": "This field is required" },
+        "toast": {
+            "success": {
+                "title": "Record created",
+                "description": "Your information has been saved."
+            },
+            "error": {
+                "title": "Submission failed",
+                "description": "Please try again later."
+            }
+        },
+        "dialog": {
+            "title": "Patient Intake Form",
+            "description": "Provide your information to start a conversation."
         }
     },
 
@@ -164,10 +181,136 @@
         "noTasks": "No tasks available."
     },
     "sidebar.content.button.new-chat": "New Chat",
+    "sidebar.content.button.new-call": "New Call",
+    "sidebar.content.button.current-conversation": "Current Conversation",
     "sidebar.content.button.record": "Medical Record",
     "sidebar.content.button.todo-list": "ToDo",
     "sidebar.content.button.history": "History",
     "sidebar.content.label.conversations": "Conversation",
     "chat.input.send-button.send": "Send",
-    "sidebar.header.app.name": "Smask"
+    "sidebar.header.app.name": "Medee",
+    "sidebar.content.label.contacts": "Contacts",
+    "badge.beta": "Beta",
+    "page.login.label.role": "Login as",
+    "page.login.role.patient": "Patient",
+    "page.login.role.doctor": "Doctor",
+    "page.login.title": "Welcome to Medee",
+    "page.login.subtitle": "Your assistant to start conversations, manage medical records, and track to‑dos.",
+    "page.login.form.login_title": "Sign in to Medee",
+    "page.login.form.register_title": "Create your Medee account",
+
+    "page.login.label.username": "Username",
+    "page.login.label.password": "Password",
+    "page.login.label.confirm_password": "Confirm Password",
+
+    "page.login.button.login": "Login",
+  "page.login.button.register": "Register",
+  "page.login.button.loggingIn": "Logging in...",
+  "page.login.button.loading": "Loading...",
+
+  "page.login.error.password_mismatch": "Passwords do not match",
+  "page.login.error.login_failed": "Login failed",
+  "page.login.error.register_failed": "Registration failed",
+  "page.login.label.address": "Address",
+  "page.login.label.hospital": "Hospital",
+  "page.login.placeholder.choose_address": "Choose address",
+  "page.login.placeholder.choose_hospital": "Choose hospital",
+  "page.login.error.address_hospital_required": "Please select address and hospital",
+
+  "navbar.settings": "Settings",
+  "navbar.breadcrumb.modelsPrompts": "Models & Prompts",
+  "navbar.breadcrumb.currentConversation": "Current Conversation",
+  "navbar.breadcrumb.newChat": "New Chat",
+  "navbar.breadcrumb.home": "Home",
+  "navbar.breadcrumb.chat": "Chat",
+  "navbar.breadcrumb.record": "Medical Record",
+  "navbar.breadcrumb.diagnosis": "Diagnosis",
+  "navbar.breadcrumb.todo": "To‑Do List",
+  "navbar.breadcrumb.history": "History",
+  "navbar.breadcrumb.contact": "Contacts",
+  "navbar.breadcrumb.patients": "Patients",
+  "navbar.language.label": "Language: {lang}",
+  "navbar.language.en": "English",
+  "navbar.language.vi": "Vietnamese",
+
+  "common.loading": "Loading...",
+  "common.open": "Open",
+  "common.create": "Create",
+  "common.explore": "Explore",
+  "common.settings": "Settings",
+  "common.yes": "Yes",
+  "common.no": "No",
+
+  "page.home.title": "Welcome to Medee",
+  "page.home.title.description": "Your smart assistant to start a conversation, manage medical records, and stay on top of care tasks.",
+  "page.home.card.title.start": "Start a Conversation",
+  "page.home.card.title.record": "Check Medical Record",
+  "page.home.card.title.todo": "Check To‑Do List",
+  "page.home.card.button.start": "New Chat",
+  "page.home.card.button.open": "Open",
+  "page.home.why.title": "Why Medee?",
+  "page.home.why.description": "We are Medee — a team at the intersection of Healthcare and Technology, where real-world clinical experience meets bold, persistent innovation. Our mission is to build practical AI solutions that address day-to-day challenges in care delivery, while improving quality and safety for patients and providers.",
+  "page.home.footer": "© 2025 Medee. All rights reserved.",
+
+  "todo.upcomingActions": "Upcoming actions",
+  "todo.items": "items",
+  "todo.startConversation": "Start a conversation",
+
+  "history.title": "Conversation History",
+  "history.empty": "No conversations yet.",
+  "history.lastActivity": "Last activity:",
+  "history.noMessagesYet": "No messages yet",
+
+  "chat.empty.noConversation": "No conversation yet.",
+  "chat.empty.startQuestion": "Start a conversation?",
+  "chat.empty.newChat": "New Chat",
+  "chat.input.hint": "Press <kbd class=\"rounded border px-1\">Enter</kbd> to send • <kbd class=\"rounded border px-1\">Shift</kbd>+<kbd class=\"rounded border px-1\">Enter</kbd> for newline",
+
+  "record.title": "Medical Record",
+  "record.loading": "Loading record...",
+  "record.empty": "No medical record yet.",
+  "record.send": "Send Medical Record",
+  "sendContact.title": "Send Medical Record",
+  "sendContact.description": "Choose what to send and destination.",
+  "sendContact.includeConversation": "Also send the conversation?",
+  "sendContact.chooseAddress": "Choose address",
+  "sendContact.selectAddress": "Select address",
+  "sendContact.chooseHospital": "Choose hospital",
+  "sendContact.selectHospital": "Select hospital",
+  "sendContact.sending": "Sending...",
+  "sendContact.send": "Send",
+  "sendContact.toast.success": "Sent to facility",
+  "sendContact.toast.alreadySent": "You have already sent this record.",
+  "sendContact.toast.failed": "Failed to send",
+
+  "sidebar.footer.logout": "Log out",
+  "doctor.sidebar.header.title": "Doctor Panel",
+  "doctor.sidebar.group.patients": "Patients",
+  "doctor.sidebar.allPatients": "All Patients",
+
+  "contact.title.patients": "Patients",
+  "contact.field.age": "Age",
+  "contact.field.address": "Address",
+  "contact.patient": "Patient",
+  "contact.detail.view.conversation": "Conversation",
+  "contact.detail.view.contact": "Contact",
+  "contact.detail.openChat": "Open Chat",
+  "contact.detail.startChatPrompt": "Start doctor–patient chat",
+
+  "sidebar.main.conversation.button.new-chat": "New Chat",
+
+  "voice": {
+    "title": "Voice Call",
+    "status": {
+      "listening": "Listening… tap to stop",
+      "playing": "Playing response…",
+      "tapToSpeak": "Tap to speak",
+      "notSupported": "Speech recognition not supported"
+    },
+    "label": {
+      "youSaid": "You said",
+      "assistantSaid": "Doctor said"
+    }
+  }
+
 }

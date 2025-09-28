@@ -1,4 +1,5 @@
-import { useUserStore } from '@/stores/userStore';
+// Legacy API for creating a chat session from a medical record submission.
+// Updated to avoid coupling with a Pinia store.
 
 export interface MedicalRecordRequest {
     patient_info: {
@@ -36,7 +37,7 @@ export interface MedicalRecordRequest {
 
 export async function submitPatientInfo(
     medicalRecord: MedicalRecordRequest
-): Promise<void> {
+): Promise<{ message: string; session_id: string }> {
     try {
         const API_BASE = import.meta.env.VITE_API_BASE;
         const response = await fetch(`${API_BASE}/patient_info`, {
@@ -52,11 +53,9 @@ export async function submitPatientInfo(
         }
 
         const data = await response.json();
-        const sessionId = data.session_id;
         console.log('Medical record submitted successfully.');
-
-        const userStore = useUserStore();
-        userStore.setSessionId(sessionId);
+        // Return session id to the caller instead of mutating a store here.
+        return data;
     } catch (error) {
         console.error('Error submitting medical record:', error);
         throw error;

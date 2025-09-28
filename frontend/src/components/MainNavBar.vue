@@ -8,26 +8,90 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Settings } from 'lucide-vue-next';
-import { computed } from 'vue';
-import { useRoute, RouterLink } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, RouterLink, useRouter } from 'vue-router';
+import { useContactStore } from '@/stores/contact';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
+const router = useRouter();
+const contactStore = useContactStore();
+const contactName = ref<string | null>(null);
+const { t } = useI18n();
+
+async function refreshContactName() {
+    try {
+        if (
+            (route.name === 'contact.detail' ||
+                route.name === 'contact.chat') &&
+            route.params.id
+        ) {
+            const id = String(route.params.id);
+            const res = await contactStore.getContactDetail(id);
+            // Try to get a human-friendly name from medical record
+            contactName.value =
+                (res as any)?.medical_record?.patient_info?.full_name || null;
+        } else {
+            contactName.value = null;
+        }
+    } catch {
+        contactName.value = null;
+    }
+}
+
+watch(
+    () => route.fullPath,
+    () => {
+        void refreshContactName();
+    },
+    { immediate: true }
+);
 
 const breadcrumbItems = computed(() => {
     const segments = route.path.split('/').filter(Boolean);
     return segments.map((segment, index) => {
         const path = '/' + segments.slice(0, index + 1).join('/');
-        if (segment === 'models-n-prompts')
-            return { title: 'Models & Prompts', path };
+
+        // Known segments -> i18n keys
+        const segmentKeyMap: Record<string, string> = {
+            home: 'navbar.breadcrumb.home',
+            chat: 'navbar.breadcrumb.chat',
+            record: 'navbar.breadcrumb.record',
+            diagnosis: 'navbar.breadcrumb.diagnosis',
+            todo: 'navbar.breadcrumb.todo',
+            history: 'navbar.breadcrumb.history',
+            contact: 'navbar.breadcrumb.contact',
+            patients: 'navbar.breadcrumb.patients',
+            'models-n-prompts': 'navbar.breadcrumb.modelsPrompts',
+            'current-conversation': 'navbar.breadcrumb.currentConversation',
+            'new-chat': 'navbar.breadcrumb.newChat',
+        };
+
+        // Show patient name instead of ID in contact routes
+        if (
+            segments[0] === 'contact' &&
+            segments[1] === 'patients' &&
+            index === 2
+        ) {
+            return { title: contactName.value || segment, path };
+        }
+
+        const key = segmentKeyMap[segment];
+        if (key) {
+            return { title: t(key), path };
+        }
+
         return {
             title: segment.charAt(0).toUpperCase() + segment.slice(1),
             path,
         };
     });
 });
+
+function goHome() {
+    router.push('/home');
+}
 </script>
 
 <template>
@@ -65,13 +129,20 @@ const breadcrumbItems = computed(() => {
             </div>
         </div>
 
-        <!-- LEFT: Breadcrumb -->
-
-        <!-- RIGHT: Settings icon -->
+        <!-- RIGHT: App logo (clickable) -->
         <div class="ml-auto">
-            <Button variant="ghost" size="icon" aria-label="Settings">
-                <Settings class="size-5" />
-            </Button>
+            <button
+                class="select-none outline-hidden cursor-pointer"
+                aria-label="Go to home"
+                @click="goHome"
+            >
+                <img
+                    src="/medee.jpg"
+                    alt="Medee"
+                    class="h-12 md:h-14 w-auto object-contain"
+                    draggable="false"
+                />
+            </button>
         </div>
     </header>
 </template>

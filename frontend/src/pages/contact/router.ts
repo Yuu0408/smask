@@ -1,10 +1,20 @@
-import type { RouteRecordRaw } from 'vue-router';
+﻿import type { RouteRecordRaw } from 'vue-router';
 
 const contactRoute: RouteRecordRaw[] = [
     {
-        path: 'contact',
-        name: 'contact.contact',
+        path: 'patients',
+        name: 'contact.patients',
         component: () => import('./ContactPage.vue'),
+    },
+    {
+        path: 'patients/:id',
+        name: 'contact.detail',
+        component: () => import('./PatientDetailPage.vue'),
+    },
+    {
+        path: 'patients/:id/chat',
+        name: 'contact.chat',
+        component: () => import('./DirectChatPage.vue'),
     },
 ];
 

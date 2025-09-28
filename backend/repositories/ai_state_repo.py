@@ -17,9 +17,16 @@ class AIStateRepo:
 
     def get_ai_state(self, record_id: UUID, user_id: UUID) -> AIState:
         try:
-            stmt = select(AIState).where(
-                AIState.record_id == record_id,
-                AIState.user_id == user_id,
+            # populate_existing=True forces SQLAlchemy to refresh an already-loaded
+            # instance in the identity map with fresh DB values. This avoids stale
+            # data after raw upserts in the same session.
+            stmt = (
+                select(AIState)
+                .where(
+                    AIState.record_id == record_id,
+                    AIState.user_id == user_id,
+                )
+                .execution_options(populate_existing=True)
             )
             state = self.db.exec(stmt).first()
             if not state:

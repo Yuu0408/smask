@@ -9,7 +9,7 @@
                 <div
                     class="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground"
                 >
-                    AI
+                    <User class="size-4" aria-hidden="true" />
                 </div>
             </div>
 
@@ -30,7 +30,7 @@
                 <div
                     class="flex size-8 items-center justify-center rounded-md bg-muted text-foreground"
                 >
-                    U
+                    <User class="size-4" aria-hidden="true" />
                 </div>
             </div>
         </div>
@@ -38,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import { User } from 'lucide-vue-next';
 interface Props {
     role: 'human' | 'ai';
     content: string;

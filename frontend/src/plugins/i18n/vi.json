@@ -150,6 +150,21 @@
         "submit": {
             "default": "Gửi",
             "submitting": "Đang gửi..."
+        },
+        "validation": { "required": "Trường này là bắt buộc" },
+        "toast": {
+            "success": {
+                "title": "Tạo hồ sơ thành công",
+                "description": "Thông tin của bạn đã được lưu."
+            },
+            "error": {
+                "title": "Gửi thất bại",
+                "description": "Vui lòng thử lại sau."
+            }
+        },
+        "dialog": {
+            "title": "Phiếu khai thông tin bệnh nhân",
+            "description": "Vui lòng cung cấp thông tin để bắt đầu cuộc trò chuyện."
         }
     },
     "sidebar": {
@@ -161,6 +176,124 @@
     },
     "todo": {
         "title": "Danh sách cần làm",
-        "noTasks": "Hiện không có việc cần làm."
+        "noTasks": "Hiện không có việc cần làm.",
+        "upcomingActions": "Công việc sắp tới",
+        "items": "mục",
+        "startConversation": "Bắt đầu cuộc trò chuyện"
+    },
+    
+    "navbar.settings": "Cài đặt",
+    "navbar.breadcrumb.modelsPrompts": "Mô hình & Gợi ý",
+    "navbar.breadcrumb.currentConversation": "Cuộc trò chuyện hiện tại",
+    "navbar.breadcrumb.newChat": "Trò chuyện mới",
+    "navbar.breadcrumb.home": "Trang chủ",
+    "navbar.breadcrumb.chat": "Nhắn tin",
+    "navbar.breadcrumb.record": "Hồ sơ y tế",
+    "navbar.breadcrumb.diagnosis": "Chẩn đoán",
+    "navbar.breadcrumb.todo": "Việc cần làm",
+    "navbar.breadcrumb.history": "Lịch sử",
+    "navbar.breadcrumb.contact": "Liên hệ",
+    "navbar.breadcrumb.patients": "Bệnh nhân",
+    "navbar.language.label": "Ngôn ngữ: {lang}",
+    "navbar.language.en": "Tiếng Anh",
+    "navbar.language.vi": "Tiếng Việt",
+
+    "common.loading": "Đang tải...",
+    "common.open": "Mở",
+    "common.create": "Tạo",
+    "common.explore": "Khám phá",
+    "common.settings": "Cài đặt",
+    "common.yes": "Có",
+    "common.no": "Không",
+
+    "page.home.title": "Chào mừng đến với Medee",
+    "page.home.title.description": "Trợ lý giúp bạn bắt đầu trò chuyện, quản lý hồ sơ y tế và theo dõi các việc cần làm.",
+    "page.home.card.title.start": "Bắt đầu cuộc trò chuyện",
+    "page.home.card.title.record": "Xem hồ sơ y tế",
+    "page.home.card.title.todo": "Xem việc cần làm",
+    "page.home.card.button.start": "Bắt đầu",
+    "page.home.card.button.open": "Mở",
+    "page.home.why.title": "Tại sao lại dùng Medee?",
+    "page.home.why.description": "Chúng tôi là Medee – một đội ngũ kết hợp giữa Y tế và Công nghệ, nơi kinh nghiệm lâm sàng thực tiễn gặp gỡ sự sáng tạo bền bỉ. Mục tiêu của chúng tôi là xây dựng các giải pháp AI thiết thực cho y tế, giải quyết những bài toán hằng ngày, đồng thời nâng cao chất lượng và an toàn trong chăm sóc sức khỏe.",
+    "page.home.footer": "© 2025 Medee. Bảo lưu mọi quyền.",
+
+    "history.title": "Lịch sử hội thoại",
+    "history.empty": "Chưa có cuộc hội thoại nào.",
+    "history.lastActivity": "Hoạt động gần nhất:",
+    "history.noMessagesYet": "Chưa có tin nhắn nào",
+
+    "chat.empty.noConversation": "Chưa có hội thoại nào.",
+    "chat.empty.startQuestion": "Bắt đầu cuộc trò chuyện?",
+    "chat.empty.newChat": "Cuộc trò chuyện mới",
+    "chat.input.send-button.send": "Gửi",
+    "chat.input.hint": "Nhấn <kbd class=\"rounded border px-1\">Enter</kbd> để gửi • <kbd class=\"rounded border px-1\">Shift</kbd>+<kbd class=\"rounded border px-1\">Enter</kbd> để xuống dòng",
+
+    "record.title": "Hồ sơ y tế",
+    "record.loading": "Đang tải hồ sơ...",
+    "record.empty": "Chưa có hồ sơ y tế.",
+    "record.send": "Gửi hồ sơ y tế",
+    "sendContact.title": "Gửi hồ sơ y tế",
+    "sendContact.description": "Chọn nội dung và nơi gửi.",
+    "sendContact.includeConversation": "Gửi kèm hội thoại?",
+    "sendContact.chooseAddress": "Chọn địa chỉ",
+    "sendContact.selectAddress": "Chọn địa chỉ",
+    "sendContact.chooseHospital": "Chọn bệnh viện",
+    "sendContact.selectHospital": "Chọn bệnh viện",
+    "sendContact.sending": "Đang gửi...",
+    "sendContact.send": "Gửi",
+    "sendContact.toast.success": "Đã gửi tới cơ sở y tế",
+    "sendContact.toast.alreadySent": "Bạn đã gửi hồ sơ này rồi.",
+    "sendContact.toast.failed": "Gửi thất bại",
+
+    "sidebar.footer.logout": "Đăng xuất",
+    "doctor.sidebar.header.title": "Bảng điều khiển bác sĩ",
+    "doctor.sidebar.group.patients": "Bệnh nhân",
+    "doctor.sidebar.allPatients": "Tất cả bệnh nhân",
+
+    "contact.title.patients": "Bệnh nhân",
+    "contact.field.age": "Tuổi",
+    "contact.field.address": "Địa chỉ",
+    "contact.patient": "Bệnh nhân",
+    "contact.detail.view.conversation": "Hội thoại",
+    "contact.detail.view.contact": "Liên hệ",
+    "contact.detail.openChat": "Mở trò chuyện",
+    "contact.detail.startChatPrompt": "Bắt đầu trò chuyện bác sĩ – bệnh nhân",
+
+    "page.login.subtitle": "Trợ lý giúp bạn bắt đầu trò chuyện, quản lý hồ sơ y tế và theo dõi các việc cần làm.",
+    "page.login.form.login_title": "Đăng nhập Medee",
+    "page.login.form.register_title": "Tạo tài khoản Medee",
+    "page.login.error.password_mismatch": "Mật khẩu không khớp",
+    "page.login.error.login_failed": "Đăng nhập thất bại",
+    "page.login.error.register_failed": "Đăng ký thất bại",
+    "page.login.label.address": "Địa chỉ",
+    "page.login.label.hospital": "Bệnh viện",
+    "page.login.placeholder.choose_address": "Chọn địa chỉ",
+    "page.login.placeholder.choose_hospital": "Chọn bệnh viện",
+    "page.login.error.address_hospital_required": "Vui lòng chọn địa chỉ và bệnh viện",
+
+    "sidebar.header.app.name": "Medee",
+    "sidebar.content.button.new-chat": "Trò chuyện mới",
+    "sidebar.content.button.new-call": "Cuộc gọi mới",
+    "sidebar.content.button.current-conversation": "Cuộc trò chuyện hiện tại",
+    "sidebar.content.button.record": "Hồ sơ y tế",
+    "sidebar.content.button.todo-list": "Việc cần làm",
+    "sidebar.content.button.history": "Lịch sử",
+    "sidebar.content.label.conversations": "Hội thoại",
+    "sidebar.content.label.contacts": "Liên hệ",
+    "badge.beta": "Thử nghiệm",
+    "sidebar.main.conversation.button.new-chat": "Trò chuyện mới",
+
+    "voice": {
+      "title": "Cuộc gọi thoại",
+      "status": {
+        "listening": "Đang nghe… nhấn để dừng",
+        "playing": "Đang phát phản hồi…",
+        "tapToSpeak": "Nhấn để nói",
+        "notSupported": "Trình nhận dạng giọng nói không được hỗ trợ"
+      },
+      "label": {
+        "youSaid": "Bạn nói",
+        "assistantSaid": "Bác sĩ nói"
+      }
     }
 }

@@ -1,4 +1,5 @@
-# auth.py
+﻿# auth.py
+from repositories.medical_record_repo import MedicalRecordRepo
 from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from sqlalchemy.orm import Session
 from database import get_session
@@ -24,6 +25,38 @@ def set_refresh_cookie(resp: Response, token: str):
 def clear_refresh_cookie(resp: Response):
     resp.delete_cookie(settings.COOKIE_NAME, path="/auth")
 
+
+def get_current_user(request: Request, db: Session = Depends(get_session)) -> User:
+    auth = request.headers.get("authorization") or request.headers.get("Authorization")
+    if not auth or not auth.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token")
+
+    token = auth.split(" ", 1)[1]
+    try:
+        payload = decode_token(token)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+
+    if payload.get("type") != "access":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
+
+    user = db.get(User, payload.get("sub"))
+    if not user or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
+
+    if payload.get("ver") != user.token_version:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token revoked")
+
+    return user
+
+@router.get("/me", response_model=UserPublic)
+def get_me(current: User = Depends(get_current_user), db: Session = Depends(get_session)):
+    medical_record_repo = MedicalRecordRepo(db)
+    record_id = medical_record_repo.get_latest_record_id(user_id=current.id)
+    if not record_id:
+        record_id = ""
+    return UserPublic(id=str(current.id), record_id=str(record_id), username=current.username, is_active=current.is_active, role=current.role_type)
+
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, response: Response, db: Session = Depends(get_session)):
     user = db.query(User).filter(User.username == payload.username).first()
@@ -38,9 +71,13 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_s
     set_refresh_cookie(response, refresh)
 
     access = create_access_token(user.id, user.token_version)
+    medical_record_repo = MedicalRecordRepo(db)
+    record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
+    if not record_id:
+        record_id = ""
     return TokenResponse(
         accessToken=access,
-        user=UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
+        user=UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
     )
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -73,16 +110,29 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_sess
     set_refresh_cookie(response, new_refresh)
 
     new_access = create_access_token(user.id, user.token_version)
+    medical_record_repo = MedicalRecordRepo(db)
+    record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
+    if not record_id:
+        record_id = ""
     return TokenResponse(
         accessToken=new_access,
-        user=UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
+        user=UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
     )
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def register(payload: RegisterRequest, response: Response, db: Session = Depends(get_session)):
+    # Enforce required metadata for doctor role
+    if payload.role == "doctor":
+        meta = payload.metadata or {}
+        addr = meta.get("address")
+        fac = meta.get("facility")
+        if not addr or not fac:
+            raise HTTPException(status_code=400, detail="Doctor registration requires address and facility")
     user = User(
         username=payload.username,
         hashed_password=hash_password(payload.password),
+        role_type=payload.role,
+        user_metadata=payload.metadata or {},
         is_active=True,
         token_version=0,
     )
@@ -102,9 +152,13 @@ def register(payload: RegisterRequest, response: Response, db: Session = Depends
     set_refresh_cookie(response, refresh)
 
     access = create_access_token(user.id, user.token_version)
+    medical_record_repo = MedicalRecordRepo(db)
+    record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
+    if not record_id:
+        record_id = ""
     return {
         "accessToken": access,
-        "user": UserPublic(id=str(user.id), username=user.username, is_active=user.is_active),
+        "user": UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
     }
 
 @router.post("/logout")
@@ -113,3 +167,6 @@ def logout(response: Response, db: Session = Depends(get_session), request: Requ
     # Without an access token here, a simple cookie clear is okay.
     clear_refresh_cookie(response)
     return {"ok": True}
+
+
+

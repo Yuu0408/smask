@@ -1,15 +1,17 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+// Legacy component; store integration disabled.
+// import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useI18n } from 'vue-i18n';
 import type { DiagnosisPaper } from '@/types/diagnosisPaper';
 
-const store = useUserStore();
+// const store = useUserStore();
 const router = useRouter();
-const diagnosis = computed<DiagnosisPaper | null>(() => store.diagnosis);
+const diagnosis = computed<DiagnosisPaper | null>(() => null);
 const { t } = useI18n();
 
 onMounted(() => {

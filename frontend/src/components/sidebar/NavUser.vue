@@ -17,7 +17,7 @@ import {
 // import { storeToRefs } from 'pinia';
 // import UserAvatar from '../common/UserAvatar.vue';
 // import { useAzureStore } from '@/stores/azure';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 
 // const store = useMeStore();
 // const azure = useAzureStore();
@@ -66,7 +66,7 @@ const { isMobile } = useSidebar();
                 <DropdownMenuContent
                     class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                     :side="isMobile ? 'bottom' : 'right'"
-                    :align="end"
+                    align="end"
                     :side-offset="4"
                 >
                     <!-- <DropdownMenuItem @click="logout" class="text-destructive">

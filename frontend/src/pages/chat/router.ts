@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from 'vue-router';
+﻿import type { RouteRecordRaw } from 'vue-router';
 
 const chatRoute: RouteRecordRaw[] = [
     {
@@ -10,6 +10,11 @@ const chatRoute: RouteRecordRaw[] = [
         path: 'conversation',
         name: 'chat.conversation',
         component: () => import('./conversation/ConversationPage.vue'),
+    },
+    {
+        path: 'current-conversation',
+        name: 'chat.current-conversation',
+        component: () => import('./conversation/CurrentConversationPage.vue'),
     },
 ];
 

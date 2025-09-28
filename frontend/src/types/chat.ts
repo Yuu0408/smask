@@ -7,6 +7,7 @@ export interface sendChatMessageRequest {
 export interface sendChatMessageResponse {
     message: string;
     multiple_choices?: string[];
+    decision?: string;
 }
 
 export interface getChatHistoryRequest {

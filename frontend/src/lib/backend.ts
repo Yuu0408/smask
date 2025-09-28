@@ -1,6 +1,5 @@
 import axios from 'axios';
 // import { useAzureStore } from '@/stores/azure';
-import router from '@/router';
 
 const $backend = axios.create({
     baseURL: import.meta.env.VITE_SERVER_BASE_URL || 'http://localhost:8080',

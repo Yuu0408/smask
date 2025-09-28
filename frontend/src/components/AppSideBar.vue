@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar';
 
-import { AudioLines, Sparkles, User } from 'lucide-vue-next';
+import { LogOut, UserRound, Settings } from 'lucide-vue-next';
 import NavMain, { type SidebarItem } from '@/components/sidebar/NavMain.vue';
-import NavUser from '@/components/sidebar/NavUser.vue';
 
 import {
     Sidebar,
@@ -13,30 +12,25 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarGroup,
-    useSidebar,
 } from '@/components/ui/sidebar';
 
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { MessageCirclePlus } from 'lucide-vue-next';
 
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import SidebarHeader from './ui/sidebar/SidebarHeader.vue';
 import { Separator } from '@/components/ui/separator';
-import { useDialog } from '@/plugins/dialog-manager/use-dialog';
-import MedicalRecordDialog from '@/pages/chat/medical-record/MedicalRecordDialog.vue';
 import { useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
+import { computed } from 'vue';
 
 // const store = useMeStore();
 // // const azure = useAzureStore();
@@ -44,36 +38,18 @@ const router = useRouter();
 const route = useRoute();
 // const { me: user } = storeToRefs(store);
 
-const logout = async () => {
-    try {
-        // await azure.logout();
-        // store.me = null;
-        // await router.push({
-        //     name: 'login',
-        // });
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-};
-
-const { isMobile } = useSidebar();
-
-const props = withDefaults(defineProps<SidebarProps>(), {
+withDefaults(defineProps<SidebarProps>(), {
     collapsible: 'icon',
 });
-const { openDialog } = useDialog();
-const { t } = useI18n();
+
+const { t, locale } = useI18n();
 
 // Create computed navigation items with active state based on current route
 
-const handleNewChat = async () => {
-    openDialog({
-        component: MedicalRecordDialog,
-        // optional initial props
-    });
-};
-
 const auth = useAuthStore();
+const displayName = computed(
+    () => auth.user?.username || t('sidebar.header.app.name')
+);
 
 async function handleLogout() {
     try {
@@ -86,6 +62,13 @@ async function handleLogout() {
     } catch (e) {
         console.error('Logout failed', e);
     }
+}
+
+function setLanguage(lang: 'en' | 'vi') {
+    locale.value = lang;
+    try {
+        window.localStorage.setItem('locale', lang);
+    } catch {}
 }
 
 const navMain = [
@@ -103,12 +86,14 @@ const navMain = [
     <Sidebar collapsible="icon">
         <SidebarHeader class="px-2 py-4">
             <div class="flex items-center gap-2 px-2">
-                <div class="size-8 rounded-md bg-primary/10" />
-                <span class="font-semibold">{{
-                    t('sidebar.header.app.name')
-                }}</span>
+                <UserRound />
+                <span
+                    class="font-semibold group-data-[collapsible=icon]:hidden"
+                    >{{ displayName }}</span
+                >
             </div>
         </SidebarHeader>
+
         <SidebarContent>
             <NavMain :items="navMain" />
         </SidebarContent>
@@ -120,27 +105,46 @@ const navMain = [
                 <SidebarMenuItem>
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                            <SidebarMenuButton
-                                size="lg"
-                                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                            >
+                            <SidebarMenuButton>
+                                <Settings class="size-4" />
+                                <span>{{ t('navbar.settings') }}</span>
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                            :side="isMobile ? 'bottom' : 'right'"
-                            align="end"
-                            :side-offset="4"
-                        >
+                        <DropdownMenuContent align="end" class="min-w-56">
+                            <DropdownMenuLabel>
+                                {{
+                                    t('navbar.language.label', {
+                                        lang:
+                                            locale === 'vi'
+                                                ? t('navbar.language.vi')
+                                                : t('navbar.language.en'),
+                                    })
+                                }}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem
-                                @click="logout"
-                                class="text-destructive"
+                                :class="{ 'font-semibold': locale === 'en' }"
+                                @click="setLanguage('en')"
                             >
-                                <LogOut class="text-destructive" />
-                                Log out
+                                {{ t('navbar.language.en') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                :class="{ 'font-semibold': locale === 'vi' }"
+                                @click="setLanguage('vi')"
+                            >
+                                {{ t('navbar.language.vi') }}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton
+                        class="text-destructive"
+                        @click="handleLogout"
+                    >
+                        <LogOut class="size-4" />
+                        <span>{{ t('sidebar.footer.logout') }}</span>
+                    </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarFooter>

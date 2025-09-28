@@ -1,6 +1,7 @@
-from sqlmodel import Session, SQLModel
+﻿from sqlmodel import Session, SQLModel
 from conf.setting import settings
 from models.entities.model import *
+from models.entities.contact_models import *
 import logging
 
 engine = settings.SQL_ENGINE

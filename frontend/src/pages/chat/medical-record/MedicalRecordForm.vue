@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
@@ -27,23 +27,27 @@ import {
 } from '@/components/ui/select';
 
 import { useChatStore } from '@/stores/chat';
-import { useUserStore } from '@/stores/user';
 import { useDialog } from '@/plugins/dialog-manager/use-dialog';
+import VoiceCallDialog from '@/pages/chat/voice/VoiceCallDialog.vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/stores/auth';
 
-const { closeAllDialogs } = useDialog();
+const { closeAllDialogs, openDialog } = useDialog();
 const { t } = useI18n();
+const props = defineProps<{ mode?: 'chat' | 'voice' }>();
 const emits = defineEmits<{
     (e: 'submit', payload: any): void;
 }>();
 const router = useRouter();
 
 const chatStore = useChatStore();
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const loading = ref({ submit: false });
 
-const { user } = storeToRefs(userStore);
+const { user } = storeToRefs(authStore);
+console.log('current user in MedicalRecordForm:', user.value);
+const userId = computed(() => user.value?.id ?? '');
 
 /**
  * Schema
@@ -184,6 +188,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             social_information: {
                 alcohol_consumption: values.alcohol_consumption,
                 smoking_habit: values.smoking_habit,
+                latest_alcohol_smoking_intake: '',
                 living_situation: values.living_situation,
                 daily_activity_independence: values.daily_activity_independence,
                 recent_travel_history: values.recent_travel_history,
@@ -196,22 +201,34 @@ const onSubmit = form.handleSubmit(async (values) => {
                 },
             }),
         };
-        const userId = user.value.id;
 
-        const response = await chatStore.createNewRecord(userId, payload);
+        const response = await chatStore.createNewRecord(userId.value, payload);
 
-        user.value.currentRecordId = response.data.record_id;
-        console.log('Set currentRecordId to', user.value.currentRecordId);
-
+        if (user.value) {
+            user.value.currentRecordId = response.data.record_id;
+            console.log('Set currentRecordId to', user.value.currentRecordId);
+        }
         toast.success(t('patientForm.toast.success.title'), {
             description: t('patientForm.toast.success.description'),
         });
 
         emits('submit', values);
         closeAllDialogs();
-        router.push({
-            name: 'chat.new-chat',
-        });
+        if ((props.mode ?? 'chat') === 'voice') {
+            // Open full-screen voice dialog (non-blocking), passing initial AI message to auto-speak
+            openDialog({
+                component: VoiceCallDialog,
+                props: {
+                    userId: user.value?.id,
+                    recordId: response.data.record_id,
+                    initialMessage: response.data.message,
+                },
+            });
+        } else {
+            router.push({
+                name: 'current-conversation',
+            });
+        }
         form.resetForm();
     } catch (err) {
         console.error('submitPatientInfo error:', err);
@@ -814,7 +831,7 @@ const onSubmit = form.handleSubmit(async (values) => {
         <!-- Reason for Visit -->
         <section>
             <h3 class="text-lg font-semibold mb-4">
-                {{ $t('patientForm.sections.reason-for-visit') }}
+                {{ $t('patientForm.sections.reasonForVisit') }}
             </h3>
 
             <div class="grid grid-cols-1 gap-4 pb-5">

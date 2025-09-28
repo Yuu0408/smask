@@ -15,6 +15,7 @@ import MedicalRecordForm, {
 export type { PatientFormValues } from './MedicalRecordForm.vue';
 
 const open = defineModel<boolean>(); // v-model:open from parent
+const props = defineProps<{ mode?: 'chat' | 'voice' }>();
 
 const emits = defineEmits(['submit']);
 
@@ -36,7 +37,10 @@ const handleSubmit = (values: PatientFormValues) => {
             </DialogHeader>
 
             <!-- Your teammate's layout expects the form to emit `submit` -->
-            <MedicalRecordForm @submit="handleSubmit" />
+            <MedicalRecordForm
+                :mode="props.mode ?? 'chat'"
+                @submit="handleSubmit"
+            />
         </DialogContent>
     </Dialog>
 </template>

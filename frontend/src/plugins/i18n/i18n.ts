@@ -8,15 +8,21 @@ const messages = {
     // ja,
 };
 
-// Always default to Vietnamese
+// Load default locale from localStorage or fallback to 'en'
 const getDefaultLocale = (): string => {
+    if (typeof window !== 'undefined') {
+        const saved = window.localStorage.getItem('locale');
+        if (saved === 'vi' || saved === 'en') return saved;
+    }
     return 'en';
 };
 
-export default createI18n({
+const i18n = createI18n({
     legacy: false,
-    locale: getDefaultLocale(), // always "vi"
+    locale: getDefaultLocale(),
     fallbackLocale: 'en',
     messages,
     globalInjection: true,
 });
+
+export default i18n;
