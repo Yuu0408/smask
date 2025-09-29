@@ -338,36 +338,36 @@ const form = useForm<PatientFormValues>({
 });
 
 // Helper computed to estimate years smoked for UI hint
-const currentAgeComputed = computed(() => {
-    const birthday = (form?.values?.birthday as unknown as string) || '';
-    if (!birthday) return undefined as number | undefined;
-    try {
-        const dob = new Date(birthday);
-        const today = new Date();
-        let age = today.getFullYear() - dob.getFullYear();
-        const m = today.getMonth() - dob.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-        return age;
-    } catch {
-        return undefined;
-    }
-});
+// const currentAgeComputed = computed(() => {
+//     const birthday = (form?.values?.birthday as unknown as string) || '';
+//     if (!birthday) return undefined as number | undefined;
+//     try {
+//         const dob = new Date(birthday);
+//         const today = new Date();
+//         let age = today.getFullYear() - dob.getFullYear();
+//         const m = today.getMonth() - dob.getMonth();
+//         if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+//         return age;
+//     } catch {
+//         return undefined;
+//     }
+// });
 
-const smokingYearsApprox = computed(() => {
-    const v: any = form?.values || {};
-    const start = Number(v.smoking_start_age || NaN);
-    if (isNaN(start)) return undefined as number | undefined;
-    if (v.smoking_habit === 'used_to_quit') {
-        const end = Number(v.smoking_end_age || NaN);
-        if (!isNaN(end) && end > start) return end - start;
-        return undefined;
-    }
-    if (v.smoking_habit === 'current') {
-        const ca = currentAgeComputed.value;
-        if (ca != null && ca > start) return ca - start;
-    }
-    return undefined;
-});
+// const smokingYearsApprox = computed(() => {
+//     const v: any = form?.values || {};
+//     const start = Number(v.smoking_start_age || NaN);
+//     if (isNaN(start)) return undefined as number | undefined;
+//     if (v.smoking_habit === 'used_to_quit') {
+//         const end = Number(v.smoking_end_age || NaN);
+//         if (!isNaN(end) && end > start) return end - start;
+//         return undefined;
+//     }
+//     if (v.smoking_habit === 'current') {
+//         const ca = currentAgeComputed.value;
+//         if (ca != null && ca > start) return ca - start;
+//     }
+//     return undefined;
+// });
 
 const canSubmit = computed(
     () =>
@@ -1011,50 +1011,95 @@ const onSubmit = form.handleSubmit(async (values) => {
                     v-if="form.values.smoking_habit === 'used_to_quit'"
                     class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
                 >
-                    <span>{{ $t('patientForm.inline.smokingQuit.prefix') }}</span>
+                    <span>{{
+                        $t('patientForm.inline.smokingQuit.prefix')
+                    }}</span>
                     <Input
                         class="w-16"
                         type="number"
                         :modelValue="form.values.smoking_start_age"
-                        @update:modelValue="v => form.setFieldValue('smoking_start_age', String(v ?? ''))"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'smoking_start_age',
+                                    String(v ?? '')
+                                )
+                        "
                     />
                     <span>{{ $t('patientForm.inline.smokingQuit.to') }}</span>
                     <Input
                         class="w-16"
                         type="number"
                         :modelValue="form.values.smoking_end_age"
-                        @update:modelValue="v => form.setFieldValue('smoking_end_age', String(v ?? ''))"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'smoking_end_age',
+                                    String(v ?? '')
+                                )
+                        "
                     />
-                    <span>• {{ $t('patientForm.inline.smokingQuit.cigs') }}</span>
+                    <span
+                        >• {{ $t('patientForm.inline.smokingQuit.cigs') }}</span
+                    >
                     <Input
                         class="w-16"
                         type="number"
                         :modelValue="form.values.smoking_cigarettes_per_day"
-                        @update:modelValue="v => form.setFieldValue('smoking_cigarettes_per_day', String(v ?? ''))"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'smoking_cigarettes_per_day',
+                                    String(v ?? '')
+                                )
+                        "
                     />
-                    <span>{{ $t('patientForm.inline.smokingQuit.cigsUnit') }}</span>
+                    <span>{{
+                        $t('patientForm.inline.smokingQuit.cigsUnit')
+                    }}</span>
                 </div>
 
                 <div
                     v-if="form.values.smoking_habit === 'current'"
                     class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
                 >
-                    <span>{{ $t('patientForm.inline.smokingCurrent.prefix') }}</span>
+                    <span>{{
+                        $t('patientForm.inline.smokingCurrent.prefix')
+                    }}</span>
                     <Input
                         class="w-16"
                         type="number"
                         :modelValue="form.values.smoking_start_age"
-                        @update:modelValue="v => form.setFieldValue('smoking_start_age', String(v ?? ''))"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'smoking_start_age',
+                                    String(v ?? '')
+                                )
+                        "
                     />
-                    <span>{{ $t('patientForm.inline.smokingCurrent.toNow') }}</span>
-                    <span>• {{ $t('patientForm.inline.smokingCurrent.cigs') }}</span>
+                    <span>{{
+                        $t('patientForm.inline.smokingCurrent.toNow')
+                    }}</span>
+                    <span
+                        >•
+                        {{ $t('patientForm.inline.smokingCurrent.cigs') }}</span
+                    >
                     <Input
                         class="w-16"
                         type="number"
                         :modelValue="form.values.smoking_cigarettes_per_day"
-                        @update:modelValue="v => form.setFieldValue('smoking_cigarettes_per_day', String(v ?? ''))"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'smoking_cigarettes_per_day',
+                                    String(v ?? '')
+                                )
+                        "
                     />
-                    <span>{{ $t('patientForm.inline.smokingCurrent.cigsUnit') }}</span>
+                    <span>{{
+                        $t('patientForm.inline.smokingCurrent.cigsUnit')
+                    }}</span>
                 </div>
 
                 <!-- Living situation -->
@@ -1377,5 +1422,3 @@ const onSubmit = form.handleSubmit(async (values) => {
         </div>
     </form>
 </template>
-
-

@@ -202,7 +202,11 @@ const socialItems = computed(() => {
     ];
 
     // Append details if present
-    if (d.alcohol_consumption && d.alcohol_consumption !== 'never' && d.alcohol_details) {
+    if (
+        d.alcohol_consumption &&
+        d.alcohol_consumption !== 'never' &&
+        d.alcohol_details
+    ) {
         const ad = d.alcohol_details || {};
         let desc = '';
         if (d.alcohol_consumption === 'occasionally') {
@@ -218,7 +222,11 @@ const socialItems = computed(() => {
         const sd = d.smoking_details || {};
         let desc = '';
         if (d.smoking_habit === 'used_to_quit') {
-            const years = sd.years_smoked ?? (sd.end_age != null && sd.start_age != null ? sd.end_age - sd.start_age : undefined);
+            const years =
+                sd.years_smoked ??
+                (sd.end_age != null && sd.start_age != null
+                    ? sd.end_age - sd.start_age
+                    : undefined);
             desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → ${t('patientForm.smokingDetails.endAge')}: ${sd.end_age ?? '-'}${years != null ? ` (~${years})` : ''}, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
         } else if (d.smoking_habit === 'current') {
             desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → now, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;

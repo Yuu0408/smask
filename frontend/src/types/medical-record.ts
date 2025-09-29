@@ -22,8 +22,8 @@ export interface MedicalRecordData {
         alcohol_details?: {
             per_month_times?: number; // for occasionally
             per_week_times?: number; // for frequently
-            per_time_ml?: number;     // for occasionally
-            avg_per_day_ml?: number;  // for frequently or daily
+            per_time_ml?: number; // for occasionally
+            avg_per_day_ml?: number; // for frequently or daily
             drink_type?: string;
         };
         smoking_habit: string; // never | used_to_quit | current
