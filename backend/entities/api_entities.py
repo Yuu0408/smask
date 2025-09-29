@@ -14,9 +14,26 @@ class PatientInfo(BaseModel):
     nationality: str
     address: str = Field(..., description="Address of patient")
 
+class AlcoholDetails(BaseModel):
+    per_month_times: Optional[int] = None
+    per_week_times: Optional[int] = None
+    per_time_ml: Optional[int] = None
+    avg_per_day_ml: Optional[int] = None
+    drink_type: Optional[str] = None
+
+
+class SmokingDetails(BaseModel):
+    start_age: Optional[int] = None
+    end_age: Optional[int] = None
+    cigarettes_per_day: Optional[int] = None
+    years_smoked: Optional[int] = None
+
+
 class SocialInformation(BaseModel):
     alcohol_consumption: Optional[str]
+    alcohol_details: Optional[AlcoholDetails] = None
     smoking_habit: Optional[str]
+    smoking_details: Optional[SmokingDetails] = None
     living_situation: Optional[str]
     daily_activity_independence: Optional[str]
     recent_travel_history: Optional[str]

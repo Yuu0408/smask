@@ -63,6 +63,7 @@ function translateAlcohol(value?: string): string {
         never: 'never',
         occasionally: 'occasionally',
         frequently: 'frequently',
+        daily: 'daily',
     };
     return map[value] ? t(`patientForm.options.${map[value]}`) : value;
 }
@@ -72,8 +73,7 @@ function translateSmoking(value?: string): string {
     const map: Record<string, string> = {
         never: 'never',
         used_to_quit: 'usedToQuit',
-        occasionally: 'occasionally',
-        daily: 'daily',
+        current: 'currentSmoking',
     };
     return map[value] ? t(`patientForm.options.${map[value]}`) : value;
 }
@@ -169,14 +169,16 @@ const socialItems = computed(() => {
     const d = record.value?.data?.social_information as
         | {
               alcohol_consumption?: string;
+              alcohol_details?: any;
               smoking_habit?: string;
+              smoking_details?: any;
               living_situation?: string;
               daily_activity_independence?: string;
               recent_travel_history?: string;
           }
         | undefined;
     if (!d) return [] as Array<{ label: string; value: string }>;
-    return [
+    const items: Array<{ label: string; value: string }> = [
         {
             label: t('medicalRecord.alcohol'),
             value: translateAlcohol(d.alcohol_consumption),
@@ -198,6 +200,32 @@ const socialItems = computed(() => {
             value: translateTravel(d.recent_travel_history),
         },
     ];
+
+    // Append details if present
+    if (d.alcohol_consumption && d.alcohol_consumption !== 'never' && d.alcohol_details) {
+        const ad = d.alcohol_details || {};
+        let desc = '';
+        if (d.alcohol_consumption === 'occasionally') {
+            desc = `${t('patientForm.alcoholDetails.perMonthTimes')}: ${ad.per_month_times ?? '-'}, ${t('patientForm.alcoholDetails.perTimeMl')}: ${ad.per_time_ml ?? '-'} ml, ${t('patientForm.alcoholDetails.drinkType')}: ${ad.drink_type ?? '-'}`;
+        } else if (d.alcohol_consumption === 'frequently') {
+            desc = `${t('patientForm.alcoholDetails.perWeekTimes')}: ${ad.per_week_times ?? '-'}, ${t('patientForm.alcoholDetails.avgPerDayMl')}: ${ad.avg_per_day_ml ?? '-'} ml, ${t('patientForm.alcoholDetails.drinkType')}: ${ad.drink_type ?? '-'}`;
+        } else if (d.alcohol_consumption === 'daily') {
+            desc = `${t('patientForm.alcoholDetails.avgPerDayMl')}: ${ad.avg_per_day_ml ?? '-'} ml, ${t('patientForm.alcoholDetails.drinkType')}: ${ad.drink_type ?? '-'}`;
+        }
+        items.splice(1, 0, { label: t('medicalRecord.alcohol'), value: desc });
+    }
+    if (d.smoking_habit && d.smoking_habit !== 'never' && d.smoking_details) {
+        const sd = d.smoking_details || {};
+        let desc = '';
+        if (d.smoking_habit === 'used_to_quit') {
+            const years = sd.years_smoked ?? (sd.end_age != null && sd.start_age != null ? sd.end_age - sd.start_age : undefined);
+            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → ${t('patientForm.smokingDetails.endAge')}: ${sd.end_age ?? '-'}${years != null ? ` (~${years})` : ''}, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
+        } else if (d.smoking_habit === 'current') {
+            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → now, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
+        }
+        items.splice(3, 0, { label: t('medicalRecord.smoking'), value: desc });
+    }
+    return items;
 });
 
 const medicalHistoryItems = computed(() => {

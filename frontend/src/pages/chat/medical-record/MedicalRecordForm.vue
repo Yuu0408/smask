@@ -49,6 +49,9 @@ const { user } = storeToRefs(authStore);
 console.log('current user in MedicalRecordForm:', user.value);
 const userId = computed(() => user.value?.id ?? '');
 
+// Helper computed to estimate years smoked for UI hint
+// Initialized after form below to access form.values
+
 /**
  * Schema
  * - Core required fields mirror your original isFormValid()
@@ -81,7 +84,18 @@ const baseRequired = {
     alcohol_consumption: z
         .string()
         .min(1, t('patientForm.validation.required')),
+    // alcohol detail fields (as strings; coerced on submit)
+    alcohol_per_month_times: z.string().optional(),
+    alcohol_per_week_times: z.string().optional(),
+    alcohol_per_time_ml: z.string().optional(),
+    alcohol_avg_per_day_ml: z.string().optional(),
+    alcohol_drink_type: z.string().optional(),
+
     smoking_habit: z.string().min(1, t('patientForm.validation.required')),
+    // smoking detail fields
+    smoking_start_age: z.string().optional(),
+    smoking_end_age: z.string().optional(),
+    smoking_cigarettes_per_day: z.string().optional(),
     living_situation: z.string().min(1, t('patientForm.validation.required')),
     daily_activity_independence: z
         .string()
@@ -126,6 +140,160 @@ const rawSchema = z.object(baseRequired).superRefine((val, ctx) => {
             });
         }
     }
+    // Alcohol conditional requirements
+    const num = (s?: string | null) => (s && s.trim() !== '' ? Number(s) : NaN);
+    if (val.alcohol_consumption === 'occasionally') {
+        if (
+            !val.alcohol_per_month_times ||
+            isNaN(num(val.alcohol_per_month_times)) ||
+            num(val.alcohol_per_month_times) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_per_month_times'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (
+            !val.alcohol_per_time_ml ||
+            isNaN(num(val.alcohol_per_time_ml)) ||
+            num(val.alcohol_per_time_ml) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_per_time_ml'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (!val.alcohol_drink_type || val.alcohol_drink_type.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_drink_type'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+    }
+    if (val.alcohol_consumption === 'frequently') {
+        if (
+            !val.alcohol_per_week_times ||
+            isNaN(num(val.alcohol_per_week_times)) ||
+            num(val.alcohol_per_week_times) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_per_week_times'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (
+            !val.alcohol_avg_per_day_ml ||
+            isNaN(num(val.alcohol_avg_per_day_ml)) ||
+            num(val.alcohol_avg_per_day_ml) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_avg_per_day_ml'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (!val.alcohol_drink_type || val.alcohol_drink_type.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_drink_type'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+    }
+    if (val.alcohol_consumption === 'daily') {
+        if (
+            !val.alcohol_avg_per_day_ml ||
+            isNaN(num(val.alcohol_avg_per_day_ml)) ||
+            num(val.alcohol_avg_per_day_ml) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_avg_per_day_ml'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (!val.alcohol_drink_type || val.alcohol_drink_type.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['alcohol_drink_type'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+    }
+
+    // Smoking conditional requirements
+    if (val.smoking_habit === 'used_to_quit') {
+        if (
+            !val.smoking_start_age ||
+            isNaN(num(val.smoking_start_age)) ||
+            num(val.smoking_start_age) < 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_start_age'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (
+            !val.smoking_end_age ||
+            isNaN(num(val.smoking_end_age)) ||
+            num(val.smoking_end_age) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_end_age'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        const sa = num(val.smoking_start_age);
+        const ea = num(val.smoking_end_age);
+        if (!isNaN(sa) && !isNaN(ea) && ea <= sa) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_end_age'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (
+            !val.smoking_cigarettes_per_day ||
+            isNaN(num(val.smoking_cigarettes_per_day)) ||
+            num(val.smoking_cigarettes_per_day) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_cigarettes_per_day'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+    }
+    if (val.smoking_habit === 'current') {
+        if (
+            !val.smoking_start_age ||
+            isNaN(num(val.smoking_start_age)) ||
+            num(val.smoking_start_age) < 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_start_age'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+        if (
+            !val.smoking_cigarettes_per_day ||
+            isNaN(num(val.smoking_cigarettes_per_day)) ||
+            num(val.smoking_cigarettes_per_day) <= 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['smoking_cigarettes_per_day'],
+                message: t('patientForm.validation.required'),
+            });
+        }
+    }
 });
 
 export type PatientFormValues = z.infer<typeof rawSchema>;
@@ -149,7 +317,16 @@ const form = useForm<PatientFormValues>({
         family_medical_history: '',
 
         alcohol_consumption: '',
+        alcohol_per_month_times: '',
+        alcohol_per_week_times: '',
+        alcohol_per_time_ml: '',
+        alcohol_avg_per_day_ml: '',
+        alcohol_drink_type: '',
+
         smoking_habit: '',
+        smoking_start_age: '',
+        smoking_end_age: '',
+        smoking_cigarettes_per_day: '',
         living_situation: '',
         daily_activity_independence: '',
         recent_travel_history: '',
@@ -160,6 +337,38 @@ const form = useForm<PatientFormValues>({
     },
 });
 
+// Helper computed to estimate years smoked for UI hint
+const currentAgeComputed = computed(() => {
+    const birthday = (form?.values?.birthday as unknown as string) || '';
+    if (!birthday) return undefined as number | undefined;
+    try {
+        const dob = new Date(birthday);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+        return age;
+    } catch {
+        return undefined;
+    }
+});
+
+const smokingYearsApprox = computed(() => {
+    const v: any = form?.values || {};
+    const start = Number(v.smoking_start_age || NaN);
+    if (isNaN(start)) return undefined as number | undefined;
+    if (v.smoking_habit === 'used_to_quit') {
+        const end = Number(v.smoking_end_age || NaN);
+        if (!isNaN(end) && end > start) return end - start;
+        return undefined;
+    }
+    if (v.smoking_habit === 'current') {
+        const ca = currentAgeComputed.value;
+        if (ca != null && ca > start) return ca - start;
+    }
+    return undefined;
+});
+
 const canSubmit = computed(
     () =>
         (form.meta.value.valid && !loading.value.submit) || loading.value.submit
@@ -168,6 +377,27 @@ const canSubmit = computed(
 const onSubmit = form.handleSubmit(async (values) => {
     loading.value.submit = true;
     try {
+        const toNum = (s?: string | null) => {
+            if (s == null) return undefined;
+            const n = Number(String(s).trim());
+            return isNaN(n) ? undefined : n;
+        };
+        const calcAge = (birthday: string): number | undefined => {
+            if (!birthday) return undefined;
+            try {
+                const dob = new Date(birthday);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate()))
+                    age--;
+                return age;
+            } catch {
+                return undefined;
+            }
+        };
+        const currentAge = calcAge(values.birthday);
+
         const payload = {
             patient_info: {
                 full_name: values.full_name,
@@ -187,8 +417,67 @@ const onSubmit = form.handleSubmit(async (values) => {
             },
             social_information: {
                 alcohol_consumption: values.alcohol_consumption,
+                alcohol_details:
+                    values.alcohol_consumption === 'never'
+                        ? undefined
+                        : {
+                              per_month_times:
+                                  values.alcohol_consumption === 'occasionally'
+                                      ? toNum(values.alcohol_per_month_times)
+                                      : undefined,
+                              per_week_times:
+                                  values.alcohol_consumption === 'frequently'
+                                      ? toNum(values.alcohol_per_week_times)
+                                      : undefined,
+                              per_time_ml:
+                                  values.alcohol_consumption === 'occasionally'
+                                      ? toNum(values.alcohol_per_time_ml)
+                                      : undefined,
+                              avg_per_day_ml:
+                                  values.alcohol_consumption === 'frequently' ||
+                                  values.alcohol_consumption === 'daily'
+                                      ? toNum(values.alcohol_avg_per_day_ml)
+                                      : undefined,
+                              drink_type:
+                                  values.alcohol_consumption !== 'never'
+                                      ? values.alcohol_drink_type || undefined
+                                      : undefined,
+                          },
                 smoking_habit: values.smoking_habit,
-                latest_alcohol_smoking_intake: '',
+                smoking_details:
+                    values.smoking_habit === 'never'
+                        ? undefined
+                        : (() => {
+                              const start = toNum(values.smoking_start_age);
+                              const end =
+                                  values.smoking_habit === 'used_to_quit'
+                                      ? toNum(values.smoking_end_age)
+                                      : undefined;
+                              const years = (() => {
+                                  if (start == null) return undefined;
+                                  if (
+                                      values.smoking_habit === 'used_to_quit' &&
+                                      end != null
+                                  ) {
+                                      return end - start;
+                                  }
+                                  if (
+                                      values.smoking_habit === 'current' &&
+                                      currentAge != null
+                                  ) {
+                                      return currentAge - start;
+                                  }
+                                  return undefined;
+                              })();
+                              return {
+                                  start_age: start,
+                                  end_age: end,
+                                  cigarettes_per_day: toNum(
+                                      values.smoking_cigarettes_per_day
+                                  ),
+                                  years_smoked: years,
+                              };
+                          })(),
                 living_situation: values.living_situation,
                 daily_activity_independence: values.daily_activity_independence,
                 recent_travel_history: values.recent_travel_history,
@@ -340,7 +629,6 @@ const onSubmit = form.handleSubmit(async (values) => {
                         </div>
                     </FormItem>
                 </FormField>
-
                 <!-- Occupation -->
                 <FormField v-slot="{ componentField }" name="occupation">
                     <FormItem>
@@ -535,6 +823,9 @@ const onSubmit = form.handleSubmit(async (values) => {
                                 <SelectItem value="frequently">{{
                                     $t('patientForm.options.frequently')
                                 }}</SelectItem>
+                                <SelectItem value="daily">{{
+                                    $t('patientForm.options.daily')
+                                }}</SelectItem>
                             </SelectContent>
                         </Select>
                         <div class="lg:min-h-6">
@@ -542,6 +833,140 @@ const onSubmit = form.handleSubmit(async (values) => {
                         </div>
                     </FormItem>
                 </FormField>
+
+                <!-- Alcohol inline details -->
+                <div
+                    v-if="form.values.alcohol_consumption === 'occasionally'"
+                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                >
+                    <span>{{
+                        $t('patientForm.inline.alcoholOccasional.prefix')
+                    }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.alcohol_per_month_times"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_per_month_times',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                    <span>{{
+                        $t('patientForm.inline.alcoholOccasional.times')
+                    }}</span>
+                    <Input
+                        class="w-20"
+                        type="number"
+                        :modelValue="form.values.alcohol_per_time_ml"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_per_time_ml',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                    <span>{{
+                        $t('patientForm.inline.alcoholOccasional.ml')
+                    }}</span>
+                    <Input
+                        class="w-40"
+                        :modelValue="form.values.alcohol_drink_type"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_drink_type',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                </div>
+
+                <div
+                    v-if="form.values.alcohol_consumption === 'frequently'"
+                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                >
+                    <span>{{
+                        $t('patientForm.inline.alcoholFrequent.prefix')
+                    }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.alcohol_per_week_times"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_per_week_times',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                    <span>{{
+                        $t('patientForm.inline.alcoholFrequent.times')
+                    }}</span>
+                    <Input
+                        class="w-20"
+                        type="number"
+                        :modelValue="form.values.alcohol_avg_per_day_ml"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_avg_per_day_ml',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                    <span>{{
+                        $t('patientForm.inline.alcoholFrequent.ml')
+                    }}</span>
+                    <Input
+                        class="w-40"
+                        :modelValue="form.values.alcohol_drink_type"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_drink_type',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                </div>
+
+                <div
+                    v-if="form.values.alcohol_consumption === 'daily'"
+                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                >
+                    <span>{{
+                        $t('patientForm.inline.alcoholDaily.prefix')
+                    }}</span>
+                    <Input
+                        class="w-20"
+                        type="number"
+                        :modelValue="form.values.alcohol_avg_per_day_ml"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_avg_per_day_ml',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                    <span>{{ $t('patientForm.inline.alcoholDaily.ml') }}</span>
+                    <Input
+                        class="w-40"
+                        :modelValue="form.values.alcohol_drink_type"
+                        @update:modelValue="
+                            (v) =>
+                                form.setFieldValue(
+                                    'alcohol_drink_type',
+                                    String(v ?? '')
+                                )
+                        "
+                    />
+                </div>
 
                 <!-- Smoking -->
                 <FormField v-slot="{ field }" name="smoking_habit">
@@ -570,11 +995,8 @@ const onSubmit = form.handleSubmit(async (values) => {
                                 <SelectItem value="used_to_quit">{{
                                     $t('patientForm.options.usedToQuit')
                                 }}</SelectItem>
-                                <SelectItem value="occasionally">{{
-                                    $t('patientForm.options.occasionally')
-                                }}</SelectItem>
-                                <SelectItem value="daily">{{
-                                    $t('patientForm.options.daily')
+                                <SelectItem value="current">{{
+                                    $t('patientForm.options.currentSmoking')
                                 }}</SelectItem>
                             </SelectContent>
                         </Select>
@@ -583,6 +1005,57 @@ const onSubmit = form.handleSubmit(async (values) => {
                         </div>
                     </FormItem>
                 </FormField>
+
+                <!-- Smoking inline details -->
+                <div
+                    v-if="form.values.smoking_habit === 'used_to_quit'"
+                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                >
+                    <span>{{ $t('patientForm.inline.smokingQuit.prefix') }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.smoking_start_age"
+                        @update:modelValue="v => form.setFieldValue('smoking_start_age', String(v ?? ''))"
+                    />
+                    <span>{{ $t('patientForm.inline.smokingQuit.to') }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.smoking_end_age"
+                        @update:modelValue="v => form.setFieldValue('smoking_end_age', String(v ?? ''))"
+                    />
+                    <span>• {{ $t('patientForm.inline.smokingQuit.cigs') }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.smoking_cigarettes_per_day"
+                        @update:modelValue="v => form.setFieldValue('smoking_cigarettes_per_day', String(v ?? ''))"
+                    />
+                    <span>{{ $t('patientForm.inline.smokingQuit.cigsUnit') }}</span>
+                </div>
+
+                <div
+                    v-if="form.values.smoking_habit === 'current'"
+                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                >
+                    <span>{{ $t('patientForm.inline.smokingCurrent.prefix') }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.smoking_start_age"
+                        @update:modelValue="v => form.setFieldValue('smoking_start_age', String(v ?? ''))"
+                    />
+                    <span>{{ $t('patientForm.inline.smokingCurrent.toNow') }}</span>
+                    <span>• {{ $t('patientForm.inline.smokingCurrent.cigs') }}</span>
+                    <Input
+                        class="w-16"
+                        type="number"
+                        :modelValue="form.values.smoking_cigarettes_per_day"
+                        @update:modelValue="v => form.setFieldValue('smoking_cigarettes_per_day', String(v ?? ''))"
+                    />
+                    <span>{{ $t('patientForm.inline.smokingCurrent.cigsUnit') }}</span>
+                </div>
 
                 <!-- Living situation -->
                 <FormField v-slot="{ field }" name="living_situation">
@@ -904,3 +1377,5 @@ const onSubmit = form.handleSubmit(async (values) => {
         </div>
     </form>
 </template>
+
+

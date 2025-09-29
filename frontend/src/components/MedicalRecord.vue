@@ -42,6 +42,7 @@ function translateAlcohol(value?: string): string {
         never: 'never',
         occasionally: 'occasionally',
         frequently: 'frequently',
+        daily: 'daily',
     };
     return map[value] ? t(`patientForm.options.${map[value]}`) : value;
 }
@@ -51,8 +52,7 @@ function translateSmoking(value?: string): string {
     const map: Record<string, string> = {
         never: 'never',
         used_to_quit: 'usedToQuit',
-        occasionally: 'occasionally',
-        daily: 'daily',
+        current: 'currentSmoking',
     };
     return map[value] ? t(`patientForm.options.${map[value]}`) : value;
 }

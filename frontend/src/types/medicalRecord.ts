@@ -16,8 +16,21 @@ export interface MedicalRecord {
         family_medical_history: string;
     };
     social_information: {
-        alcohol_consumption?: string;
-        smoking_habit?: string;
+        alcohol_consumption?: string; // never | occasionally | frequently | daily
+        alcohol_details?: {
+            per_month_times?: number;
+            per_week_times?: number;
+            per_time_ml?: number;
+            avg_per_day_ml?: number;
+            drink_type?: string;
+        };
+        smoking_habit?: string; // never | used_to_quit | current
+        smoking_details?: {
+            start_age?: number;
+            end_age?: number;
+            cigarettes_per_day?: number;
+            years_smoked?: number;
+        };
         living_situation?: string;
         daily_activity_independence?: string;
         recent_travel_history?: string;

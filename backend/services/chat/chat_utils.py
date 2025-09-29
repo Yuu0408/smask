@@ -4,7 +4,7 @@ from graph.chains.conversation_chain import create_conversation_chain
 from graph.chains.information_chain import create_information_chain
 from graph.chains.diagnosis_chain import create_diagnosis_chain
 from services.contact.options import get_allowed_addresses, get_facilities_by_address
-
+import json
 
 def _normalize_record(medical_record):
     try:
@@ -15,8 +15,26 @@ def _normalize_record(medical_record):
     return medical_record or {}
 
 def get_ai_response(medical_record, reasoning, note, history, message):
-    conversation_chain = create_conversation_chain(reasoning=reasoning, note=note, conversation_history=history, message=message)
-    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record)})
+    # Ensure plain-text for prompt interpolation
+    if isinstance(reasoning, (dict, list)):
+        try:
+            reasoning_text = json.dumps(reasoning, ensure_ascii=False)
+        except Exception:
+            reasoning_text = str(reasoning)
+    elif reasoning is None:
+        reasoning_text = ""
+    else:
+        reasoning_text = str(reasoning)
+
+    note_text = "" if note is None else str(note)
+
+    conversation_chain = create_conversation_chain(
+        reasoning=reasoning_text,
+        note=note_text,
+        conversation_history=history,
+        message=message,
+    )
+    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning})
 
     return response
 

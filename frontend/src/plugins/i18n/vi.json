@@ -133,8 +133,9 @@
             "never": "Không bao giờ",
             "occasionally": "Thỉnh thoảng",
             "frequently": "Thường xuyên",
-            "usedToQuit": "Đã từng, nhưng đã bỏ",
-            "daily": "Có, hàng ngày",
+            "usedToQuit": "Đã từng hút nhưng đã bỏ",
+            "daily": "Hằng ngày",
+            "currentSmoking": "Vẫn đang hút",
             "yes": "Có",
             "no": "Không",
             "partially": "Một phần",
@@ -145,6 +146,47 @@
             "otherLiving": "Khác",
             "travel14": "Có, trong vòng 14 ngày qua",
             "travelMonth": "Có, trong vòng một tháng qua"
+        },
+        "alcoholDetails": {
+            "perMonthTimes": "1 tháng uống (lần)",
+            "perWeekTimes": "1 tuần uống (lần)",
+            "perTimeMl": "Mỗi lần (ml)",
+            "avgPerDayMl": "Trung bình mỗi ngày (ml)",
+            "drinkType": "Loại bia/rượu"
+        },
+        "smokingDetails": {
+            "startAge": "Hút từ tuổi",
+            "endAge": "Đến tuổi",
+            "cigarettesPerDay": "Trung bình mỗi ngày (điếu)",
+            "yearsHint": "Số năm sẽ được tự động tính"
+        },
+        "inline": {
+            "alcoholOccasional": {
+                "prefix": "1 tháng uống",
+                "times": "lần, mỗi lần uống",
+                "ml": "ml, loại bia/rượu:"
+            },
+            "alcoholFrequent": {
+                "prefix": "1 tuần uống",
+                "times": "lần, trung bình mỗi ngày",
+                "ml": "ml, loại bia/rượu:"
+            },
+            "alcoholDaily": {
+                "prefix": "Trung bình mỗi ngày",
+                "ml": "ml, loại bia/rượu:"
+            },
+            "smokingQuit": {
+                "prefix": "Hút thuốc từ",
+                "to": "đến tuổi",
+                "cigs": "trung bình mỗi ngày hút",
+                "cigsUnit": "điếu"
+            },
+            "smokingCurrent": {
+                "prefix": "Hút thuốc từ",
+                "toNow": "đến nay",
+                "cigs": "trung bình mỗi ngày hút",
+                "cigsUnit": "điếu"
+            }
         },
         "warning": "Vui lòng điền đầy đủ các trường bắt buộc trước khi đóng biểu mẫu.",
         "submit": {

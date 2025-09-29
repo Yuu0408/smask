@@ -33,29 +33,34 @@ class ChatService:
             raise HTTPException(status_code=400, detail=f'Invalid user id')
         
         print(f"Data: {data}")
-        if data.get("social_information")["alcohol_consumption"] == "never" and data.get("social_information")["smoking_habit"] == "never":
-            data.get("social_information")["latest_alcohol_smoking_intake"] = "never"
         
         record = self.medical_record_repo.add_record(user_id=user_id, data=data)
         record_id = record.record_id
         
-        ai_response = get_information(record, [], "")
+        # ai_response = get_information(record, [], "")
+        
         
         ai_state = self.ai_state_repo.add_ai_state(
             user_id=user_id, 
             record_id=record_id, 
-            data=AIStateData(reasoning="", note="", decision=ai_response.decision).model_dump(mode="json")
+            data=AIStateData(reasoning=None, note="", decision="MAIN_QUESTIONING").model_dump(mode="json")
         )
 
         # Initialize an empty todo list for this new record
         self.todo_repo.replace_todos(user_id=user_id, record_id=record_id, items=[])
 
         if ai_state.data["decision"] == "MAIN_QUESTIONING":
-            ai_response = get_ai_response(record, ai_state.data["reasoning"] if ai_state else "", ai_state.data["note"] if ai_state else "", [], "")
+            ai_response = get_ai_response(record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", [], "")
+            # Normalize nested Pydantic from chain output to our DTO schema
+            normalized_reasoning = (
+                ai_response.reasoning.model_dump(mode="json")
+                if getattr(ai_response, "reasoning", None) is not None and hasattr(ai_response.reasoning, "model_dump")
+                else (ai_response.reasoning if getattr(ai_response, "reasoning", None) is not None else None)
+            )
             ai_state = self.ai_state_repo.add_ai_state(
                 user_id=user_id, 
                 record_id=record_id, 
-                data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
+                data=AIStateData(reasoning=normalized_reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
             )
             
         first_bot_message = (getattr(ai_response, "generation", "") or "").strip()
@@ -124,15 +129,20 @@ class ChatService:
             ai_state = self.ai_state_repo.add_ai_state(
                 user_id=user_id, 
                 record_id=record_id, 
-                data=AIStateData(reasoning="", note="", decision=ai_response.decision).model_dump(mode="json")
+                data=AIStateData(reasoning=None, note="", decision=ai_response.decision).model_dump(mode="json")
             )
 
         if ai_state.data["decision"] == "MAIN_QUESTIONING":
-            ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else "", ai_state.data["note"] if ai_state else "", chat_history, message)
+            ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", chat_history, message)
+            normalized_reasoning = (
+                ai_response.reasoning.model_dump(mode="json")
+                if getattr(ai_response, "reasoning", None) is not None and hasattr(ai_response.reasoning, "model_dump")
+                else (ai_response.reasoning if getattr(ai_response, "reasoning", None) is not None else None)
+            )
             ai_state = self.ai_state_repo.add_ai_state(
                 user_id=user_id, 
                 record_id=record_id, 
-                data=AIStateData(reasoning=ai_response.reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
+                data=AIStateData(reasoning=normalized_reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
             )
 
             messages = [{"role": "human", "content": message}, {"role": "ai", "content": ai_response.generation}]
@@ -175,7 +185,7 @@ class ChatService:
 
             new_state = {
                 **(current_state or {}),
-                "reasoning": "",
+                "reasoning": None,
                 "note": "",
                 "decision": "FINAL_STEPS",
             }
@@ -224,7 +234,7 @@ class ChatService:
                 pass
             merged_state = {
                 **(ai_state.data if ai_state and hasattr(ai_state, "data") else {}),
-                "reasoning": "",
+                "reasoning": None,
                 "note": "",
                 "decision": "FINAL_STEPS",
             }

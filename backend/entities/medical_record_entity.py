@@ -19,11 +19,34 @@ class MedicalRecord(BaseModel):
         allergies: str = Field(default_factory=list, description="allergies the patient has.")
         family_medical_history: str = Field(..., description="Medical conditions present in the patient's family.")
     
+    class AlcoholDetails(BaseModel):
+        per_month_times: Optional[int] = Field(None, description="For occasional drinking: number of times per month")
+        per_week_times: Optional[int] = Field(None, description="For frequent drinking: number of times per week")
+        per_time_ml: Optional[int] = Field(None, description="For occasional drinking: milliliters per occasion")
+        avg_per_day_ml: Optional[int] = Field(None, description="For frequent or daily drinking: average milliliters per day")
+        drink_type: Optional[str] = Field(None, description="Type of alcohol: beer/wine/spirits, etc.")
+
+    class SmokingDetails(BaseModel):
+        start_age: Optional[int] = Field(None, description="Age when the patient started smoking")
+        end_age: Optional[int] = Field(None, description="Age when the patient stopped smoking (if applicable)")
+        cigarettes_per_day: Optional[int] = Field(None, description="Average number of cigarettes per day")
+        years_smoked: Optional[int] = Field(None, description="Estimated years of smoking")
+
     class SocialInformation(BaseModel):
-        alcohol_consumption: Optional[str] = Field(None, description="Does the patient consume alcohol? If so, how frequently and how much?")
-        smoking_habit: Optional[str] = Field(None, description="Does the patient smoke? If so, how many cigarettes per day and for how long?")
+        alcohol_consumption: Optional[str] = Field(
+            None,
+            description="Alcohol consumption: never | occasionally | frequently | daily",
+        )
+        alcohol_details: Optional["MedicalRecord.AlcoholDetails"] = Field(
+            None, description="Structured details depending on alcohol consumption pattern"
+        )
+        smoking_habit: Optional[str] = Field(
+            None, description="Smoking status: never | used_to_quit | current"
+        )
+        smoking_details: Optional["MedicalRecord.SmokingDetails"] = Field(
+            None, description="Structured details depending on smoking status"
+        )
         living_situation: Optional[str] = Field(None, description="Does the patient live alone or with others?")
-        latest_alcohol_smoking_intake: Optional[str] = Field(None, description="If the patient does smoke or drink, when was the latest time they consumed alcohol or smoked?")
         daily_activity_independence: Optional[str] = Field(None, description="Can the patient independently perform daily activities, or do they require assistance?")
         recent_travel_history: Optional[str] = Field(None, description="Has the patient traveled internationally recently?")
     

@@ -135,7 +135,8 @@
             "occasionally": "Occasionally",
             "frequently": "Frequently",
             "usedToQuit": "Used to, but quit",
-            "daily": "Yes, daily",
+            "daily": "Daily",
+            "currentSmoking": "Still smoking",
             "yes": "Yes",
             "no": "No",
             "partially": "Partially",
@@ -146,6 +147,49 @@
             "otherLiving": "Other",
             "travel14": "Yes, within the last 14 days",
             "travelMonth": "Yes, within the last month"
+        },
+        "alcoholDetails": {
+            "perMonthTimes": "Times per month",
+            "perWeekTimes": "Times per week",
+            "perTimeMl": "Milliliters per occasion",
+            "avgPerDayMl": "Average ml per day",
+            "drinkType": "Type of alcohol (beer/wine/spirits)"
+        },
+        "smokingDetails": {
+            "startAge": "Start age",
+            "endAge": "End age",
+            "cigarettesPerDay": "Cigarettes per day",
+            "yearsHint": "Years will be calculated from start age"
+        },
+        "inline": {
+            "alcoholOccasional": {
+                "prefix": "Per month",
+                "times": "times, per occasion",
+                "ml": "ml, drink type:"
+            },
+            "alcoholFrequent": {
+                "prefix": "Per week",
+                "times": "times, average per day",
+                "ml": "ml, drink type:"
+            },
+            "alcoholDaily": {
+                "prefix": "Average per day",
+                "ml": "ml, drink type:"
+            },
+            "smokingQuit": {
+                "prefix": "Smoked from age",
+                "to": "to",
+                "years": "(years auto-calculated)",
+                "cigs": "average cigarettes/day",
+                "cigsUnit": ""
+            },
+            "smokingCurrent": {
+                "prefix": "Smoked from age",
+                "toNow": "to now",
+                "years": "(years auto-calculated)",
+                "cigs": "average cigarettes/day",
+                "cigsUnit": ""
+            }
         },
         "warning": "Please fill out all required fields before closing the form.",
         "submit": {

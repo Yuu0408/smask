@@ -28,10 +28,26 @@ class MedicalHistory(BaseModel):
     family_medical_history: str
 
 
+class AlcoholDetails(BaseModel):
+    per_month_times: Optional[int] = None
+    per_week_times: Optional[int] = None
+    per_time_ml: Optional[int] = None
+    avg_per_day_ml: Optional[int] = None
+    drink_type: Optional[str] = None
+
+
+class SmokingDetails(BaseModel):
+    start_age: Optional[int] = None
+    end_age: Optional[int] = None
+    cigarettes_per_day: Optional[int] = None
+    years_smoked: Optional[int] = None
+
+
 class SocialInformation(BaseModel):
     alcohol_consumption: str
+    alcohol_details: Optional[AlcoholDetails] = None
     smoking_habit: str
-    latest_alcohol_smoking_intake: str | None
+    smoking_details: Optional[SmokingDetails] = None
     living_situation: str
     daily_activity_independence: str
     recent_travel_history: str
@@ -88,8 +104,27 @@ class GetChatHistoryRequest(BaseModel):
 class GetChatHistoryResponse(BaseModel):
     history: List[ChatMessageDto]
 
+class Reasoning(BaseModel):
+    class PredictedDisease(BaseModel):
+        name: str = Field(..., description="The name of the diagnosed or predicted disease.")
+        symptoms: List[str] = Field(..., description="List of symptoms associated with the disease.")
+        supporting_evidence: List[str] = Field(..., description="List of symptoms you can tell from patient that supports the diagnosis.")
+        differentiating_factor: Optional[str] = Field(None, description="Key factor that differentiates this disease from others.")
+
+    most_likely: Optional[PredictedDisease] = Field(
+        None, description="The condition most strongly supported by the patient's symptoms and history."
+    )
+    
+    possible_diagnoses: List[PredictedDisease] = Field(
+        [], description="Other plausible diagnoses that may explain the patient's symptoms."
+    )
+    
+    rule_out: List[PredictedDisease] = Field(
+        [], description="Dangerous or serious conditions that might not fully match the case but must be ruled out carefully due to risk."
+    )
+
 class AIStateData(BaseModel):
-    reasoning: str 
+    reasoning: Optional[Reasoning] = None
     note: str
     decision: str
 

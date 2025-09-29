@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -8,10 +8,28 @@ from config import Config
 # Define the structured output model
 class Conversation(BaseModel):
     """Generated response and decision"""
+    class Reasoning(BaseModel):
+        class PredictedDisease(BaseModel):
+            name: str = Field(..., description="The name of the diagnosed or predicted disease.")
+            symptoms: List[str] = Field(..., description="List of symptoms associated with the disease.")
+            supporting_evidence: List[str] = Field(..., description="List of symptoms you can tell from patient that supports the diagnosis.")
+            differentiating_factor: Optional[str] = Field(None, description="Key factor that differentiates this disease from others.")
 
-    reasoning: str = Field(description="Your reasoning about the patient's answer, and the reason why you should ask the question you are about to ask the patient.")
+        most_likely: Optional[PredictedDisease] = Field(
+            None, description="The condition most strongly supported by the patient's symptoms and history."
+        )
+        
+        possible_diagnoses: List[PredictedDisease] = Field(
+            [], description="Other plausible diagnoses that may explain the patient's symptoms."
+        )
+        
+        rule_out: List[PredictedDisease] = Field(
+            [], description="Dangerous or serious conditions that might not fully match the case but must be ruled out carefully due to risk."
+        )
+
+    reasoning: Reasoning = Field(description="Your reasoning based on the last patient response. What question you will ask next and why. What differential you're trying to confirm or eliminate if applicable. Potential serious conditions to rule out")
     note: str = Field(description="Your note contain important information you think the diagnosis team would need to have for better diagnosis (ex: possible conditions, ruled out conditions, insight, reasoning, ...) (since the diagnosis team can access this conversation content, you may not write information that is already be access through the conversation or already existing inside the medical record, so just write your insight). You may update this note overtime (delete, update,... based on the information, your insight, and reasoning). Write them as short as possible, but still enough information. you may write them in bullet format if needed")
-    generation: str = Field(description="Your question or answer to patient's questions. Ask questions for rule out diagnosis")
+    generation: str = Field(description="Your question or answer to patient's questions. Ask questions for rule out potential diseases, from the following order: 1, need to be ruled out dangerous diseases 2, Most potential disease 3, Other possible diseases. You must ask one clear relevant question for one thing at a time (Dont ask multiple questions at a time since it may overwhelm patient). For example, instead of asking question like do you have headache or sweat, which are two things: headache and sweat, you must ask headache on one question, then asking sweat on another question. Provide multiple-choice answers when appropriate.")
     multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
     decision: str = Field(description="Your decided stage (MAIN_QUESTIONING or DIAGNOSIS)")
 
@@ -61,9 +79,17 @@ def create_conversation_chain(reasoning, note, conversation_history, message):
     - Do not thank the user every time they provide information. Only do so if the information is especially sensitive or emotionally heavy.
     - Do not make your answer seem redundant and too long. Only say things clearly without saying thank or sorry most of the time
     - Avoid repeating "Cảm ơn bạn đã chia sẻ" or "Thank you for letting me know" unless it adds empathetic value to the conversation (e.g., after a painful or difficult disclosure).
-"""
+    - For reasoning, you can update it based on the new information from patient, like adding new potential conditions, removing ruled out conditions, updating your insight and reasoning. But keep it as short as possible.
+
+    <!!! ESPECIALLY IMPORTANT>
+    - Always ask only one symptom per question.  
+    Do not combine multiple conditions in a single sentence.  
+    Example: Ask “Do you have a headache?” → after the answer, ask “Do you feel tired?”
+    - You must ask as many questions as possible to gather enough symptom information before moving to DIAGNOSIS stage (ensure you asked all the symptoms related to: rule out dangerous diseases, most likely disease, other possible diseases). Only move to DIAGNOSIS stage when you have asked enough questions to cover all the symptoms related to the potential conditions you have in your reasoning.
+
+    """
     + "\nThe current Patient Medical Record: {medical_record} \n"
-    + f"\nYour objective of the latest question: {reasoning} \n"
+    + "\nYour objective of the latest question: {reasoning} \n"
     + f"\nYour notes: {note} \n")
 
     # Return the configured LLM object
