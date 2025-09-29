@@ -20,25 +20,30 @@ class Conversation(BaseModel):
         )
         
         possible_diagnoses: List[PredictedDisease] = Field(
-            [], description="Other plausible diagnoses that may explain the patient's symptoms."
+            default_factory=list, description="Other plausible diagnoses that may explain the patient's symptoms."
         )
         
         rule_out: List[PredictedDisease] = Field(
-            [], description="Dangerous or serious conditions that might not fully match the case but must be ruled out carefully due to risk."
+            default_factory=list, description="Dangerous or serious conditions that might not fully match the case but must be ruled out carefully due to risk."
         )
 
-    reasoning: Reasoning = Field(description="Your reasoning based on the last patient response. What question you will ask next and why. What differential you're trying to confirm or eliminate if applicable. Potential serious conditions to rule out")
-    note: str = Field(description="Your note contain important information you think the diagnosis team would need to have for better diagnosis (ex: possible conditions, ruled out conditions, insight, reasoning, ...) (since the diagnosis team can access this conversation content, you may not write information that is already be access through the conversation or already existing inside the medical record, so just write your insight). You may update this note overtime (delete, update,... based on the information, your insight, and reasoning). Write them as short as possible, but still enough information. you may write them in bullet format if needed")
-    generation: str = Field(description="Your question or answer to patient's questions. Ask questions for rule out potential diseases, from the following order: 1, need to be ruled out dangerous diseases 2, Most potential disease 3, Other possible diseases. You must ask one clear relevant question for one thing at a time (Dont ask multiple questions at a time since it may overwhelm patient). For example, instead of asking question like do you have headache or sweat, which are two things: headache and sweat, you must ask headache on one question, then asking sweat on another question. Provide multiple-choice answers when appropriate.")
-    multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
-    decision: str = Field(description="Your decided stage (MAIN_QUESTIONING or DIAGNOSIS)")
+        diseases_to_ask: List[str] = Field(
+            default_factory=list, description="List of all diseases still need to ask about (including most likely, possible, and rule out diseases).")
+
+        already_asked_diseases: List[str] = Field(default_factory=list, description="List of diseases you already asked about") 
+        current_disease_to_ask: Optional[str] = Field(None, description="The disease you are currently asking about. Must be one of the diseases in diseases_to_ask")
+
+    reasoning: Reasoning = Field(default_factory=Reasoning, description="Your reasoning based on the last patient response. What question you will ask next and why. What differential you're trying to confirm or eliminate if applicable. Potential serious conditions to rule out")
+    note: str = Field(default="", description="Your note contain important information you think the diagnosis team would need to have for better diagnosis (ex: possible conditions, ruled out conditions, insight, reasoning, ...) (since the diagnosis team can access this conversation content, you may not write information that is already be access through the conversation or already existing inside the medical record, so just write your insight). You may update this note overtime (delete, update,... based on the information, your insight, and reasoning). Write them as short as possible, but still enough information. you may write them in bullet format if needed")
+    generation: str = Field(default="", description="Your question or answer to patient's questions. Ask questions for rule out potential diseases, from the following order: 1, need to be ruled out dangerous diseases 2, Most potential disease 3, Other possible diseases. You must ask one clear relevant question for one thing at a time (Dont ask multiple questions at a time since it may overwhelm patient). For example, instead of asking question like do you have headache or sweat, which are two things: headache and sweat, you must ask headache on one question, then asking sweat on another question. Provide multiple-choice answers when appropriate.")
+    multiple_choices: List[str] = Field(default_factory=list, description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
+    decision: str = Field(default="MAIN_QUESTIONING", description="Your decided stage (MAIN_QUESTIONING or DIAGNOSIS)")
 
 def create_conversation_chain(reasoning, note, conversation_history, message):
     llm = ChatOpenAI(
         model="gpt-4o",
         openai_api_key=Config.OPENAI_API_KEY,
         temperature=1,
-
     )
 
     today = date.today()
@@ -85,12 +90,13 @@ def create_conversation_chain(reasoning, note, conversation_history, message):
     - Always ask only one symptom per question.  
     Do not combine multiple conditions in a single sentence.  
     Example: Ask “Do you have a headache?” → after the answer, ask “Do you feel tired?”
-    - You must ask as many questions as possible to gather enough symptom information before moving to DIAGNOSIS stage (ensure you asked all the symptoms related to: rule out dangerous diseases, most likely disease, other possible diseases). Only move to DIAGNOSIS stage when you have asked enough questions to cover all the symptoms related to the potential conditions you have in your reasoning.
-
+    - Never move to DIAGNOSIS stage unless you have asked all questions to rule out all the diseases (ensure you asked all the symptoms related to: rule out dangerous diseases, most likely disease, other possible diseases). Only move to DIAGNOSIS stage when you have asked enough questions to cover all the symptoms related to the potential conditions you have in your reasoning.
     """
     + "\nThe current Patient Medical Record: {medical_record} \n"
     + "\nYour objective of the latest question: {reasoning} \n"
-    + f"\nYour notes: {note} \n")
+    + f"\nYour notes: {note} \n"
+    + "\nOutput schema requirements: reasoning, note, generation, multiple_choices, decision. Decision must be exactly one of MAIN_QUESTIONING or DIAGNOSIS.\n"
+    )
 
     # Return the configured LLM object
     structured_llm_router = llm.with_structured_output(Conversation)

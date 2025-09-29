@@ -7,10 +7,10 @@ from config import Config
 
 # Define the structured output model
 class Conversation(BaseModel):
-    missing_information: Optional[List[str]] = Field(description="List of missing required patient information fields (e.g., full name, birthday,...). For social habits: if the patient drinks or smokes, ensure detailed info is collected depending on the chosen category (alcohol: frequency + amount + type; smoking: start age, end age or 'now', cigarettes/day). Only include fields that are missing. If nothing is missing, return [].")
-    generation: str = Field(description="Your question or answer in the patient's language. If the patient drinks or smokes, collect the detailed fields relevant to their selection (alcohol: optionally per-month/per-week frequency, per-occasion ml or average ml/day, and drink type; smoking: start age, end age if quit or 'now', and average cigarettes/day). If no required information is missing, return an empty string.")
-    multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
-    decision: str = Field(description="Your decided stage (INFORMATION_COLLECTION or MAIN_QUESTIONING)")
+    missing_information: List[str] = Field(default_factory=list, description="List of missing required patient information fields (e.g., full name, birthday,...). For social habits: if the patient drinks or smokes, ensure detailed info is collected depending on the chosen category (alcohol: frequency + amount + type; smoking: start age, end age or 'now', cigarettes/day). Only include fields that are missing. If nothing is missing, return [].")
+    generation: str = Field(default="", description="Your question or answer in the patient's language. If the patient drinks or smokes, collect the detailed fields relevant to their selection (alcohol: optionally per-month/per-week frequency, per-occasion ml or average ml/day, and drink type; smoking: start age, end age if quit or 'now', and average cigarettes/day). If no required information is missing, return an empty string.")
+    multiple_choices: List[str] = Field(default_factory=list, description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
+    decision: str = Field(default="MAIN_QUESTIONING", description="Your decided stage (INFORMATION_COLLECTION or MAIN_QUESTIONING)")
 
 # Initialize the LLM with a system prompt
 
@@ -93,6 +93,7 @@ def create_information_chain(conversation_history, message):
     - You must say in the same language as patient's nationality.
     """
     + "\nThe current Patient Medical Record: {medical_record} \n")
+    + "\nOutput schema requirements: missing_information, generation, multiple_choices, decision. Decision must be exactly one of INFORMATION_COLLECTION or MAIN_QUESTIONING.\n"
 
     # Return the configured LLM object
     structured_llm_router = llm.with_structured_output(Conversation)

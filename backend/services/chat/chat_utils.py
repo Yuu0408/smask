@@ -34,7 +34,7 @@ def get_ai_response(medical_record, reasoning, note, history, message):
         conversation_history=history,
         message=message,
     )
-    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning})
+    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning, "note": note_text})
 
     return response
 
@@ -67,6 +67,5 @@ def update_medical_record(medical_record, history):
     response = update_medical_record_chain.invoke({"medical_record": _normalize_record(medical_record), "history": history})
 
     return response
-
 
 

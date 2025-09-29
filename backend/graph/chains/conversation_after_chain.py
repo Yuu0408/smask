@@ -9,9 +9,9 @@ from config import Config
 class Conversation(BaseModel):
     """Generated response and decision"""
 
-    generation: str = Field(description="Your question or answer to patient's questions")
-    multiple_choices: List[str] = Field(description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
-    decision: str = Field(description="Your decided stage (DIAGNOSIS or CONVERSATION or END)")
+    generation: str = Field(default="", description="Your question or answer to patient's questions")
+    multiple_choices: List[str] = Field(default_factory=list, description="List of the 1~4 suggested answer (short) you give to the patient. If the question cant be answer by short answer, let it []. The suggested answer must be in the same language with the conversation")
+    decision: str = Field(default="CONVERSATION", description="Your decided stage (DIAGNOSIS or CONVERSATION or END)")
     # Agent action section
     action: str = Field(
         default="NONE",

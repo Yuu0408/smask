@@ -7,8 +7,8 @@ from config import Config
 class Conversation(BaseModel):
     """Generated response and decision"""
 
-    generation: str = Field(description="Your question or answer to patient's questions")
-    decision: str = Field(description="Your decided stage (DIAGNOSIS or CONVERSATION")
+    generation: str = Field(default="", description="Your question or answer to patient's questions")
+    decision: str = Field(default="CONVERSATION", description="Your decided stage (DIAGNOSIS or CONVERSATION")
 
 # Initialize the LLM with a system prompt
 llm = ChatOpenAI(
