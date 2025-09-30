@@ -116,10 +116,10 @@
             "menstrualCycle": "e.g., Regular, Irregular",
             "chiefComplaint": "e.g., I’ve had a sore throat and cough for 3 days.",
             "medicalHistory": "e.g., Started with mild fever and developed into body aches.",
-            "pastMedicalHistory": "e.g., Diabetes, hypertension",
+            "pastMedicalHistory": "e.g., High blood pressure (diagnosed at age 50 until now, still being treated with medication); Colon cancer (diagnosed at age 46, had surgery, currently under monitoring and no further treatment)",
             "medication": "e.g., Paracetamol 500mg",
             "allergy": "e.g., Penicillin",
-            "familyMedicalHistory": "e.g., Family history of heart disease"
+            "familyMedicalHistory": "e.g., Paternal aunt: sickle cell anemia; Grandfather: high blood pressure"
         },
         "actions": {
             "addMedication": "Add Medication",

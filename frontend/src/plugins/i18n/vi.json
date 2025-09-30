@@ -115,10 +115,10 @@
             "menstrualCycle": "ví dụ: Đều, không đều",
             "chiefComplaint": "ví dụ: Tôi bị đau họng và ho trong 3 ngày.",
             "medicalHistory": "ví dụ: Bắt đầu với sốt nhẹ, sau đó đau nhức cơ thể.",
-            "pastMedicalHistory": "ví dụ: Tiểu đường, cao huyết áp",
+            "pastMedicalHistory": "ví dụ: Huyết áp cao (chẩn đoán lúc 50 tuổi tới nay, vẫn đang điều trị bằng thuốc); Ung thư đại tràng (chẩn đoán lúc 46 tuổi, đã phẫu thuật, hiện đang theo dõi và không điều trị gì thêm)",
             "medication": "ví dụ: Paracetamol 500mg",
             "allergy": "ví dụ: Dị ứng Penicillin",
-            "familyMedicalHistory": "ví dụ: Gia đình có người mắc bệnh tim"
+            "familyMedicalHistory": "ví dụ: Cô ruột: thiếu máu hình liềm; Ông nội: huyết áp cao"
         },
         "actions": {
             "addMedication": "Thêm Thuốc",
