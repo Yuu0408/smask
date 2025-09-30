@@ -14,7 +14,7 @@ def _normalize_record(medical_record):
         pass
     return medical_record or {}
 
-def get_ai_response(medical_record, reasoning, note, history, message):
+def get_ai_response(medical_record, reasoning, note, history, message, diseases_already_asked, disease_to_ask):
     # Ensure plain-text for prompt interpolation
     if isinstance(reasoning, (dict, list)):
         try:
@@ -33,8 +33,10 @@ def get_ai_response(medical_record, reasoning, note, history, message):
         note=note_text,
         conversation_history=history,
         message=message,
+        diseases_already_asked=diseases_already_asked,
+        disease_to_ask=disease_to_ask
     )
-    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning, "note": note_text})
+    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning, "note": note_text, "diseases_already_asked": diseases_already_asked})
 
     return response
 

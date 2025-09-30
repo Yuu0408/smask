@@ -2,7 +2,7 @@
 
 from datetime import date
 from datetime import datetime
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Set
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -127,6 +127,8 @@ class AIStateData(BaseModel):
     reasoning: Optional[Reasoning] = None
     note: str
     decision: str
+    diseases_already_asked: Set[str] = Field(default_factory=set)
+    disease_to_ask: Optional[str] = None
 
 class ChatTextRequest(BaseModel):
     user_id: str

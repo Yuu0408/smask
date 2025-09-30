@@ -50,7 +50,7 @@ class ChatService:
         self.todo_repo.replace_todos(user_id=user_id, record_id=record_id, items=[])
 
         if ai_state.data["decision"] == "MAIN_QUESTIONING":
-            ai_response = get_ai_response(record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", [], "")
+            ai_response = get_ai_response(record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", [], "", None, "")
             # Normalize nested Pydantic from chain output to our DTO schema
             normalized_reasoning = (
                 ai_response.reasoning.model_dump(mode="json")
@@ -131,18 +131,26 @@ class ChatService:
                 record_id=record_id, 
                 data=AIStateData(reasoning=None, note="", decision=ai_response.decision).model_dump(mode="json")
             )
+        
+        diseases_already_asked = set(ai_state.data.get("diseases_already_asked", []))
+        disease_to_ask = ai_state.data.get("disease_to_ask", "")
 
         if ai_state.data["decision"] == "MAIN_QUESTIONING":
-            ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", chat_history, message)
+            ai_response = get_ai_response(medical_record, ai_state.data["reasoning"] if ai_state else None, ai_state.data["note"] if ai_state else "", chat_history, message, diseases_already_asked, disease_to_ask)
             normalized_reasoning = (
                 ai_response.reasoning.model_dump(mode="json")
                 if getattr(ai_response, "reasoning", None) is not None and hasattr(ai_response.reasoning, "model_dump")
                 else (ai_response.reasoning if getattr(ai_response, "reasoning", None) is not None else None)
             )
+            if disease_to_ask != ai_response.disease_to_ask_on_the_next_question:
+                diseases_already_asked.add(ai_response.disease_to_ask)
+            
+            disease_to_ask = ai_response.disease_to_ask_on_the_next_question
+
             ai_state = self.ai_state_repo.add_ai_state(
                 user_id=user_id, 
                 record_id=record_id, 
-                data=AIStateData(reasoning=normalized_reasoning, note=ai_response.note, decision=ai_response.decision).model_dump(mode="json")
+                data=AIStateData(reasoning=normalized_reasoning, note=ai_response.note, decision=ai_response.decision, diseases_already_asked=diseases_already_asked, disease_to_ask=disease_to_ask).model_dump(mode="json")
             )
 
             messages = [{"role": "human", "content": message}, {"role": "ai", "content": ai_response.generation}]
