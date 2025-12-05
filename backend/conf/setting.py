@@ -28,9 +28,17 @@ class Settings(BaseSettings):
     @computed_field
     @cached_property
     def SQL_ENGINE(self) -> Engine:
-        # DATABASE_URL = f"postgresql+psycopg2://{self.PG_USER}:{quote_plus(self.PG_PASSWORD)}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
-        DATABASE_URL = Config.DATABASE_URL
-        return create_engine(DATABASE_URL, echo=self.PG_ECHO)
+        """
+        Build a sync SQLAlchemy engine even if the env accidentally provides an async URL.
+        """
+        db_url = Config.DATABASE_URL
+        # If an async driver was supplied (e.g., postgresql+asyncpg), switch to sync equivalent.
+        if db_url.startswith("postgresql+asyncpg"):
+            db_url = db_url.replace("postgresql+asyncpg", "postgresql+psycopg2", 1)
+        if db_url.startswith("sqlite+aiosqlite"):
+            db_url = db_url.replace("sqlite+aiosqlite", "sqlite", 1)
+
+        return create_engine(db_url, echo=self.PG_ECHO)
     
     def SQL_URL(self) -> str:
         return Config.DATABASE_URL

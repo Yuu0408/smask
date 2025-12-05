@@ -25,6 +25,11 @@
         "typing": "Typing...",
         "error": "Something went wrong. Please try again."
     },
+    "chat": {
+        "placeholder": {
+            "loading": "Thinking..."
+        }
+    },
     "diagnosisPage": {
         "title": "Diagnosis Summary",
         "notAvailable": "Diagnosis is not yet available.",

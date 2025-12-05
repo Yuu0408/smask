@@ -40,7 +40,6 @@ def create_conversation_chain(reasoning, note, conversation_history, message, di
     llm = ChatOpenAI(
         model="gpt-4o",
         openai_api_key=Config.OPENAI_API_KEY,
-        temperature=1,
     )
 
     today = date.today()

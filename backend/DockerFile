@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir poetry
 
 # Install dependencies with Poetry (this also handles dependencies from poetry.lock)
 RUN poetry install --only main --no-root
+# Override bcrypt to a version compatible with passlib (bcrypt 4.0.x keeps __about__)
+RUN poetry run pip install \"bcrypt<4.1.0\"
 
 # Copy the rest of the application code into the container
 COPY . /app/

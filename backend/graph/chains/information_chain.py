@@ -16,10 +16,8 @@ class Conversation(BaseModel):
 
 def create_information_chain(conversation_history, message):
     llm = ChatOpenAI(
-        model="gpt-5-2025-08-07",
+        model="gpt-4o",
         openai_api_key=Config.OPENAI_API_KEY,
-        temperature=1,
-        reasoning_effort="minimal"
     )
 
     today = date.today()

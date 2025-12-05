@@ -32,6 +32,7 @@ import VoiceCallDialog from '@/pages/chat/voice/VoiceCallDialog.vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
+import { patientPresets } from './presets';
 
 const { closeAllDialogs, openDialog } = useDialog();
 const { t } = useI18n();
@@ -44,6 +45,7 @@ const router = useRouter();
 const chatStore = useChatStore();
 const authStore = useAuthStore();
 const loading = ref({ submit: false });
+const selectedPreset = ref('');
 
 const { user } = storeToRefs(authStore);
 console.log('current user in MedicalRecordForm:', user.value);
@@ -337,6 +339,17 @@ const form = useForm<PatientFormValues>({
     },
 });
 
+// Dev helper: apply selected preset
+const applyPreset = () => {
+    const preset = patientPresets.find((p) => p.value === selectedPreset.value);
+    if (!preset) {
+        toast.error('Vui lòng chọn mẫu cần điền');
+        return;
+    }
+    form.setValues(preset.data as any);
+    toast.success(`Đã điền sẵn thông tin mẫu: ${preset.label}`);
+};
+
 // Helper computed to estimate years smoked for UI hint
 // const currentAgeComputed = computed(() => {
 //     const birthday = (form?.values?.birthday as unknown as string) || '';
@@ -541,6 +554,37 @@ const onSubmit = form.handleSubmit(async (values) => {
         class="pb-4 max-h-[72vh] overflow-auto max-w-full space-y-6 lg:grid lg:space-y-0 lg:grid-cols-1 lg:gap-x-4 overflow-y-auto overflow-x-clip"
         @submit="onSubmit"
     >
+        <div
+            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        >
+            <p class="text-sm text-muted-foreground">
+                (Dev) Chọn và điền nhanh mẫu bệnh thường gặp.
+            </p>
+            <div class="flex items-center gap-2">
+                <Select v-model="selectedPreset">
+                    <SelectTrigger class="w-56">
+                        <SelectValue placeholder="Chọn mẫu" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            v-for="preset in patientPresets"
+                            :key="preset.value"
+                            :value="preset.value"
+                        >
+                            {{ preset.label }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    @click="applyPreset"
+                >
+                    Điền mẫu
+                </Button>
+            </div>
+        </div>
         <!-- Patient Information -->
         <section>
             <h3 class="text-lg font-semibold mb-4">

@@ -1,4 +1,3 @@
-from services.chat.chat_utils import get_ai_response, get_information
 from sqlmodel import Session
 from fastapi import HTTPException
 from repositories import MedicalRecordRepo, ChatHistoryRepo, AIStateRepo

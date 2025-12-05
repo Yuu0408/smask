@@ -123,12 +123,62 @@ class Reasoning(BaseModel):
         [], description="Dangerous or serious conditions that might not fully match the case but must be ruled out carefully due to risk."
     )
 
+class SymptomNote(BaseModel):
+    summary: str = Field(..., description="Short sentence describing the symptom in patient language.")
+    detail: Optional[str] = Field(None, description="Optional expansion or qualifiers.")
+    status: Literal["reported", "confirmed", "ruled_out", "uncertain"] = "reported"
+    source: Literal["patient", "assistant"] = "patient"
+    linked: List[str] = Field(default_factory=list, description="Diseases or systems this symptom relates to.")
+    onset: Optional[str] = None
+    severity: Optional[str] = None
+
+
+class ReasoningCandidate(BaseModel):
+    name: str
+    likelihood: Literal["high", "medium", "low", "rule_out"] = "medium"
+    supporting: List[str] = Field(default_factory=list)
+    missing: List[str] = Field(default_factory=list)
+    conflicts: List[str] = Field(default_factory=list)
+    priority: Literal["must_rule_out", "watch", "standard"] = "standard"
+
+
+class ReasoningSnapshot(BaseModel):
+    summary: str
+    high_priority: List[ReasoningCandidate] = Field(default_factory=list)
+    differentials: List[ReasoningCandidate] = Field(default_factory=list)
+    rule_out: List[ReasoningCandidate] = Field(default_factory=list)
+    recommended_tests: List[str] = Field(default_factory=list)
+    needs_more_questions: bool = True
+    good_conclusion: bool = False
+    refresh_reason: Optional[str] = None
+
+
+class PendingQuestion(BaseModel):
+    id: str
+    text: str
+    options: List[str] = Field(default_factory=list)
+    target: Optional[str] = None
+    intent: Literal["clarify_form", "basic_symptom", "rule_out", "conclusion"] = "basic_symptom"
+    rationale: Optional[str] = None
+
+
+class SharedState(BaseModel):
+    basic_form: dict = Field(default_factory=dict, description="Original patient form payload.")
+    clarified_form: dict = Field(default_factory=dict, description="Only fields clarified or corrected during chat.")
+    symptom_notes: List[SymptomNote] = Field(default_factory=list)
+    red_flags: List[str] = Field(default_factory=list)
+    info_gaps_basic: List[str] = Field(default_factory=list)
+    info_gaps_symptom: List[str] = Field(default_factory=list)
+    reasoning_snapshot: Optional[ReasoningSnapshot] = None
+    pending_questions: List[PendingQuestion] = Field(default_factory=list)
+    last_question: Optional[PendingQuestion] = None
+    asked_targets: List[str] = Field(default_factory=list, description="Targets/topics already asked to avoid repeats.")
+    conversation_tail: List[dict] = Field(default_factory=list, description="Full conversation history to preserve context and tone.")
+
+
 class AIStateData(BaseModel):
-    reasoning: Optional[Reasoning] = None
-    note: str
-    decision: str
-    diseases_already_asked: Set[str] = Field(default_factory=set)
-    disease_to_ask: Optional[str] = None
+    shared_state: SharedState
+    stage: Literal["FORM_CLARIFICATION", "BASIC_QUESTIONING", "REASONING", "RULE_OUT", "CLOSING"]
 
 class ChatTextRequest(BaseModel):
     user_id: str
@@ -139,6 +189,9 @@ class ChatTextResponse(BaseModel):
     message: str
     multiple_choices: Optional[List[str]] = None
     decision: Optional[str] = None
+    action: Optional[str] = None
+    send_contact: Optional[dict] = None
+    todos: Optional[List[TodoItem]] = None
 
 
 class TTSRequest(BaseModel):

@@ -9,7 +9,7 @@ const { dialogStack, handleOpenChange, closeDialog } = dialogUtils;
         <component
             :is="dialog.component"
             v-bind="dialog.props"
-            :open="dialog.isOpen"
+            v-model:open="dialog.isOpen"
             @update:open="
                 (isOpen: boolean) => handleOpenChange(dialog.id, isOpen)
             "

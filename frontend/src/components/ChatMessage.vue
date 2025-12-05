@@ -22,7 +22,12 @@
                         : 'bg-muted/50'
                 "
             >
-                <p class="whitespace-pre-wrap leading-relaxed">{{ content }}</p>
+                <p
+                    class="whitespace-pre-wrap leading-relaxed"
+                    :class="placeholderClass"
+                >
+                    {{ displayText }}
+                </p>
             </div>
 
             <!-- User avatar -->
@@ -38,10 +43,31 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { User } from 'lucide-vue-next';
-interface Props {
-    role: 'human' | 'ai';
-    content: string;
-}
-defineProps<Props>();
+const props = withDefaults(
+    defineProps<{
+        role: 'human' | 'ai';
+        content: string;
+        pending?: boolean;
+    }>(),
+    { pending: false }
+);
+const { t } = useI18n();
+
+const displayText = computed(() => {
+    const text = props.content ?? '';
+    const fallback =
+        t('chat.placeholder.loading') || 'AI is preparing your response...';
+    if (text.trim().length > 0) return text;
+    // Always show a fallback when the message text is empty to avoid a blank bubble.
+    return fallback;
+});
+
+const placeholderClass = computed(() =>
+    props.pending || (props.content ?? '').trim().length === 0
+        ? 'italic text-muted-foreground'
+        : ''
+);
 </script>

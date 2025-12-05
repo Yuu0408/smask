@@ -1,80 +1,5 @@
 {
     "patientForm": {
-        "title": "Patient Information",
-        "fullName": "Full name",
-        "yearOfBirth": "Year of birth",
-        "age": "Age",
-        "gender": "Gender",
-        "occupation": "Occupation",
-        "nationality": "Nationality",
-        "submit": "Continue"
-    },
-    "settings": {
-        "title": "Settings",
-        "language": "Language",
-        "theme": "Theme",
-        "light": "Light",
-        "dark": "Dark"
-    },
-    "chatInput": {
-        "placeholder": "Nhập tin nhắn của bạn…"
-    },
-    "chatPage": {
-        "viewDiagnosis": "Nhấn để xem chẩn đoán của bạn",
-        "sessionNotInitialized": "Phiên chưa được khởi tạo.",
-        "typing": "Đang nhập...",
-        "error": "Đã xảy ra lỗi. Vui lòng thử lại."
-    },
-    "diagnosisPage": {
-        "title": "Tóm tắt chẩn đoán",
-        "notAvailable": "Hiện chưa có chẩn đoán.",
-        "notAvailableShort": "Không có",
-        "reasoning": "Lý luận",
-        "mostLikely": "Chẩn đoán có khả năng cao nhất",
-        "possible": "Các chẩn đoán có thể",
-        "ruleOut": "Loại trừ các bệnh",
-        "furtherTests": "Xét nghiệm bổ sung được khuyến nghị",
-        "differentiating": "Yếu tố phân biệt",
-        "supporting": "Bằng chứng hỗ trợ",
-        "urgency": "Độ khẩn cấp",
-        "routine": "thường quy"
-    },
-    "medicalRecord": {
-        "title": "Hồ sơ y tế",
-        "notAvailableShort": "Không có",
-        "none": "Không có",
-        "yes": "Có",
-        "no": "Không",
-
-        "patientInfo": "Thông Tin Cơ Bản",
-        "fullName": "Họ và tên",
-        "birthday": "Ngày sinh",
-        "gender": "Giới tính",
-        "occupation": "Nghề nghiệp",
-        "nationality": "Quốc tịch",
-        "address": "Địa chỉ",
-
-        "medicalHistory": "Tiền sử bệnh",
-        "chiefComplaint": "Vấn đề chính",
-        "symptomProgression": "Diễn tiến triệu chứng",
-        "pastMedicalHistory": "Tiền sử bệnh tật",
-        "currentMedications": "Thuốc đang sử dụng",
-        "allergies": "Dị ứng",
-        "familyHistory": "Tiền sử bệnh gia đình",
-
-        "socialInfo": "Thông tin xã hội",
-        "alcohol": "Uống rượu",
-        "smoking": "Hút thuốc",
-        "livingSituation": "Hoàn cảnh sống",
-        "dailyActivity": "Khả năng hoạt động hàng ngày",
-        "travelHistory": "Lịch sử đi lại gần đây",
-
-        "obstetric": "Lịch sử sản phụ khoa",
-        "menstruationStatus": "Tình trạng kinh nguyệt",
-        "menstrualCycle": "Chu kỳ kinh nguyệt",
-        "sexualActivity": "Hoạt động tình dục gần đây"
-    },
-    "patientForm": {
         "title": "Phiếu Khai Thông Tin Bệnh Nhân",
         "description": "Vui lòng cung cấp thông tin cá nhân và y tế trước khi bắt đầu.",
         "sections": {
@@ -124,7 +49,6 @@
             "addMedication": "Thêm Thuốc",
             "addAllergy": "Thêm Dị Ứng"
         },
-
         "options": {
             "select": "Chọn",
             "male": "Nam",
@@ -193,7 +117,9 @@
             "default": "Gửi",
             "submitting": "Đang gửi..."
         },
-        "validation": { "required": "Trường này là bắt buộc" },
+        "validation": {
+            "required": "Trường này là bắt buộc"
+        },
         "toast": {
             "success": {
                 "title": "Tạo hồ sơ thành công",
@@ -209,6 +135,67 @@
             "description": "Vui lòng cung cấp thông tin để bắt đầu cuộc trò chuyện."
         }
     },
+    "settings": {
+        "title": "Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+    },
+    "chatInput": {
+        "placeholder": "Nhập tin nhắn của bạn…"
+    },
+    "chatPage": {
+        "viewDiagnosis": "Nhấn để xem chẩn đoán của bạn",
+        "sessionNotInitialized": "Phiên chưa được khởi tạo.",
+        "typing": "Đang nhập...",
+        "error": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "diagnosisPage": {
+        "title": "Tóm tắt chẩn đoán",
+        "notAvailable": "Hiện chưa có chẩn đoán.",
+        "notAvailableShort": "Không có",
+        "reasoning": "Lý luận",
+        "mostLikely": "Chẩn đoán có khả năng cao nhất",
+        "possible": "Các chẩn đoán có thể",
+        "ruleOut": "Loại trừ các bệnh",
+        "furtherTests": "Xét nghiệm bổ sung được khuyến nghị",
+        "differentiating": "Yếu tố phân biệt",
+        "supporting": "Bằng chứng hỗ trợ",
+        "urgency": "Độ khẩn cấp",
+        "routine": "thường quy"
+    },
+    "medicalRecord": {
+        "title": "Hồ sơ y tế",
+        "notAvailableShort": "Không có",
+        "none": "Không có",
+        "yes": "Có",
+        "no": "Không",
+        "patientInfo": "Thông Tin Cơ Bản",
+        "fullName": "Họ và tên",
+        "birthday": "Ngày sinh",
+        "gender": "Giới tính",
+        "occupation": "Nghề nghiệp",
+        "nationality": "Quốc tịch",
+        "address": "Địa chỉ",
+        "medicalHistory": "Tiền sử bệnh",
+        "chiefComplaint": "Vấn đề chính",
+        "symptomProgression": "Diễn tiến triệu chứng",
+        "pastMedicalHistory": "Tiền sử bệnh tật",
+        "currentMedications": "Thuốc đang sử dụng",
+        "allergies": "Dị ứng",
+        "familyHistory": "Tiền sử bệnh gia đình",
+        "socialInfo": "Thông tin xã hội",
+        "alcohol": "Uống rượu",
+        "smoking": "Hút thuốc",
+        "livingSituation": "Hoàn cảnh sống",
+        "dailyActivity": "Khả năng hoạt động hàng ngày",
+        "travelHistory": "Lịch sử đi lại gần đây",
+        "obstetric": "Lịch sử sản phụ khoa",
+        "menstruationStatus": "Tình trạng kinh nguyệt",
+        "menstrualCycle": "Chu kỳ kinh nguyệt",
+        "sexualActivity": "Hoạt động tình dục gần đây"
+    },
     "sidebar": {
         "chat": "Nhắn tin",
         "medicalRecord": "Hồ sơ y tế",
@@ -223,7 +210,6 @@
         "items": "mục",
         "startConversation": "Bắt đầu cuộc trò chuyện"
     },
-    
     "navbar.settings": "Cài đặt",
     "navbar.breadcrumb.modelsPrompts": "Mô hình & Gợi ý",
     "navbar.breadcrumb.currentConversation": "Cuộc trò chuyện hiện tại",
@@ -239,7 +225,6 @@
     "navbar.language.label": "Ngôn ngữ: {lang}",
     "navbar.language.en": "Tiếng Anh",
     "navbar.language.vi": "Tiếng Việt",
-
     "common.loading": "Đang tải...",
     "common.open": "Mở",
     "common.create": "Tạo",
@@ -247,7 +232,6 @@
     "common.settings": "Cài đặt",
     "common.yes": "Có",
     "common.no": "Không",
-
     "page.home.title": "Chào mừng đến với Medee",
     "page.home.title.description": "Trợ lý giúp bạn bắt đầu trò chuyện, quản lý hồ sơ y tế và theo dõi các việc cần làm.",
     "page.home.card.title.start": "Bắt đầu cuộc trò chuyện",
@@ -258,18 +242,15 @@
     "page.home.why.title": "Tại sao lại dùng Medee?",
     "page.home.why.description": "Chúng tôi là Medee – một đội ngũ kết hợp giữa Y tế và Công nghệ, nơi kinh nghiệm lâm sàng thực tiễn gặp gỡ sự sáng tạo bền bỉ. Mục tiêu của chúng tôi là xây dựng các giải pháp AI thiết thực cho y tế, giải quyết những bài toán hằng ngày, đồng thời nâng cao chất lượng và an toàn trong chăm sóc sức khỏe.",
     "page.home.footer": "© 2025 Medee. Bảo lưu mọi quyền.",
-
     "history.title": "Lịch sử hội thoại",
     "history.empty": "Chưa có cuộc hội thoại nào.",
     "history.lastActivity": "Hoạt động gần nhất:",
     "history.noMessagesYet": "Chưa có tin nhắn nào",
-
     "chat.empty.noConversation": "Chưa có hội thoại nào.",
     "chat.empty.startQuestion": "Bắt đầu cuộc trò chuyện?",
     "chat.empty.newChat": "Cuộc trò chuyện mới",
     "chat.input.send-button.send": "Gửi",
     "chat.input.hint": "Nhấn <kbd class=\"rounded border px-1\">Enter</kbd> để gửi • <kbd class=\"rounded border px-1\">Shift</kbd>+<kbd class=\"rounded border px-1\">Enter</kbd> để xuống dòng",
-
     "record.title": "Hồ sơ y tế",
     "record.loading": "Đang tải hồ sơ...",
     "record.empty": "Chưa có hồ sơ y tế.",
@@ -286,12 +267,10 @@
     "sendContact.toast.success": "Đã gửi tới cơ sở y tế",
     "sendContact.toast.alreadySent": "Bạn đã gửi hồ sơ này rồi.",
     "sendContact.toast.failed": "Gửi thất bại",
-
     "sidebar.footer.logout": "Đăng xuất",
     "doctor.sidebar.header.title": "Bảng điều khiển bác sĩ",
     "doctor.sidebar.group.patients": "Bệnh nhân",
     "doctor.sidebar.allPatients": "Tất cả bệnh nhân",
-
     "contact.title.patients": "Bệnh nhân",
     "contact.field.age": "Tuổi",
     "contact.field.address": "Địa chỉ",
@@ -300,7 +279,6 @@
     "contact.detail.view.contact": "Liên hệ",
     "contact.detail.openChat": "Mở trò chuyện",
     "contact.detail.startChatPrompt": "Bắt đầu trò chuyện bác sĩ – bệnh nhân",
-
     "page.login.title": "Chào mừng đến với Medee",
     "page.login.subtitle": "Trợ lý giúp bạn chẩn đoán sức khỏe, quản lý hồ sơ y tế và theo dõi các việc cần làm.",
     "page.login.label.role_login": "Đăng nhập với vai trò",
@@ -323,7 +301,6 @@
     "page.login.placeholder.choose_address": "Chọn địa chỉ",
     "page.login.placeholder.choose_hospital": "Chọn bệnh viện",
     "page.login.error.address_hospital_required": "Vui lòng chọn địa chỉ và bệnh viện",
-
     "sidebar.header.app.name": "Medee",
     "sidebar.content.button.new-chat": "Trò chuyện mới",
     "sidebar.content.button.new-call": "Cuộc gọi mới",
@@ -335,18 +312,22 @@
     "sidebar.content.label.contacts": "Liên hệ",
     "badge.beta": "Thử nghiệm",
     "sidebar.main.conversation.button.new-chat": "Trò chuyện mới",
-
     "voice": {
-      "title": "Cuộc gọi thoại",
-      "status": {
-        "listening": "Đang nghe… nhấn để dừng",
-        "playing": "Đang phát phản hồi…",
-        "tapToSpeak": "Nhấn để nói",
-        "notSupported": "Trình nhận dạng giọng nói không được hỗ trợ"
-      },
-      "label": {
-        "youSaid": "Bạn nói",
-        "assistantSaid": "Bác sĩ nói"
-      }
+        "title": "Cuộc gọi thoại",
+        "status": {
+            "listening": "Đang nghe… nhấn để dừng",
+            "playing": "Đang phát phản hồi…",
+            "tapToSpeak": "Nhấn để nói",
+            "notSupported": "Trình nhận dạng giọng nói không được hỗ trợ"
+        },
+        "label": {
+            "youSaid": "Bạn nói",
+            "assistantSaid": "Bác sĩ nói"
+        }
+    },
+    "chat": {
+        "placeholder": {
+            "loading": "Đang suy nghĩ..."
+        }
     }
 }

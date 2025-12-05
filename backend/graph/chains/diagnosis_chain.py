@@ -16,7 +16,8 @@ def create_diagnosis_chain():
   llm = ChatOpenAI(
       model="gpt-4o",
       openai_api_key=Config.OPENAI_API_KEY,
-      temperature=0.5
+      temperature=1,
+      # reasoning_effort="none"
   )
 
   system = (f"""

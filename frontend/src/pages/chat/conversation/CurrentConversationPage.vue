@@ -77,13 +77,11 @@ async function handleSend(text: string) {
     multipleChoices.value = [];
     const conv = activeConversation.value;
 
-    if (text !== '###DIAGNOSIS###') {
-        conv.messages.push({
-            id: crypto.randomUUID(),
-            role: 'human',
-            content: text,
-        });
-    }
+    conv.messages.push({
+        id: crypto.randomUUID(),
+        role: 'human',
+        content: text,
+    });
     const aiPlaceholderId = crypto.randomUUID();
     conv.messages.push({ id: aiPlaceholderId, role: 'ai', content: '' });
 
@@ -99,10 +97,6 @@ async function handleSend(text: string) {
         });
         const idx = conv.messages.findIndex((m) => m.id === aiPlaceholderId);
         if (idx !== -1) conv.messages[idx].content = res.data.message;
-
-        if (res.data.decision === 'DIAGNOSIS') {
-            handleSend('###DIAGNOSIS###');
-        }
         multipleChoices.value = res.data.multiple_choices ?? [];
     } finally {
         sending.value = false;

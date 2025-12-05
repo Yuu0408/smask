@@ -3,6 +3,7 @@ export interface Message {
     role: 'ai' | 'human';
     content: string;
     multiple_choices?: string[];
+    pending?: boolean;
 }
 export interface Conversation {
     id: string;

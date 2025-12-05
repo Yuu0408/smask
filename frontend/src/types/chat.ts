@@ -7,7 +7,14 @@ export interface sendChatMessageRequest {
 export interface sendChatMessageResponse {
     message: string;
     multiple_choices?: string[];
-    decision?: string;
+    decision?: ChatStage;
+    action?: 'NONE' | 'SEND_CONTACT';
+    send_contact?: {
+        include_conversation: boolean;
+        address: string;
+        facility: string;
+    } | null;
+    todos?: TodoItem[];
 }
 
 export interface getChatHistoryRequest {
@@ -24,4 +31,17 @@ export interface ChatMessage {
 
 export interface GetChatHistoryResponse {
     history: ChatMessage[];
+}
+
+export type ChatStage =
+    | 'FORM_CLARIFICATION'
+    | 'BASIC_QUESTIONING'
+    | 'REASONING'
+    | 'RULE_OUT'
+    | 'CLOSING'
+    | 'LEGACY_DIAGNOSIS';
+
+export interface TodoItem {
+    text: string;
+    is_check: boolean;
 }

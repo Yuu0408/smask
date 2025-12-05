@@ -12,6 +12,7 @@ import type { Conversation, Message } from '@/types/message';
 import { useAuthStore } from '@/stores/auth';
 import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
 import { useI18n } from 'vue-i18n';
+import type { ChatStage } from '@/types/chat';
 
 const chatStore = useChatStore();
 const { openDialog } = useDialog();
@@ -34,6 +35,7 @@ const conversations = ref<Conversation[]>([]);
 
 const activeId = ref('1');
 const sending = ref(false);
+const currentStage = ref<ChatStage | null>(null);
 const activeConversation = computed(() =>
     conversations.value.find((c) => c.id === activeId.value)
 );
@@ -46,6 +48,7 @@ const showEmpty = computed(
 
 async function loadHistory() {
     sending.value = true;
+    currentStage.value = null;
     try {
         const res = await chatStore.getChatHistory({
             user_id: userId.value,
@@ -56,6 +59,7 @@ async function loadHistory() {
             id: h.id ?? crypto.randomUUID(),
             role: h.role, // 'ai' | 'human' (matches your UI types)
             content: h.content,
+            pending: false,
             // created_at is available as h.created_at if you need it later
         }));
 
@@ -101,10 +105,13 @@ async function handleSend(text: string) {
 
     // push placeholder AI message
     const aiPlaceholderId = crypto.randomUUID();
+    const placeholderText =
+        stagePlaceholder(currentStage.value) || 'AI is preparing your response...';
     conv.messages.push({
         id: aiPlaceholderId,
         role: 'ai',
-        content: '',
+        content: placeholderText,
+        pending: true,
     });
     await nextTick();
     bottomRef.value?.scrollIntoView({ behavior: 'smooth' });
@@ -121,10 +128,12 @@ async function handleSend(text: string) {
         const idx = conv.messages.findIndex((m) => m.id === aiPlaceholderId);
         if (idx !== -1) {
             conv.messages[idx].content = res.data.message;
+            conv.messages[idx].pending = false;
         }
 
         // update multiple choices if any
         multipleChoices.value = res.data.multiple_choices ?? [];
+        currentStage.value = res.data.decision ?? currentStage.value;
     } finally {
         sending.value = false;
         await nextTick();
@@ -155,6 +164,21 @@ watch(
         }
     }
 );
+
+const stageFriendlyLabels: Record<ChatStage, string> = {
+    FORM_CLARIFICATION: 'Validating form details',
+    BASIC_QUESTIONING: 'Asking symptom basics',
+    REASONING: 'Analyzing findings',
+    RULE_OUT: 'Ruling out risks',
+    CLOSING: 'Summarizing next steps',
+    LEGACY_DIAGNOSIS: 'Reviewing diagnosis',
+};
+
+function stagePlaceholder(stage: ChatStage | null) {
+    if (!stage) return 'AI is preparing your response...';
+    const friendly = stageFriendlyLabels[stage] ?? stage;
+    return `${friendly} (${stage})...`;
+}
 </script>
 
 <template>
@@ -179,6 +203,7 @@ watch(
                 :key="m.id"
                 :role="m.role"
                 :content="m.content"
+                :pending="m.pending"
             />
         </div>
         <div ref="bottomRef"></div>

@@ -21,6 +21,7 @@ const router = useRouter();
 
 const messages = ref<Message[]>([]);
 const multipleChoices = ref<string[]>([]);
+const stage = ref<string | undefined>(undefined);
 
 const userId = computed(() => user.value?.id ?? '');
 const recordId = computed(() => user.value?.currentRecordId ?? '');
@@ -41,7 +42,7 @@ watch(toastVisible, (visible) => {
     if (visible) setTimeout(() => (toastVisible.value = false), 4000);
 });
 
-function goToDiagnosis() {
+function goToSummary() {
     router.push('/diagnosis');
     toastVisible.value = false;
 }
@@ -70,10 +71,8 @@ async function sendMessage(text: string) {
         const idx = messages.value.findIndex((m) => m.id === aiId);
         if (idx !== -1) messages.value[idx].content = res.data.message;
         multipleChoices.value = res.data.multiple_choices ?? [];
-        if (res.data.decision === 'DIAGNOSIS') {
-            // Optionally navigate or show toast
-            toastVisible.value = true;
-        }
+        stage.value = res.data.decision;
+        toastVisible.value = res.data.decision === 'CLOSING';
     } catch (error) {
         console.error(error);
         const idx = messages.value.findIndex((m) => m.id === aiId);
@@ -95,10 +94,10 @@ defineExpose({ sendMessage });
         <Transition name="fade">
             <div
                 v-if="toastVisible"
-                @click="goToDiagnosis"
+                @click="goToSummary"
                 class="fixed top-20 right-4 z-40 bg-gray-100 dark:bg-zinc-700 text-black dark:text-white px-4 py-2 rounded-lg shadow-md cursor-pointer transition hover:bg-gray-200 dark:hover:bg-zinc-600"
             >
-                📄 {{ t('chatPage.viewDiagnosis') }}
+                {{ t('chatPage.viewDiagnosis') }}
             </div>
         </Transition>
 

@@ -1,73 +1,73 @@
-﻿from graph.chains.extraction_chain import create_extraction_chain
-from graph.chains.conversation_after_chain import create_conversation_after_chain
-from graph.chains.conversation_chain import create_conversation_chain
-from graph.chains.information_chain import create_information_chain
-from graph.chains.diagnosis_chain import create_diagnosis_chain
+from typing import Any, Dict
+
+from graph.chains.basic_questions_chain import create_basic_questions_chain
+from graph.chains.closing_chain import create_closing_chain
+from graph.chains.diagnostic_reasoning_chain import create_diagnostic_reasoning_chain
+from graph.chains.form_clarification_chain import create_form_clarification_chain
+from graph.chains.rule_out_in_chain import create_rule_out_in_chain
+from graph.chains.state_update_chain import create_state_update_chain
 from services.contact.options import get_allowed_addresses, get_facilities_by_address
-import json
 
-def _normalize_record(medical_record):
-    try:
-        if hasattr(medical_record, 'data'):
-            return getattr(medical_record, 'data') or {}
-    except Exception:
-        pass
-    return medical_record or {}
 
-def get_ai_response(medical_record, reasoning, note, history, message, diseases_already_asked, disease_to_ask):
-    # Ensure plain-text for prompt interpolation
-    if isinstance(reasoning, (dict, list)):
-        try:
-            reasoning_text = json.dumps(reasoning, ensure_ascii=False)
-        except Exception:
-            reasoning_text = str(reasoning)
-    elif reasoning is None:
-        reasoning_text = ""
-    else:
-        reasoning_text = str(reasoning)
+def _normalize_state(shared_state) -> Dict[str, Any]:
+    if hasattr(shared_state, "model_dump"):
+        return shared_state.model_dump(mode="json")
+    return shared_state or {}
 
-    note_text = "" if note is None else str(note)
 
-    conversation_chain = create_conversation_chain(
-        reasoning=reasoning_text,
-        note=note_text,
-        conversation_history=history,
-        message=message,
-        diseases_already_asked=diseases_already_asked,
-        disease_to_ask=disease_to_ask
+def run_state_update(shared_state, last_question, patient_message):
+    chain = create_state_update_chain()
+    return chain.invoke(
+        {
+            "state": _normalize_state(shared_state),
+            "last_question": last_question,
+            "patient_message": patient_message,
+        }
     )
-    response = conversation_chain.invoke({"medical_record": _normalize_record(medical_record), "reasoning": reasoning, "note": note_text, "diseases_already_asked": diseases_already_asked})
-
-    return response
-
-def get_information(medical_record, history, message):
-    information_chain = create_information_chain(conversation_history=history, message=message)
-    response = information_chain.invoke({"medical_record": _normalize_record(medical_record)})
-
-    return response
-
-def get_diagnosis(medical_record, history, note):
-    diagnosis_chain = create_diagnosis_chain()
-    response = diagnosis_chain.invoke({"medical_record": _normalize_record(medical_record), "history": history, "note": note})
-
-    return response
-
-def get_conversation_after(diagnosis, history, message, medical_record):
-    if message == "###DIAGNOSIS###":
-        dummy_message = ""
-    else:
-        dummy_message = message
-    allowed_addresses = get_allowed_addresses()
-    facilities_by_address = get_facilities_by_address()
-    conversation_after_chain = create_conversation_after_chain(conversation_history=history, message=dummy_message, allowed_addresses=allowed_addresses, facilities_by_address=facilities_by_address)
-    response = conversation_after_chain.invoke({"diagnosis": diagnosis, "medical_record": _normalize_record(medical_record)})
-
-    return response
-
-def update_medical_record(medical_record, history):
-    update_medical_record_chain = create_extraction_chain()
-    response = update_medical_record_chain.invoke({"medical_record": _normalize_record(medical_record), "history": history})
-
-    return response
 
 
+def run_form_clarification(shared_state, latest_message: str = ""):
+    chain = create_form_clarification_chain()
+    return chain.invoke({"state": _normalize_state(shared_state), "latest_message": latest_message})
+
+
+def run_basic_question(shared_state):
+    chain = create_basic_questions_chain()
+    return chain.invoke(
+        {
+            "state": _normalize_state(shared_state),
+        }
+    )
+
+
+def run_diagnostic_reasoning(shared_state):
+    chain = create_diagnostic_reasoning_chain()
+    state_json = _normalize_state(shared_state)
+    return chain.invoke(
+        {
+            "state": state_json,
+        }
+    )
+
+
+def run_rule_out_question(shared_state):
+    chain = create_rule_out_in_chain()
+    return chain.invoke(
+        {
+            "state": _normalize_state(shared_state),
+        }
+    )
+
+
+def run_closing(shared_state):
+    chain = create_closing_chain(
+        allowed_addresses=get_allowed_addresses(),
+        facilities_by_address=get_facilities_by_address(),
+    )
+    state_json = _normalize_state(shared_state)
+    return chain.invoke(
+        {
+            "state": state_json,
+            "reasoning_snapshot": state_json.get("reasoning_snapshot"),
+        }
+    )

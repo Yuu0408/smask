@@ -14,7 +14,8 @@ import MedicalRecordForm, {
 // Otherwise, you can inline a minimal shape here.
 export type { PatientFormValues } from './MedicalRecordForm.vue';
 
-const open = defineModel<boolean>(); // v-model:open from parent
+// Bind to `open` so DialogManager's :open works correctly
+const open = defineModel<boolean>('open', { default: false });
 const props = defineProps<{ mode?: 'chat' | 'voice' }>();
 
 const emits = defineEmits(['submit']);
