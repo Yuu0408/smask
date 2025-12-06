@@ -174,11 +174,19 @@ class SharedState(BaseModel):
     last_question: Optional[PendingQuestion] = None
     asked_targets: List[str] = Field(default_factory=list, description="Targets/topics already asked to avoid repeats.")
     conversation_tail: List[dict] = Field(default_factory=list, description="Full conversation history to preserve context and tone.")
+    selection_plan: Optional[dict] = Field(default=None, description="Latest question-selection plan between reasoning and rule-out.")
 
 
 class AIStateData(BaseModel):
     shared_state: SharedState
-    stage: Literal["FORM_CLARIFICATION", "BASIC_QUESTIONING", "REASONING", "RULE_OUT", "CLOSING"]
+    stage: Literal[
+        "FORM_CLARIFICATION",
+        "BASIC_QUESTIONING",
+        "REASONING",
+        "RULE_OUT",
+        "CLOSING",
+        "NEXT_STEP",
+    ]
 
 class ChatTextRequest(BaseModel):
     user_id: str
@@ -205,6 +213,9 @@ class UserPublic(BaseModel):
     username: str
     is_active: bool
     role: Literal["patient", "doctor"]
+    metadata: dict = Field(default_factory=dict)
+    address: Optional[str] = None
+    facility: Optional[str] = None
 
 class LoginRequest(BaseModel):
     username: str
@@ -291,9 +302,11 @@ class ContactDetailResponse(BaseModel):
     record_id: str
     address: str
     facility: str
+    include_conversation: bool
     medical_record: MedicalRecordData | dict
     diagnosis: Optional[dict] = None
     reasoning_process: Optional[str] = None
+    reasoning_snapshot: Optional[dict] = None
     further_test: Optional[list] = None
     todos: List[TodoItem] = []
     conversation: Optional[List[ChatMessageDto]] = None

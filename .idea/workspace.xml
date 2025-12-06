@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07ce01ee-a9d5-433d-befa-1238430484f6" name="Changes" comment="" />
+    <list default="true" id="07ce01ee-a9d5-433d-befa-1238430484f6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/basic_questions_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/basic_questions_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/closing_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/closing_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/conversation_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/conversation_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/form_clarification_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/form_clarification_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/rule_out_in_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/rule_out_in_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graph/chains/state_update_chain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graph/chains/state_update_chain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/dto/modelDto.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/dto/modelDto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/repositories/contact_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/repositories/contact_repo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/chat/chat_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/chat/chat_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/chat/chat_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/chat/chat_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/chat/state_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/chat/state_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/contact/contact_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/contact/contact_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppSideBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AppSideBar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatInput.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatInput.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatMessage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatMessage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChatMultipleChoices.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChatMultipleChoices.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/DoctorSideBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DoctorSideBar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ui/sidebar/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ui/sidebar/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/layouts/AppLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/layouts/AppLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/layouts/DoctorLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/layouts/DoctorLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/chat/conversation/ConversationPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/chat/conversation/ConversationPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/chat/medical-record/MedicalRecordForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/chat/medical-record/MedicalRecordForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/contact/ContactPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/contact/ContactPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/contact/DirectChatPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/contact/DirectChatPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/contact/PatientDetailPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/contact/PatientDetailPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/contact/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/contact/router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/diagnosis/record/RecordDetailPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/diagnosis/record/RecordDetailPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/history/HistoryPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/history/HistoryPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/home/HomePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/home/HomePage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/record/RecordPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/record/RecordPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/todo/TodoPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/todo/TodoPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/i18n/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/i18n/en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/i18n/vi.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/i18n/vi.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/style.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,9 +47,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="36MIoTs2jvBsHK0bEEr4R5fBOJD" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -23,7 +60,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "rework",
+    "git-widget-placeholder": "rework-frontend",
     "ignore.virus.scanning.warn.message": "true"
   }
 }]]></component>

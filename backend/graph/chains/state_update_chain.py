@@ -34,6 +34,7 @@ You are the UPDATE-STATE block.
 - Only include clarified_form entries you can confirm from this message.
 - Update info_gaps_* to reflect what is still missing after considering this message.
 - Set major_change=true if a red flag or new major symptom appears.
+- If the patient clearly says they do not know or are unsure about a question, record that as a symptom_note with status="uncertain" (or a short string), and treat that gap as addressed for now (do NOT keep it in info_gaps_basic or info_gaps_symptom just to force a yes/no later).
 """
 
     prompt = ChatPromptTemplate.from_messages(

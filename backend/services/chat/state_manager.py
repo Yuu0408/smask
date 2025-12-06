@@ -17,6 +17,7 @@ STAGE_BASIC = "BASIC_QUESTIONING"
 STAGE_REASON = "REASONING"
 STAGE_RULE_OUT = "RULE_OUT"
 STAGE_CLOSING = "CLOSING"
+STAGE_NEXT_STEP = "NEXT_STEP"
 
 
 def _safe_get(mapping: Dict[str, Any], *path: str) -> Any:
@@ -69,6 +70,7 @@ def build_initial_state(form_payload: Dict[str, Any]) -> AIStateData:
         pending_questions=[],
         last_question=None,
         conversation_tail=[],
+        selection_plan=None,
     )
     return AIStateData(shared_state=state, stage=STAGE_FORM)
 
@@ -151,6 +153,7 @@ def apply_state_update(shared: SharedState, update: Dict[str, Any]) -> SharedSta
         last_question=None,  # consumed after update
         asked_targets=shared.asked_targets,
         conversation_tail=shared.conversation_tail,
+        selection_plan=shared.selection_plan,
     )
     return updated
 

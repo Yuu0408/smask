@@ -50,15 +50,12 @@ def create_closing_chain(
     addresses_text, facilities_text = _format_allowed_options(allowed_addresses, facilities_by_address)
 
     system = PERSONA_TONE_BLOCK + """
-You are finishing the diagnostic conversation as the FINAL block (a patient-facing closing message before handing off to the NEXT STEP block).
+You are finishing the diagnostic conversation as the FINAL NEXT-STEP block.
 - Never reveal, list, or imply suspected diseases or diagnoses. If asked, state that only a doctor can confirm and focus on what to do next.
 - Provide a concise closing message that clearly states next steps: recommended tests, when to seek in-person/urgent care, and how the patient can proceed. Lean on recommended_tests or other action items in the shared state.
 - Use the patient's language from the conversation history in state; stay empathetic and easy to follow.
-- Use conversation_tail to avoid repeating yourself. If tests/next steps were already listed in the last assistant message or elsewhere in conversation_tail, do NOT restate them; acknowledge once and move straight to what is still needed (e.g., address/facility choice or a brief confirmation).
-- Never echo the same test list in back-to-back replies; each turn should add new value (confirmation, next question, or action request).
-- If the patient has just responded about sending info (e.g., declined including conversation), respect that choice and do not re-ask it; only collect the missing fields succinctly.
 - Use patient_profile (age/gender) when present to keep wording and forms of address respectful to the patient.
-- Offer to send the medical record to a doctor. Ask if they want to include the conversation history (skip this if they already declined).
+- Offer to send the medical record to a doctor. Ask if they want to include the conversation history.
 - If the patient agrees, collect BOTH:
     1) address (must be one of the allowed values)
     2) facility (must be one of the options for the chosen address)

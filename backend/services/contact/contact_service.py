@@ -61,8 +61,35 @@ class ContactService:
             raise HTTPException(status_code=404, detail="contact not found")
 
         payload = c.payload or {}
-        mr = payload.get("medical_record") or {}
+        # Always pull the latest medical record + diagnosis + todos to avoid stale snapshots
+        try:
+            mr_row = self.repo.med.get_medical_record_by_id(record_id=c.record_id, user_id=c.patient_id)
+            payload["medical_record"] = getattr(mr_row, "data", {}) or payload.get("medical_record") or {}
+        except Exception:
+            pass
+
         diag = payload.get("diagnosis") or None
+        latest_diag = None
+        try:
+            latest_diag = self.repo.diag.get_latest(user_id=c.patient_id, record_id=c.record_id)
+        except Exception:
+            latest_diag = None
+        if latest_diag:
+            diag = getattr(latest_diag, "diagnosis", None)
+            payload["diagnosis"] = diag
+            payload["further_test"] = getattr(latest_diag, "further_test", None)
+            payload["reasoning_process"] = getattr(latest_diag, "reasoning_process", None)
+
+        try:
+            todos_live = self.repo.todo.list_todos(user_id=c.patient_id, record_id=c.record_id)
+            payload["todos"] = [
+                {"text": t.text, "is_check": bool(t.is_check)} for t in todos_live if t.text
+            ]
+        except Exception:
+            pass
+
+        mr = payload.get("medical_record") or {}
+
         # normalize further_test to a list
         ft_raw = payload.get("further_test") or []
         if isinstance(ft_raw, dict):
@@ -70,12 +97,28 @@ class ContactService:
         else:
             ft = ft_raw or []
         reasoning = payload.get("reasoning_process") or None
+        reasoning_snapshot = payload.get("reasoning_snapshot") or None
+
+        # Derive a minimal diagnosis view from reasoning_snapshot if none was saved
+        if diag is None and isinstance(reasoning_snapshot, dict):
+            summary = reasoning_snapshot.get("summary")
+            hp = reasoning_snapshot.get("high_priority") or []
+            diffs = reasoning_snapshot.get("differentials") or []
+            rule_out_list = reasoning_snapshot.get("rule_out") or []
+            if summary or hp or diffs or rule_out_list:
+                diag = {
+                    "summary": summary,
+                    "high_priority": hp,
+                    "differentials": diffs,
+                    "rule_out": rule_out_list,
+                }
         todos_raw = payload.get("todos") or []
-        conv_raw = payload.get("conversation")
+        conv_raw = payload.get("conversation", [])
+        include_conversation = bool(c.include_conversation)
 
         todos = [TodoItem(text=t.get("text",""), is_check=bool(t.get("is_check"))) for t in todos_raw if t.get("text")]
-        conversation = None
-        if isinstance(conv_raw, list):
+        conversation = []
+        if include_conversation and isinstance(conv_raw, list):
             conversation = [ChatMessageDto(
                 id=x.get("id") or "",
                 role=x.get("role") or "human",
@@ -89,9 +132,11 @@ class ContactService:
             record_id=str(c.record_id),
             address=c.address,
             facility=c.facility,
+            include_conversation=include_conversation,
             medical_record=mr,
             diagnosis=diag,
             reasoning_process=reasoning,
+            reasoning_snapshot=reasoning_snapshot,
             further_test=ft,
             todos=todos,
             conversation=conversation,

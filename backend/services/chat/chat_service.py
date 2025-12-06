@@ -1,4 +1,6 @@
+import asyncio
 from typing import Any, Dict, List, Optional
+from uuid import UUID as UUID_cls
 
 from fastapi import HTTPException
 from sqlmodel import Session
@@ -19,17 +21,23 @@ from models.dto.modelDto import (
     TodoItem,
 )
 from repositories import AIStateRepo, ChatHistoryRepo, DiagnosisRepo, MedicalRecordRepo, TodoRepo
+from repositories.contact_repo import ContactRepo
 from services.chat.chat_utils import (
     run_basic_question,
     run_closing,
     run_diagnostic_reasoning,
     run_form_clarification,
+    run_final_diagnosis,
+    run_record_update,
+    run_next_step,
+    run_rule_out_selection,
     run_rule_out_question,
     run_state_update,
 )
 from services.chat.state_manager import (
     STAGE_BASIC,
     STAGE_CLOSING,
+    STAGE_NEXT_STEP,
     STAGE_FORM,
     STAGE_REASON,
     STAGE_RULE_OUT,
@@ -50,6 +58,7 @@ class ChatService:
         self.ai_state_repo = AIStateRepo(db)
         self.todo_repo = TodoRepo(db)
         self.diagnosis_repo = DiagnosisRepo(db)
+        self.contact_repo = ContactRepo(db)
 
     def _deep_merge(self, base: Dict[str, Any], overlay: Dict[str, Any]) -> Dict[str, Any]:
         """Deep merge overlay into base without mutating inputs."""
@@ -242,9 +251,11 @@ class ChatService:
         # Keep the conversation history for tone/context
         shared = update_conversation_tail(shared, [{"role": "human", "content": message}])
 
-        # Skip state-update LLM when we're already at final next-step stage
+        response_stage_override = None
+
+        # Skip state-update LLM when we're already at final/next-step stage
         major_change = False
-        if state_data.stage != STAGE_CLOSING:
+        if state_data.stage not in {STAGE_CLOSING, STAGE_NEXT_STEP}:
             last_question_payload: Dict[str, Any] = (
                 shared.last_question.model_dump(mode="json")
                 if isinstance(shared.last_question, PendingQuestion)
@@ -336,30 +347,78 @@ class ChatService:
 
         # Block 4: Rule-out / rule-in questioning
         if stage == STAGE_RULE_OUT and not response_text:
-            rule_out_out = run_rule_out_question(shared_state=shared)
-            response_text = getattr(rule_out_out, "question", "")
-            options = getattr(rule_out_out, "options", []) or []
-            shared = set_last_question(
-                shared,
-                response_text,
-                intent="rule_out",
-                target=getattr(rule_out_out, "target_condition", None),
-                options=options,
-                rationale=getattr(rule_out_out, "rationale", None),
+            selection = run_rule_out_selection(shared_state=shared)
+            selection_payload = (
+                selection.model_dump(mode="json") if hasattr(selection, "model_dump") else dict(selection)
             )
-            snapshot = shared.reasoning_snapshot
-            if snapshot and getattr(rule_out_out, "allow_finish_if_clear", False):
-                snapshot.needs_more_questions = False
-                snapshot.refresh_reason = None
-                snapshot.good_conclusion = snapshot.good_conclusion or False
+            # Attach selection plan into shared state for transparency
+            shared.selection_plan = selection_payload  # type: ignore[attr-defined]
+
+            # If patient requested to conclude and selection allows, hand off to closing
+            if selection_payload.get("handoff_to_closing"):
+                stage = STAGE_CLOSING
+            else:
+                rule_out_out = run_rule_out_question(shared_state=shared, selection_plan=selection_payload)
+                response_text = getattr(rule_out_out, "question", "")
+                options = getattr(rule_out_out, "options", []) or []
+                shared = set_last_question(
+                    shared,
+                    response_text,
+                    intent="rule_out",
+                    target=getattr(rule_out_out, "target_condition", None)
+                    or selection_payload.get("target_condition"),
+                    options=options,
+                    rationale=getattr(rule_out_out, "rationale", None),
+                )
+                snapshot = shared.reasoning_snapshot
+                if snapshot and getattr(rule_out_out, "allow_finish_if_clear", False):
+                    snapshot.needs_more_questions = False
+                    snapshot.refresh_reason = None
+                    snapshot.good_conclusion = snapshot.good_conclusion or False
 
         # Closing message
         if stage == STAGE_CLOSING and not response_text:
+            record_update_out = None
+            final_diag_out = None
+
+            # Run record update + final diagnosis in parallel to avoid serial OpenAI calls
+            record_update_task = asyncio.create_task(
+                asyncio.to_thread(run_record_update, shared_state=shared)
+            )
+            final_diag_task = asyncio.create_task(
+                asyncio.to_thread(run_final_diagnosis, shared_state=shared)
+            )
+            record_update_result, final_diag_result = await asyncio.gather(
+                record_update_task, final_diag_task, return_exceptions=True
+            )
+
+            # Apply record updates if available
+            if not isinstance(record_update_result, Exception):
+                record_update_out = record_update_result
+                try:
+                    record_update_payload = (
+                        record_update_out.model_dump(mode="json")
+                        if hasattr(record_update_out, "model_dump")
+                        else dict(record_update_out)
+                    )
+                    updates = record_update_payload.get("record_updates") or {}
+                    if updates:
+                        shared.clarified_form = self._deep_merge(shared.clarified_form or {}, updates)
+                        merged_form = self._deep_merge(getattr(medical_record, "data", {}) or {}, updates)
+                        medical_record.data = merged_form
+                        self.medical_record_repo.update_record(medical_record)
+                except Exception:
+                    record_update_out = None
+            # Capture diagnosis result even if record update fails
+            if not isinstance(final_diag_result, Exception):
+                final_diag_out = final_diag_result
+
             closing_out = run_closing(shared_state=shared)
             response_text = getattr(closing_out, "message", "")
             options = getattr(closing_out, "options", []) or []
             action = getattr(closing_out, "action", None)
             send_contact = getattr(closing_out, "send_contact", None)
+            response_stage_override = STAGE_CLOSING
             shared.last_question = None
             shared.pending_questions = []
 
@@ -370,6 +429,38 @@ class ChatService:
                 self.medical_record_repo.update_record(medical_record)
             except Exception:
                 # Non-fatal: keep going even if persistence fails
+                pass
+
+            # Persist diagnosis (prefer final diagnosis output, fall back to snapshot)
+            try:
+                if final_diag_out:
+                    diag_payload = (
+                        final_diag_out.model_dump(mode="json")
+                        if hasattr(final_diag_out, "model_dump")
+                        else dict(final_diag_out)
+                    )
+                    diag_reasoning = diag_payload.get("reasoning_process") or ""
+                    diag_body = diag_payload.get("diagnosis") or {}
+                    diag_tests = diag_payload.get("further_test") or []
+                    self.diagnosis_repo.add_diagnosis(
+                        user_id=UUID_cls(user_id),
+                        record_id=UUID_cls(record_id),
+                        reasoning_process=diag_reasoning,
+                        diagnosis=diag_body,
+                        further_test=diag_tests,
+                    )
+                elif shared.reasoning_snapshot:
+                    snapshot_dict = shared.reasoning_snapshot.model_dump(mode="json")
+                    further_tests = snapshot_dict.get("recommended_tests") or []
+                    self.diagnosis_repo.add_diagnosis(
+                        user_id=UUID_cls(user_id),
+                        record_id=UUID_cls(record_id),
+                        reasoning_process=snapshot_dict.get("summary") or "",
+                        diagnosis=snapshot_dict,
+                        further_test=further_tests,
+                    )
+            except Exception:
+                # Non-fatal: continue flow even if diagnosis persistence fails
                 pass
 
             # Build and persist todo list (recommended tests / recommendations)
@@ -387,6 +478,80 @@ class ChatService:
                 todos_payload = [TodoItem(text=row.text, is_check=row.is_check) for row in rows if row.text]
             except Exception:
                 todos_payload = None
+
+            # If asked to send contact, create the contact record immediately
+            contact_id = None
+            if action == "SEND_CONTACT" and send_contact:
+                # Prepare extra payload (reasoning snapshot) to attach to contact
+                reasoning_snapshot_payload = None
+                if shared.reasoning_snapshot:
+                    reasoning_snapshot_payload = shared.reasoning_snapshot.model_dump(mode="json")
+                try:
+                    contact_row = self.contact_repo.create_contact(
+                        patient_id=UUID_cls(user_id),
+                        record_id=UUID_cls(record_id),
+                        address=send_contact.get("address"),
+                        facility=send_contact.get("facility"),
+                        include_conversation=bool(send_contact.get("include_conversation")),
+                        payload_extra={
+                            "reasoning_snapshot": reasoning_snapshot_payload,
+                        },
+                    )
+                    contact_id = str(contact_row.id)
+                except HTTPException as e:
+                    if e.status_code == 409:
+                        # Already sent; ignore to avoid blocking
+                        action = "NONE"
+                    else:
+                        raise
+                except Exception:
+                    action = "NONE"
+
+                if send_contact and contact_id:
+                    send_contact = {**send_contact, "contact_id": contact_id}
+
+            # After the final block, transition to the next-step stage
+            stage = STAGE_NEXT_STEP
+
+        # Next-step follow-ups: rely on conversation history only
+        if stage == STAGE_NEXT_STEP and not response_text:
+            next_step_out = run_next_step(shared_state=shared)
+            response_text = getattr(next_step_out, "message", "")
+            options = getattr(next_step_out, "options", []) or []
+            action = getattr(next_step_out, "action", None)
+            send_contact = getattr(next_step_out, "send_contact", None)
+            response_stage_override = STAGE_NEXT_STEP
+            shared.last_question = None
+            shared.pending_questions = []
+
+            contact_id = None
+            if action == "SEND_CONTACT" and send_contact:
+                reasoning_snapshot_payload = None
+                if shared.reasoning_snapshot:
+                    reasoning_snapshot_payload = shared.reasoning_snapshot.model_dump(mode="json")
+                try:
+                    contact_row = self.contact_repo.create_contact(
+                        patient_id=UUID_cls(user_id),
+                        record_id=UUID_cls(record_id),
+                        address=send_contact.get("address"),
+                        facility=send_contact.get("facility"),
+                        include_conversation=bool(send_contact.get("include_conversation")),
+                        payload_extra={
+                            "reasoning_snapshot": reasoning_snapshot_payload,
+                        },
+                    )
+                    contact_id = str(contact_row.id)
+                except HTTPException as e:
+                    if e.status_code == 409:
+                        # Already sent; ignore to avoid blocking
+                        action = "NONE"
+                    else:
+                        raise
+                except Exception:
+                    action = "NONE"
+
+                if send_contact and contact_id:
+                    send_contact = {**send_contact, "contact_id": contact_id}
 
         if not response_text:
             raise HTTPException(status_code=500, detail="Unable to generate response for current stage")
@@ -409,7 +574,7 @@ class ChatService:
         return ChatTextResponse(
             message=response_text,
             multiple_choices=options or None,
-            decision=state_data.stage,
+            decision=response_stage_override or state_data.stage,
             action=action,
             send_contact=send_contact,
             todos=todos_payload,

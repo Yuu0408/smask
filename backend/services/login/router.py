@@ -55,7 +55,17 @@ def get_me(current: User = Depends(get_current_user), db: Session = Depends(get_
     record_id = medical_record_repo.get_latest_record_id(user_id=current.id)
     if not record_id:
         record_id = ""
-    return UserPublic(id=str(current.id), record_id=str(record_id), username=current.username, is_active=current.is_active, role=current.role_type)
+    meta = current.user_metadata or {}
+    return UserPublic(
+        id=str(current.id),
+        record_id=str(record_id),
+        username=current.username,
+        is_active=current.is_active,
+        role=current.role_type,
+        metadata=meta,
+        address=meta.get("address"),
+        facility=meta.get("facility"),
+    )
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, response: Response, db: Session = Depends(get_session)):
@@ -75,9 +85,19 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_s
     record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
     if not record_id:
         record_id = ""
+    meta = user.user_metadata or {}
     return TokenResponse(
         accessToken=access,
-        user=UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
+        user=UserPublic(
+            id=str(user.id),
+            record_id=str(record_id),
+            username=user.username,
+            is_active=user.is_active,
+            role=user.role_type,
+            metadata=meta,
+            address=meta.get("address"),
+            facility=meta.get("facility"),
+        ),
     )
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -114,9 +134,19 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_sess
     record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
     if not record_id:
         record_id = ""
+    meta = user.user_metadata or {}
     return TokenResponse(
         accessToken=new_access,
-        user=UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
+        user=UserPublic(
+            id=str(user.id),
+            record_id=str(record_id),
+            username=user.username,
+            is_active=user.is_active,
+            role=user.role_type,
+            metadata=meta,
+            address=meta.get("address"),
+            facility=meta.get("facility"),
+        ),
     )
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -156,9 +186,19 @@ def register(payload: RegisterRequest, response: Response, db: Session = Depends
     record_id = medical_record_repo.get_latest_record_id(user_id=user.id)
     if not record_id:
         record_id = ""
+    meta = user.user_metadata or {}
     return {
         "accessToken": access,
-        "user": UserPublic(id=str(user.id), record_id=str(record_id), username=user.username, is_active=user.is_active, role=user.role_type),
+        "user": UserPublic(
+            id=str(user.id),
+            record_id=str(record_id),
+            username=user.username,
+            is_active=user.is_active,
+            role=user.role_type,
+            metadata=meta,
+            address=meta.get("address"),
+            facility=meta.get("facility"),
+        ),
     }
 
 @router.post("/logout")

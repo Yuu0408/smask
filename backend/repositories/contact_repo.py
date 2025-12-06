@@ -20,7 +20,16 @@ class ContactRepo:
         self.todo = TodoRepo(db)
         self.diag = DiagnosisRepo(db)
 
-    def create_contact(self, *, patient_id: UUID, record_id: UUID, address: str, facility: str, include_conversation: bool) -> Contact:
+    def _deep_merge(self, base: Dict[str, Any], overlay: Dict[str, Any]) -> Dict[str, Any]:
+        merged = {**(base or {})}
+        for k, v in (overlay or {}).items():
+            if isinstance(v, dict) and isinstance(merged.get(k), dict):
+                merged[k] = self._deep_merge(merged[k], v)
+            else:
+                merged[k] = v
+        return merged
+
+    def create_contact(self, *, patient_id: UUID, record_id: UUID, address: str, facility: str, include_conversation: bool, payload_extra: Optional[Dict[str, Any]] = None) -> Contact:
         try:
             # Prevent duplicate sends for the same record by the same patient
             exists_stmt = select(Contact).where(
@@ -44,11 +53,15 @@ class ContactRepo:
                 "todos": [
                     {"text": t.text, "is_check": bool(t.is_check)} for t in todos if t.text
                 ],
+                "conversation_included": bool(include_conversation),
                 "conversation": [
                     {"id": str(h.id), "role": h.role, "content": h.content, "created_at": h.created_at.isoformat()}
                     for h in history
-                ] if include_conversation else None,
+                ] if include_conversation else [],
             }
+
+            if payload_extra:
+                payload = self._deep_merge(payload, payload_extra)
 
             row = Contact(
                 patient_id=patient_id,

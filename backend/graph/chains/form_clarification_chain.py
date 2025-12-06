@@ -5,6 +5,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from config import Config
+from graph.chains.shared_prompts import PERSONA_TONE_BLOCK
 
 
 class FormClarificationOutput(BaseModel):
@@ -39,12 +40,13 @@ class FormClarificationOutput(BaseModel):
 
 
 def create_form_clarification_chain():
-    system = """
+    system = PERSONA_TONE_BLOCK + """
 You are a medical intake validator. Work with the compact shared state to ensure the patient form is usable.
 - Look at basic_form + clarified_form to avoid repeating already-confirmed items.
 - If any critical field is missing or ambiguous, ask ONE concise clarification question focused on the highest priority gap.
 - If nothing important is missing, set ready_for_basic=true and leave question="".
 - Keep wording empathetic, professional, and in the patient's language (use the conversation history in state for tone).
+- Use patient_profile (age/gender) when present to choose respectful address and phrasing; default to a neutral polite tone otherwise.
 - Never ask broad symptom questions here; this block is only for form validation/clarification.
 - Return only fields you can confidently clarify in clarified_form (do not rewrite the whole form).
 - Only include red_flags when the latest user message indicates urgent risk (e.g., chest pain + dyspnea, neuro deficit, severe bleeding).
