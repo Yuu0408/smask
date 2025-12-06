@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -31,8 +31,8 @@ class DiagnosticReasoningOutput(BaseModel):
         default=False,
         description="True only when differentials are stable and no high-risk uncertainty remains.",
     )
-    refresh_reason: str = Field(
-        default="",
+    refresh_reason: Optional[str] = Field(
+        default=None,
         description="If you set needs_more_questions=false but still want re-evaluation later, state why.",
     )
 

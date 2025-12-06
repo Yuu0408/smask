@@ -27,6 +27,10 @@ class RuleOutSelectionOutput(BaseModel):
         default=False,
         description="Set true when the patient requests to conclude/diagnose now or decline more questions; signal to skip further rule-out questions and move to closing if safe.",
     )
+    skip_questions: List[str] = Field(
+        default_factory=list,
+        description="Short phrases for questions/targets that should NOT be asked again given asked_targets, pending_questions, and conversation_tail.",
+    )
 
 
 def create_rule_out_selection_chain():
@@ -39,6 +43,7 @@ You are the QUESTION-SELECTION block between diagnostic reasoning and patient qu
   3) Major differentiator between top candidates.
   4) High-value missing info (info_gaps_symptom) not already asked.
 - DO NOT repeat targets already in asked_targets or pending_questions unless new info demands clarification; if a symptom/target is marked uncertain, treat it as addressed for now.
+- Populate skip_questions with concise question/target phrases that are already covered (asked_targets, pending_questions, or clearly answered in conversation_tail) so downstream blocks avoid repeating them.
 - If the conversation_tail shows the patient is asking for something else (e.g., wants diagnosis or asks to stop), prioritize that intent: set handoff_to_closing=true when safe, or pick one single high-yield safety/triage question with allow_finish_if_clear=true.
 - Keep selection concise; no question wording here, just pick the target/intention.
 - Set allow_finish_if_clear=true only if one more answer could safely conclude.
