@@ -358,7 +358,7 @@ const applyPreset = () => {
         return;
     }
     const data = { ...preset.data } as any;
-    if (data.hasOwnProperty('recent_sexual_activity')) {
+    if (Object.prototype.hasOwnProperty.call(data, 'recent_sexual_activity')) {
         const val = data.recent_sexual_activity;
         data.recent_sexual_activity =
             val === true ? 'true' : val === false ? 'false' : null;

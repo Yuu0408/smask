@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Label } from '@/components/ui/label';
 
+defineOptions({
+    name: 'InfoItem',
+});
+
 defineProps<{
     label: string;
     value: string;

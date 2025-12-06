@@ -26,7 +26,9 @@
                         v-if="pending"
                         class="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"
                     >
-                        <span class="size-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span
+                            class="size-2 rounded-full bg-amber-500 animate-pulse"
+                        ></span>
                         {{ t('chat.placeholder.loading') }}
                     </span>
                 </div>
@@ -81,8 +83,12 @@ const displayText = computed(() => {
     const waitingText = t('chat.placeholder.waiting');
     const loadingText = t('chat.placeholder.loading');
     const fallback =
-        (waitingText && waitingText !== 'chat.placeholder.waiting' && waitingText) ||
-        (loadingText && loadingText !== 'chat.placeholder.loading' && loadingText) ||
+        (waitingText &&
+            waitingText !== 'chat.placeholder.waiting' &&
+            waitingText) ||
+        (loadingText &&
+            loadingText !== 'chat.placeholder.loading' &&
+            loadingText) ||
         'AI is preparing your response...';
     if (text.trim().length > 0) return text;
     // Always show a fallback when the message text is empty to avoid a blank bubble.

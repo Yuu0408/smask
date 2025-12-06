@@ -18,15 +18,15 @@ import {
     MessageSquare,
     Stethoscope,
     UserRound,
+    Shield,
 } from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useContactStore } from '@/stores/contact';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -81,14 +81,20 @@ onMounted(async () => {
             name: p.full_name,
         }));
         if (!doctorAddress.value && !doctorFacility.value) {
-            await auth.getMe().catch(() => {});
+            await auth
+                .getMe()
+                .catch((error) =>
+                    console.error('Failed to refresh doctor metadata', error)
+                );
         }
         console.log('Doctor metadata', {
             address: doctorAddress.value,
             facility: doctorFacility.value,
             metadata: (user.value as any)?.metadata,
         });
-    } catch {}
+    } catch (error) {
+        console.error('Failed to load patients', error);
+    }
 });
 
 async function handleLogout() {
@@ -100,14 +106,13 @@ async function handleLogout() {
     }
 }
 
-const isActive = (path: string) =>
-    route.path === path || route.path.startsWith(`${path}/`);
-
 function setLanguage(lang: 'en' | 'vi') {
     locale.value = lang;
     try {
         window.localStorage.setItem('locale', lang);
-    } catch {}
+    } catch (error) {
+        console.warn('Unable to persist language preference', error);
+    }
 }
 </script>
 
@@ -125,7 +130,9 @@ function setLanguage(lang: 'en' | 'vi') {
                     <p class="truncate text-base font-semibold">
                         {{ displayName }}
                     </p>
-                    <p class="text-xs text-muted-foreground flex items-center gap-1">
+                    <p
+                        class="text-xs text-muted-foreground flex items-center gap-1"
+                    >
                         <Stethoscope class="size-3 text-primary" />
                         {{ doctorLocation }}
                     </p>
@@ -147,7 +154,8 @@ function setLanguage(lang: 'en' | 'vi') {
                         {{ t('doctor.sidebar.group.patients') }}
                     </p>
                     <p class="text-sm font-semibold text-foreground">
-                        {{ patients.length }} {{ t('doctor.sidebar.allPatients') }}
+                        {{ patients.length }}
+                        {{ t('doctor.sidebar.allPatients') }}
                     </p>
                     <div class="mt-3 flex gap-2">
                         <button
@@ -166,7 +174,10 @@ function setLanguage(lang: 'en' | 'vi') {
                 <SidebarGroup>
                     <SidebarGroupLabel
                         class="text-xs uppercase tracking-[0.18em] text-muted-foreground"
-                    >{{ t('doctor.sidebar.group.patients') }}</SidebarGroupLabel>
+                        >{{
+                            t('doctor.sidebar.group.patients')
+                        }}</SidebarGroupLabel
+                    >
 
                     <SidebarMenuItem
                         v-for="p in patients"

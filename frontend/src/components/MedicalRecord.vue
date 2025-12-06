@@ -1,14 +1,14 @@
 <script setup lang="ts">
-// @ts-nocheck
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CardSection from './CardSection.vue';
 import Info from './Info.vue';
 import { useI18n } from 'vue-i18n';
+import type { MedicalRecord } from '@/types/medicalRecord';
 
 // Legacy component; data wiring disabled
 const router = useRouter();
-const record = computed(() => null);
+const record = computed<MedicalRecord | null>(() => null);
 const { t, locale } = useI18n();
 
 onMounted(() => {

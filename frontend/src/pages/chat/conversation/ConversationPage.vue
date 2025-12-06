@@ -179,8 +179,12 @@ function stagePlaceholder(stage: ChatStage | null) {
     const waitingText = t('chat.placeholder.waiting');
     const loadingText = t('chat.placeholder.loading');
     const baseFallback =
-        (waitingText && waitingText !== 'chat.placeholder.waiting' && waitingText) ||
-        (loadingText && loadingText !== 'chat.placeholder.loading' && loadingText) ||
+        (waitingText &&
+            waitingText !== 'chat.placeholder.waiting' &&
+            waitingText) ||
+        (loadingText &&
+            loadingText !== 'chat.placeholder.loading' &&
+            loadingText) ||
         'AI is preparing your response...';
     if (!stage) return baseFallback;
     const key = stagePlaceholderKeys[stage];
@@ -205,7 +209,9 @@ function stagePlaceholder(stage: ChatStage | null) {
                 <div
                     class="pointer-events-none absolute -left-10 top-0 size-40 rounded-full bg-primary/15 blur-3xl"
                 />
-                <div class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                <div
+                    class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
+                >
                     {{ t('sidebar.header.app.name') }}
                     <span class="text-muted-foreground">AI</span>
                 </div>
@@ -262,9 +268,15 @@ function stagePlaceholder(stage: ChatStage | null) {
                             <div
                                 v-if="multipleChoices.length"
                                 class="relative z-10 grid gap-2"
-                                :class="multipleChoices.length > 2 ? 'grid-cols-2' : 'grid-cols-1'"
+                                :class="
+                                    multipleChoices.length > 2
+                                        ? 'grid-cols-2'
+                                        : 'grid-cols-1'
+                                "
                             >
-                                <div class="absolute -left-1 -top-6 text-primary">
+                                <div
+                                    class="absolute -left-1 -top-6 text-primary"
+                                >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         class="size-5"
@@ -296,7 +308,10 @@ function stagePlaceholder(stage: ChatStage | null) {
                             </div>
 
                             <div class="mt-3">
-                                <ChatInput :loading="sending" @send="handleSend" />
+                                <ChatInput
+                                    :loading="sending"
+                                    @send="handleSend"
+                                />
                                 <p
                                     class="mt-2 text-center text-[10px] text-muted-foreground"
                                     v-html="t('chat.input.hint')"

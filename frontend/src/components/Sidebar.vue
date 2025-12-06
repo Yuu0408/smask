@@ -94,6 +94,10 @@ import {
 } from '@/components/ui/select';
 import { useI18n } from 'vue-i18n';
 
+defineOptions({
+    name: 'MainSidebar',
+});
+
 defineProps<{ isOpen: boolean }>();
 
 const router = useRouter();

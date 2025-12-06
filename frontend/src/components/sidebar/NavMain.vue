@@ -39,7 +39,9 @@ async function refreshDoctors() {
     try {
         const res = await contactStore.listMyDoctors(user.value.id);
         myDoctors.value = res.doctors || [];
-    } catch {}
+    } catch (error) {
+        console.error('Failed to refresh doctors', error);
+    }
 }
 
 onMounted(async () => {

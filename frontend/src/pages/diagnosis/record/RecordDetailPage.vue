@@ -86,7 +86,9 @@ const sections = computed(() => [
                             <Button variant="outline" class="rounded-xl">
                                 {{ t('sidebar.history') }}
                             </Button>
-                            <Button class="rounded-xl shadow-primary/20 shadow-lg">
+                            <Button
+                                class="rounded-xl shadow-primary/20 shadow-lg"
+                            >
                                 {{ t('contact.detail.openChat') }}
                             </Button>
                         </div>
@@ -122,7 +124,9 @@ const sections = computed(() => [
                                         section.title
                                     }}</CardTitle>
                                 </div>
-                                <p class="text-xs font-medium text-muted-foreground">
+                                <p
+                                    class="text-xs font-medium text-muted-foreground"
+                                >
                                     {{ section.badge }}
                                 </p>
                             </CardHeader>

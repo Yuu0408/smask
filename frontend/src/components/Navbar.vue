@@ -1,3 +1,9 @@
+<script setup lang="ts">
+defineOptions({
+    name: 'AppNavbar',
+});
+</script>
+
 <template>
     <nav
         class="fixed top-0 left-0 right-0 z-40 bg-gray-100 dark:bg-gray-900 shadow p-4 flex justify-between items-center"
@@ -8,5 +14,3 @@
         <h1 class="text-xl font-semibold px-3">Smask</h1>
     </nav>
 </template>
-
-<script setup lang="ts"></script>

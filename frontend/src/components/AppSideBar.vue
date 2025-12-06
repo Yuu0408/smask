@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, onUnmounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { SidebarProps } from '@/components/ui/sidebar';
 import {
     Sidebar,
@@ -25,7 +25,6 @@ import {
     Languages,
     LogOut,
     MessageCirclePlus,
-    Mic2,
     Settings,
     Sparkles,
     Users2,
@@ -57,7 +56,6 @@ const auth = useAuthStore();
 const { user } = storeToRefs(auth);
 const activeTitle = ref<string>('');
 const currentRecordId = computed(() => user.value?.currentRecordId || '');
-const historyStore = useHistoryStore();
 
 const navPrimary = computed(() => [
     {
@@ -124,7 +122,9 @@ function setLanguage(lang: 'en' | 'vi') {
     locale.value = lang;
     try {
         window.localStorage.setItem('locale', lang);
-    } catch {}
+    } catch (error) {
+        console.warn('Unable to persist locale', error);
+    }
 }
 
 function isActive(match: string) {
@@ -159,9 +159,6 @@ async function refreshActiveTitle() {
 
 onMounted(async () => {
     await refreshActiveTitle();
-});
-
-onUnmounted(() => {
 });
 
 watch(
@@ -260,36 +257,35 @@ watch(
 
                 <Separator class="my-2" />
 
-            <SidebarGroup>
-                <SidebarGroupLabel
-                    class="text-xs uppercase tracking-[0.18em] text-muted-foreground"
-                >
-                    {{ t('sidebar.group.followUp') }}
-                </SidebarGroupLabel>
-                <SidebarMenuItem
-                    v-for="link in navSecondary"
-                    :key="link.to"
-                    :class="{
-                        'bg-primary/10 border-primary/20': isActive(
-                            link.activeMatch
-                        ),
-                    }"
-                    class="rounded-xl transition hover:bg-primary/10"
-                >
-                    <SidebarMenuButton as-child class="rounded-xl">
-                        <router-link
-                            :to="link.to"
-                            class="flex items-center gap-3"
-                        >
-                            <component :is="link.icon" class="size-4" />
-                            <span class="font-medium truncate">{{
-                                link.label
-                            }}</span>
-                        </router-link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarGroup>
-
+                <SidebarGroup>
+                    <SidebarGroupLabel
+                        class="text-xs uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                        {{ t('sidebar.group.followUp') }}
+                    </SidebarGroupLabel>
+                    <SidebarMenuItem
+                        v-for="link in navSecondary"
+                        :key="link.to"
+                        :class="{
+                            'bg-primary/10 border-primary/20': isActive(
+                                link.activeMatch
+                            ),
+                        }"
+                        class="rounded-xl transition hover:bg-primary/10"
+                    >
+                        <SidebarMenuButton as-child class="rounded-xl">
+                            <router-link
+                                :to="link.to"
+                                class="flex items-center gap-3"
+                            >
+                                <component :is="link.icon" class="size-4" />
+                                <span class="font-medium truncate">{{
+                                    link.label
+                                }}</span>
+                            </router-link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarGroup>
             </SidebarMenu>
         </SidebarContent>
 

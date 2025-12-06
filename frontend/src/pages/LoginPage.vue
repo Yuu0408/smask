@@ -193,7 +193,8 @@ async function handleSubmit() {
                 class="flex items-center justify-between rounded-2xl border border-primary/10 bg-white/60 px-4 py-3 shadow-sm backdrop-blur"
             >
                 <div class="flex items-center gap-2">
-                    <span class="text-lg font-semibold tracking-tight text-primary"
+                    <span
+                        class="text-lg font-semibold tracking-tight text-primary"
                         >Medee</span
                     >
                     <span
@@ -205,14 +206,18 @@ async function handleSubmit() {
                     <Button
                         size="sm"
                         variant="ghost"
-                        :class="{ 'bg-primary/15 text-primary': locale === 'en' }"
+                        :class="{
+                            'bg-primary/15 text-primary': locale === 'en',
+                        }"
                         @click="setLocale('en')"
                         >EN</Button
                     >
                     <Button
                         size="sm"
                         variant="ghost"
-                        :class="{ 'bg-primary/15 text-primary': locale === 'vi' }"
+                        :class="{
+                            'bg-primary/15 text-primary': locale === 'vi',
+                        }"
                         @click="setLocale('vi')"
                         >VI</Button
                     >
@@ -220,10 +225,14 @@ async function handleSubmit() {
             </div>
 
             <div class="text-center space-y-4 pt-2">
-                <h1 class="text-4xl font-bold leading-tight tracking-tight text-slate-900">
+                <h1
+                    class="text-4xl font-bold leading-tight tracking-tight text-slate-900"
+                >
                     {{ t('page.login.title') }}
                 </h1>
-                <p class="text-lg leading-relaxed text-slate-600 max-w-3xl mx-auto">
+                <p
+                    class="text-lg leading-relaxed text-slate-600 max-w-3xl mx-auto"
+                >
                     {{ t('page.login.subtitle') }}
                 </p>
             </div>
@@ -264,13 +273,23 @@ async function handleSubmit() {
                                         v-for="(msg, idx) in sampleMessages"
                                         :key="idx"
                                         class="flex items-start gap-2"
-                                        :class="msg.role === 'human' ? 'justify-end' : 'justify-start'"
+                                        :class="
+                                            msg.role === 'human'
+                                                ? 'justify-end'
+                                                : 'justify-start'
+                                        "
                                     >
-                                        <div v-if="msg.role === 'ai'" class="flex-shrink-0 pt-1">
+                                        <div
+                                            v-if="msg.role === 'ai'"
+                                            class="flex-shrink-0 pt-1"
+                                        >
                                             <div
                                                 class="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-accent/20 text-primary shadow-sm"
                                             >
-                                                <User class="size-4" aria-hidden="true" />
+                                                <User
+                                                    class="size-4"
+                                                    aria-hidden="true"
+                                                />
                                             </div>
                                         </div>
                                         <div
@@ -283,17 +302,25 @@ async function handleSubmit() {
                                         >
                                             {{ msg.text }}
                                         </div>
-                                        <div v-if="msg.role === 'human'" class="flex-shrink-0 pt-1">
+                                        <div
+                                            v-if="msg.role === 'human'"
+                                            class="flex-shrink-0 pt-1"
+                                        >
                                             <div
                                                 class="flex size-9 items-center justify-center rounded-xl bg-muted text-foreground shadow-sm"
                                             >
-                                                <User class="size-4" aria-hidden="true" />
+                                                <User
+                                                    class="size-4"
+                                                    aria-hidden="true"
+                                                />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="pointer-events-none opacity-80">
-                                        <ChatMultipleChoices :choices="sampleChoices" />
+                                        <ChatMultipleChoices
+                                            :choices="sampleChoices"
+                                        />
                                     </div>
 
                                     <div class="pointer-events-none opacity-80">
@@ -303,13 +330,19 @@ async function handleSubmit() {
                             </div>
                         </Transition>
 
-                        <div class="absolute inset-x-0 bottom-3 flex justify-center gap-2 z-10">
+                        <div
+                            class="absolute inset-x-0 bottom-3 flex justify-center gap-2 z-10"
+                        >
                             <button
                                 v-for="(slide, idx) in slides"
                                 :key="slide.key"
                                 type="button"
                                 class="h-2.5 w-2.5 rounded-full transition"
-                                :class="currentSlide === idx ? 'bg-primary' : 'bg-muted'"
+                                :class="
+                                    currentSlide === idx
+                                        ? 'bg-primary'
+                                        : 'bg-muted'
+                                "
                                 @click="goToSlide(idx)"
                             ></button>
                         </div>
@@ -321,245 +354,275 @@ async function handleSubmit() {
                         class="w-full max-w-md overflow-hidden rounded-3xl border border-primary/15 bg-white/95 shadow-2xl shadow-primary/15 backdrop-blur"
                     >
                         <form @submit.prevent="handleSubmit">
-                        <CardHeader class="space-y-1 border-b border-border/70">
-                            <p
-                                class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+                            <CardHeader
+                                class="space-y-1 border-b border-border/70"
                             >
-                                {{ t('page.login.secureAccess') }}
-                            </p>
-                            <CardTitle class="text-2xl font-semibold">{{
-                                formTitle
-                            }}</CardTitle>
-                        </CardHeader>
-
-                        <CardContent class="space-y-6 pt-6">
-                            <div class="space-y-2">
-                                <Label
-                                    class="text-sm font-medium text-foreground"
+                                <p
+                                    class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
                                 >
-                                    {{
-                                        mode === 'login'
-                                            ? t(
-                                                  'page.login.label.role_login'
-                                              ) ||
-                                              t('page.login.label.role') ||
-                                              'Login as'
-                                            : t(
-                                                  'page.login.label.role_register'
-                                              ) || 'Register as'
-                                    }}
-                                </Label>
-                                <Tabs v-model="role" class="w-full">
-                                    <TabsList class="grid w-full grid-cols-2">
-                                        <TabsTrigger value="patient">{{
-                                            t('page.login.role.patient') ||
-                                            'Patient'
-                                        }}</TabsTrigger>
-                                        <TabsTrigger value="doctor">{{
-                                            t('page.login.role.doctor') ||
-                                            'Doctor'
-                                        }}</TabsTrigger>
-                                    </TabsList>
+                                    {{ t('page.login.secureAccess') }}
+                                </p>
+                                <CardTitle class="text-2xl font-semibold">{{
+                                    formTitle
+                                }}</CardTitle>
+                            </CardHeader>
 
-                                    <TabsContent
-                                        value="patient"
-                                        class="mt-4 space-y-4"
+                            <CardContent class="space-y-6 pt-6">
+                                <div class="space-y-2">
+                                    <Label
+                                        class="text-sm font-medium text-foreground"
                                     >
-                                        <div class="space-y-2">
-                                            <Label for="username">{{
-                                                t('page.login.label.username')
-                                            }}</Label>
-                                            <Input
-                                                id="username"
-                                                v-model="username"
-                                                type="text"
-                                                autocomplete="username"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-                                        <div class="space-y-2">
-                                            <Label for="password">{{
-                                                t('page.login.label.password')
-                                            }}</Label>
-                                            <Input
-                                                id="password"
-                                                v-model="password"
-                                                type="password"
-                                                autocomplete="current-password"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-
-                                        <div
-                                            v-if="mode === 'register'"
-                                            class="space-y-2"
+                                        {{
+                                            mode === 'login'
+                                                ? t(
+                                                      'page.login.label.role_login'
+                                                  ) ||
+                                                  t('page.login.label.role') ||
+                                                  'Login as'
+                                                : t(
+                                                      'page.login.label.role_register'
+                                                  ) || 'Register as'
+                                        }}
+                                    </Label>
+                                    <Tabs v-model="role" class="w-full">
+                                        <TabsList
+                                            class="grid w-full grid-cols-2"
                                         >
-                                            <Label for="confirmPassword">
-                                                {{
+                                            <TabsTrigger value="patient">{{
+                                                t('page.login.role.patient') ||
+                                                'Patient'
+                                            }}</TabsTrigger>
+                                            <TabsTrigger value="doctor">{{
+                                                t('page.login.role.doctor') ||
+                                                'Doctor'
+                                            }}</TabsTrigger>
+                                        </TabsList>
+
+                                        <TabsContent
+                                            value="patient"
+                                            class="mt-4 space-y-4"
+                                        >
+                                            <div class="space-y-2">
+                                                <Label for="username">{{
                                                     t(
-                                                        'page.login.label.confirm_password'
-                                                    ) || 'Confirm Password'
-                                                }}
-                                            </Label>
-                                            <Input
-                                                id="confirmPassword"
-                                                v-model="confirmPassword"
-                                                type="password"
-                                                autocomplete="new-password"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-                                    </TabsContent>
-
-                                    <TabsContent
-                                        value="doctor"
-                                        class="mt-4 space-y-4"
-                                    >
-                                        <div class="space-y-2">
-                                            <Label for="username-doctor">{{
-                                                t('page.login.label.username')
-                                            }}</Label>
-                                            <Input
-                                                id="username-doctor"
-                                                v-model="username"
-                                                type="text"
-                                                autocomplete="username"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-                                        <div class="space-y-2">
-                                            <Label for="password-doctor">{{
-                                                t('page.login.label.password')
-                                            }}</Label>
-                                            <Input
-                                                id="password-doctor"
-                                                v-model="password"
-                                                type="password"
-                                                autocomplete="current-password"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-
-                                        <div
-                                            v-if="mode === 'register'"
-                                            class="space-y-2"
-                                        >
-                                            <Label for="confirmPassword-doctor">
-                                                {{
+                                                        'page.login.label.username'
+                                                    )
+                                                }}</Label>
+                                                <Input
+                                                    id="username"
+                                                    v-model="username"
+                                                    type="text"
+                                                    autocomplete="username"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
+                                            <div class="space-y-2">
+                                                <Label for="password">{{
                                                     t(
-                                                        'page.login.label.confirm_password'
-                                                    ) || 'Confirm Password'
-                                                }}
-                                            </Label>
-                                            <Input
-                                                id="confirmPassword-doctor"
-                                                v-model="confirmPassword"
-                                                type="password"
-                                                autocomplete="new-password"
-                                                required
-                                                @input="resetError"
-                                            />
-                                        </div>
-                                        <div
-                                            v-if="mode === 'register'"
-                                            class="space-y-2 mt-2"
-                                        >
-                                            <Label>{{
-                                                t('page.login.label.address')
-                                            }}</Label>
-                                            <Select v-model="doctorAddress">
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        :placeholder="
-                                                            t(
-                                                                'page.login.placeholder.choose_address'
-                                                            )
-                                                        "
-                                                    />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Hà Nội"
-                                                        >Hà Nội</SelectItem
-                                                    >
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div
-                                            v-if="mode === 'register'"
-                                            class="space-y-2"
-                                        >
-                                            <Label>{{
-                                                t('page.login.label.hospital')
-                                            }}</Label>
-                                            <Select
-                                                v-model="doctorFacility"
-                                                :disabled="!doctorAddress"
+                                                        'page.login.label.password'
+                                                    )
+                                                }}</Label>
+                                                <Input
+                                                    id="password"
+                                                    v-model="password"
+                                                    type="password"
+                                                    autocomplete="current-password"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
+
+                                            <div
+                                                v-if="mode === 'register'"
+                                                class="space-y-2"
                                             >
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        :placeholder="
-                                                            t(
-                                                                'page.login.placeholder.choose_hospital'
-                                                            )
-                                                        "
-                                                    />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem
-                                                        value="Bệnh Viện Bạch Mai"
-                                                        >Bệnh Viện Bạch
-                                                        Mai</SelectItem
-                                                    >
-                                                </SelectContent>
-                                            </Select>
-                                        </div></TabsContent
-                                    >
-                                </Tabs>
-                            </div>
+                                                <Label for="confirmPassword">
+                                                    {{
+                                                        t(
+                                                            'page.login.label.confirm_password'
+                                                        ) || 'Confirm Password'
+                                                    }}
+                                                </Label>
+                                                <Input
+                                                    id="confirmPassword"
+                                                    v-model="confirmPassword"
+                                                    type="password"
+                                                    autocomplete="new-password"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
+                                        </TabsContent>
 
-                            <p v-if="error" class="text-sm text-red-600">
-                                {{ error }}
-                            </p>
-                        </CardContent>
+                                        <TabsContent
+                                            value="doctor"
+                                            class="mt-4 space-y-4"
+                                        >
+                                            <div class="space-y-2">
+                                                <Label for="username-doctor">{{
+                                                    t(
+                                                        'page.login.label.username'
+                                                    )
+                                                }}</Label>
+                                                <Input
+                                                    id="username-doctor"
+                                                    v-model="username"
+                                                    type="text"
+                                                    autocomplete="username"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
+                                            <div class="space-y-2">
+                                                <Label for="password-doctor">{{
+                                                    t(
+                                                        'page.login.label.password'
+                                                    )
+                                                }}</Label>
+                                                <Input
+                                                    id="password-doctor"
+                                                    v-model="password"
+                                                    type="password"
+                                                    autocomplete="current-password"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
 
-                        <CardFooter class="grid grid-rows-2 gap-2 border-t border-border/70 bg-white/70 p-4">
-                            <Button
-                                type="submit"
-                                class="w-full rounded-xl shadow-md shadow-primary/15"
-                                :disabled="loading"
+                                            <div
+                                                v-if="mode === 'register'"
+                                                class="space-y-2"
+                                            >
+                                                <Label
+                                                    for="confirmPassword-doctor"
+                                                >
+                                                    {{
+                                                        t(
+                                                            'page.login.label.confirm_password'
+                                                        ) || 'Confirm Password'
+                                                    }}
+                                                </Label>
+                                                <Input
+                                                    id="confirmPassword-doctor"
+                                                    v-model="confirmPassword"
+                                                    type="password"
+                                                    autocomplete="new-password"
+                                                    required
+                                                    @input="resetError"
+                                                />
+                                            </div>
+                                            <div
+                                                v-if="mode === 'register'"
+                                                class="space-y-2 mt-2"
+                                            >
+                                                <Label>{{
+                                                    t(
+                                                        'page.login.label.address'
+                                                    )
+                                                }}</Label>
+                                                <Select v-model="doctorAddress">
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            :placeholder="
+                                                                t(
+                                                                    'page.login.placeholder.choose_address'
+                                                                )
+                                                            "
+                                                        />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem
+                                                            value="Hà Nội"
+                                                            >Hà Nội</SelectItem
+                                                        >
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div
+                                                v-if="mode === 'register'"
+                                                class="space-y-2"
+                                            >
+                                                <Label>{{
+                                                    t(
+                                                        'page.login.label.hospital'
+                                                    )
+                                                }}</Label>
+                                                <Select
+                                                    v-model="doctorFacility"
+                                                    :disabled="!doctorAddress"
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            :placeholder="
+                                                                t(
+                                                                    'page.login.placeholder.choose_hospital'
+                                                                )
+                                                            "
+                                                        />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem
+                                                            value="Bệnh Viện Bạch Mai"
+                                                            >Bệnh Viện Bạch
+                                                            Mai</SelectItem
+                                                        >
+                                                    </SelectContent>
+                                                </Select>
+                                            </div></TabsContent
+                                        >
+                                    </Tabs>
+                                </div>
+
+                                <p v-if="error" class="text-sm text-red-600">
+                                    {{ error }}
+                                </p>
+                            </CardContent>
+
+                            <CardFooter
+                                class="grid grid-rows-2 gap-2 border-t border-border/70 bg-white/70 p-4"
                             >
-                                <span v-if="!loading">
-                                    {{
-                                        mode === 'login'
-                                            ? t('page.login.button.login')
-                                            : t('page.login.button.register')
-                                    }}
-                                </span>
-                                <span v-else>{{
-                                    t('page.login.button.loading')
-                                }}</span>
-                            </Button>
+                                <Button
+                                    type="submit"
+                                    class="w-full rounded-xl shadow-md shadow-primary/15"
+                                    :disabled="loading"
+                                >
+                                    <span v-if="!loading">
+                                        {{
+                                            mode === 'login'
+                                                ? t('page.login.button.login')
+                                                : t(
+                                                      'page.login.button.register'
+                                                  )
+                                        }}
+                                    </span>
+                                    <span v-else>{{
+                                        t('page.login.button.loading')
+                                    }}</span>
+                                </Button>
 
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                class="rounded-xl"
-                                @click="mode = mode === 'login' ? 'register' : 'login'"
-                            >
-                                <span>
-                                    {{
-                                        mode === 'login'
-                                            ? t('page.login.button.register')
-                                            : t('page.login.button.login')
-                                    }}
-                                </span>
-                            </Button>
-                        </CardFooter>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    class="rounded-xl"
+                                    @click="
+                                        mode =
+                                            mode === 'login'
+                                                ? 'register'
+                                                : 'login'
+                                    "
+                                >
+                                    <span>
+                                        {{
+                                            mode === 'login'
+                                                ? t(
+                                                      'page.login.button.register'
+                                                  )
+                                                : t('page.login.button.login')
+                                        }}
+                                    </span>
+                                </Button>
+                            </CardFooter>
                         </form>
                     </Card>
                 </div>
@@ -571,7 +634,9 @@ async function handleSubmit() {
 <style scoped>
 .slide-wipe-enter-active,
 .slide-wipe-leave-active {
-    transition: transform 0.6s ease, opacity 0.6s ease;
+    transition:
+        transform 0.6s ease,
+        opacity 0.6s ease;
 }
 .slide-wipe-enter-from {
     transform: translateX(20%);
@@ -582,4 +647,3 @@ async function handleSubmit() {
     opacity: 0;
 }
 </style>
-

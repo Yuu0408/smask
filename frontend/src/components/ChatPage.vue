@@ -27,15 +27,16 @@ const userId = computed(() => user.value?.id ?? '');
 const recordId = computed(() => user.value?.currentRecordId ?? '');
 
 const toastVisible = ref(false);
-const filteredChoices = computed(() => {
-    if (
-        multipleChoices.value.length === 1 &&
-        multipleChoices.value[0] === '%medical_record%'
-    ) {
-        toastVisible.value = true;
-        return [];
-    }
-    return multipleChoices.value;
+const filteredChoices = computed(() =>
+    multipleChoices.value.length === 1 &&
+    multipleChoices.value[0] === '%medical_record%'
+        ? []
+        : multipleChoices.value
+);
+
+watch(multipleChoices, (choices) => {
+    toastVisible.value =
+        choices.length === 1 && choices[0] === '%medical_record%';
 });
 
 watch(toastVisible, (visible) => {

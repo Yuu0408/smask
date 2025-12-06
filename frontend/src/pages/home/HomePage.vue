@@ -1,27 +1,20 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import {
-    ArrowRight,
-    BookText,
-    HeartPulse,
-    MessageCirclePlus,
-    Sparkles,
-    ClipboardList,
-} from 'lucide-vue-next';
+import { ArrowRight, HeartPulse, Sparkles } from 'lucide-vue-next';
 import { useDialog } from '@/plugins/dialog-manager/use-dialog';
 import MedicalRecordDialog from '@/pages/chat/medical-record/MedicalRecordDialog.vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import ChatMessage from '@/components/ChatMessage.vue';
-import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const { openDialog } = useDialog();
 
-const previewMessages = computed(() => [
+type PreviewMessage = { role: 'ai' | 'human'; text: string };
+
+const previewMessages = computed<PreviewMessage[]>(() => [
     { role: 'ai', text: t('page.home.preview.message1') as string },
     { role: 'human', text: t('page.home.preview.message2') as string },
     { role: 'ai', text: t('page.home.preview.message3') as string },

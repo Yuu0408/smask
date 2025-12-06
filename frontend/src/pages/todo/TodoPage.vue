@@ -116,19 +116,28 @@ async function toggleItem(idx: number) {
                                 <Button
                                     variant="outline"
                                     class="rounded-xl"
-                                    @click="openDialog({ component: MedicalRecordDialog })"
+                                    @click="
+                                        openDialog({
+                                            component: MedicalRecordDialog,
+                                        })
+                                    "
                                 >
                                     {{ t('todo.startConversation') }}
                                 </Button>
                             </div>
                         </header>
 
-                        <div v-if="loading" class="text-muted-foreground animate-pulse">
+                        <div
+                            v-if="loading"
+                            class="text-muted-foreground animate-pulse"
+                        >
                             {{ t('common.loading') }}
                         </div>
 
                         <div
-                            v-else-if="!todo || (todo && todo.items.length === 0)"
+                            v-else-if="
+                                !todo || (todo && todo.items.length === 0)
+                            "
                             class="text-muted-foreground"
                         >
                             <div
@@ -152,7 +161,11 @@ async function toggleItem(idx: number) {
                                     <Button
                                         variant="default"
                                         class="rounded-xl shadow-md shadow-primary/20"
-                                        @click="openDialog({ component: MedicalRecordDialog })"
+                                        @click="
+                                            openDialog({
+                                                component: MedicalRecordDialog,
+                                            })
+                                        "
                                     >
                                         {{ t('todo.startConversation') }}
                                     </Button>
@@ -164,56 +177,80 @@ async function toggleItem(idx: number) {
                             <div class="grid gap-4 sm:grid-cols-3">
                                 <Card class="shadow-lg shadow-primary/10">
                                     <CardHeader class="space-y-1">
-                                        <CardTitle class="text-sm font-semibold text-muted-foreground">
+                                        <CardTitle
+                                            class="text-sm font-semibold text-muted-foreground"
+                                        >
                                             Pending
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div class="text-2xl font-bold text-foreground">
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
                                             {{ pendingCount }}
                                         </div>
                                     </CardContent>
                                 </Card>
                                 <Card class="shadow-lg shadow-primary/10">
                                     <CardHeader class="space-y-1">
-                                        <CardTitle class="text-sm font-semibold text-muted-foreground">
+                                        <CardTitle
+                                            class="text-sm font-semibold text-muted-foreground"
+                                        >
                                             Completed
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div class="text-2xl font-bold text-foreground">
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
                                             {{ completedCount }}
                                         </div>
                                     </CardContent>
                                 </Card>
-                                <Card class="shadow-lg shadow-primary/10 sm:col-span-1">
+                                <Card
+                                    class="shadow-lg shadow-primary/10 sm:col-span-1"
+                                >
                                     <CardHeader class="space-y-2">
-                                        <CardTitle class="text-sm font-semibold text-muted-foreground">
+                                        <CardTitle
+                                            class="text-sm font-semibold text-muted-foreground"
+                                        >
                                             Completion
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div class="text-2xl font-bold text-foreground">
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
                                             {{ completionPct }}%
                                         </div>
-                                        <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                                        <div
+                                            class="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted"
+                                        >
                                             <div
                                                 class="h-full rounded-full bg-primary transition-all duration-500"
-                                                :style="{ width: `${completionPct}%` }"
+                                                :style="{
+                                                    width: `${completionPct}%`,
+                                                }"
                                             ></div>
                                         </div>
                                     </CardContent>
                                 </Card>
                             </div>
 
-                            <Card class="shadow-lg shadow-primary/10 border-primary/10">
+                            <Card
+                                class="shadow-lg shadow-primary/10 border-primary/10"
+                            >
                                 <CardHeader>
-                                    <CardTitle class="flex items-center justify-between">
+                                    <CardTitle
+                                        class="flex items-center justify-between"
+                                    >
                                         <span class="text-xl">{{
                                             t('todo.upcomingActions')
                                         }}</span>
-                                        <span class="text-sm text-muted-foreground"
-                                            >{{ todo.items.length }} {{ t('todo.items') }}</span
+                                        <span
+                                            class="text-sm text-muted-foreground"
+                                            >{{ todo.items.length }}
+                                            {{ t('todo.items') }}</span
                                         >
                                     </CardTitle>
                                 </CardHeader>
@@ -228,10 +265,14 @@ async function toggleItem(idx: number) {
                                                 type="checkbox"
                                                 class="mt-1 h-4 w-4 accent-emerald-600"
                                                 :checked="item.is_check"
-                                                :disabled="updatingIndex === idx"
+                                                :disabled="
+                                                    updatingIndex === idx
+                                                "
                                                 @change="toggleItem(idx)"
                                             />
-                                            <div class="text-sm leading-6 flex-1">
+                                            <div
+                                                class="text-sm leading-6 flex-1"
+                                            >
                                                 <p
                                                     class="font-medium text-foreground transition-colors"
                                                     :class="
@@ -246,7 +287,10 @@ async function toggleItem(idx: number) {
                                                     v-if="item.is_check"
                                                     class="text-[11px] uppercase tracking-[0.14em] text-emerald-600"
                                                 >
-                                                    {{ t('common.done') || 'Completed' }}
+                                                    {{
+                                                        t('common.done') ||
+                                                        'Completed'
+                                                    }}
                                                 </p>
                                             </div>
                                         </li>

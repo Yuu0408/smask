@@ -16,9 +16,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Công nhân',
             nationality: 'Việt Nam',
             address: '123 Đường Lạc Long Quân, Hà Nội',
-        chief_complaint: 'Sốt, ho, nổi ban đỏ',
-        medical_history:
-            'Vài ngày nay sốt cao, ho khan, chảy mũi, mắt hơi cay, xuất hiện ban đỏ lan dần. Không rõ vì sao.',
+            chief_complaint: 'Sốt, ho, nổi ban đỏ',
+            medical_history:
+                'Vài ngày nay sốt cao, ho khan, chảy mũi, mắt hơi cay, xuất hiện ban đỏ lan dần. Không rõ vì sao.',
             past_medical_history: 'Không bệnh mạn tính đã biết',
             current_medications: 'Không',
             allergies: 'Không ghi nhận',
@@ -51,9 +51,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Nhân viên giao hàng',
             nationality: 'Việt Nam',
             address: '45 Nguyễn Trãi, Hà Nội',
-        chief_complaint: 'Sốt nhẹ, đau đầu, mỏi người',
-        medical_history:
-            'Vài ngày nay sốt nhẹ, đau đầu âm ỉ, người bứt rứt khó chịu. Tay chân hơi ê ẩm, không rõ nguyên nhân, chưa đi khám.',
+            chief_complaint: 'Sốt nhẹ, đau đầu, mỏi người',
+            medical_history:
+                'Vài ngày nay sốt nhẹ, đau đầu âm ỉ, người bứt rứt khó chịu. Tay chân hơi ê ẩm, không rõ nguyên nhân, chưa đi khám.',
             past_medical_history: 'Không bệnh mạn tính đã biết',
             current_medications: 'Không',
             allergies: 'Không ghi nhận',
@@ -86,9 +86,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Thợ xây',
             nationality: 'Việt Nam',
             address: '12/5 Trần Hưng Đạo, Đà Nẵng',
-        chief_complaint: 'Khó thở tăng dần, ho dai dẳng',
-        medical_history:
-            'Ho khan lâu ngày, gần đây dễ hụt hơi khi đi bộ nhanh, thỉnh thoảng cảm giác nặng ngực. Có hút thuốc lâu năm.',
+            chief_complaint: 'Khó thở tăng dần, ho dai dẳng',
+            medical_history:
+                'Ho khan lâu ngày, gần đây dễ hụt hơi khi đi bộ nhanh, thỉnh thoảng cảm giác nặng ngực. Có hút thuốc lâu năm.',
             past_medical_history: 'Không rõ bệnh phổi trước đó',
             current_medications: 'Không uống thuốc đều',
             allergies: 'Chưa ghi nhận',
@@ -121,9 +121,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Nhân viên bán hàng',
             nationality: 'Việt Nam',
             address: '56 Hoàng Hoa Thám, Hà Nội',
-        chief_complaint: 'Ho kéo dài, gầy sút cân',
-        medical_history:
-            'Ho khan nhiều tuần, đôi lúc khạc ít đàm, hay mệt, ăn kém, sút cân nhẹ. Thỉnh thoảng hơi sốt về chiều.',
+            chief_complaint: 'Ho kéo dài, gầy sút cân',
+            medical_history:
+                'Ho khan nhiều tuần, đôi lúc khạc ít đàm, hay mệt, ăn kém, sút cân nhẹ. Thỉnh thoảng hơi sốt về chiều.',
             past_medical_history: 'Không bệnh mạn tính',
             current_medications: 'Không',
             allergies: 'Không',
@@ -156,9 +156,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Nhân viên văn phòng',
             nationality: 'Việt Nam',
             address: '22 Lý Tự Trọng, TP.HCM',
-        chief_complaint: 'Đau âm ỉ vùng thượng vị',
-        medical_history:
-            'Đau âm ỉ trên rốn vài ngày, đầy hơi, buồn nôn nhẹ, ăn vào hay khó chịu. Hay ăn uống thất thường, áp lực công việc.',
+            chief_complaint: 'Đau âm ỉ vùng thượng vị',
+            medical_history:
+                'Đau âm ỉ trên rốn vài ngày, đầy hơi, buồn nôn nhẹ, ăn vào hay khó chịu. Hay ăn uống thất thường, áp lực công việc.',
             past_medical_history: 'Không loét dạ dày trước đây',
             current_medications: 'Thỉnh thoảng uống thuốc giảm đau',
             allergies: 'Không',
@@ -191,9 +191,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Kỹ sư',
             nationality: 'Việt Nam',
             address: '89 Pasteur, TP.HCM',
-        chief_complaint: 'Tiểu khó, đau tức vùng dưới',
-        medical_history:
-            'Vài ngày nay tiểu hơi rát, tia tiểu yếu, cảm giác nặng tức vùng dưới. Hơi mệt, uể oải.',
+            chief_complaint: 'Tiểu khó, đau tức vùng dưới',
+            medical_history:
+                'Vài ngày nay tiểu hơi rát, tia tiểu yếu, cảm giác nặng tức vùng dưới. Hơi mệt, uể oải.',
             past_medical_history: 'Không bệnh mạn tính',
             current_medications: 'Không',
             allergies: 'Không',
@@ -226,9 +226,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Nhân viên kinh doanh',
             nationality: 'Việt Nam',
             address: '12 Nguyễn Huệ, TP.HCM',
-        chief_complaint: 'Khó chịu vùng kín, tiểu rát',
-        medical_history:
-            'Vùng kín khó chịu, tiểu rát nhẹ, dịch âm đạo hơi khác vài ngày nay, lo lắng sau lần quan hệ gần đây.',
+            chief_complaint: 'Khó chịu vùng kín, tiểu rát',
+            medical_history:
+                'Vùng kín khó chịu, tiểu rát nhẹ, dịch âm đạo hơi khác vài ngày nay, lo lắng sau lần quan hệ gần đây.',
             past_medical_history: 'Không bệnh mạn tính',
             current_medications: 'Không',
             allergies: 'Không',
@@ -261,9 +261,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Kế toán',
             nationality: 'Việt Nam',
             address: '5B Hai Bà Trưng, Hà Nội',
-        chief_complaint: 'Mệt mỏi, phát hiện mỡ máu cao',
-        medical_history:
-            'Thỉnh thoảng mệt, nặng đầu, khám sức khỏe gần đây nói mỡ máu cao. Ít vận động, hay ăn đồ chiên xào.',
+            chief_complaint: 'Mệt mỏi, phát hiện mỡ máu cao',
+            medical_history:
+                'Thỉnh thoảng mệt, nặng đầu, khám sức khỏe gần đây nói mỡ máu cao. Ít vận động, hay ăn đồ chiên xào.',
             past_medical_history: 'Tăng huyết áp nhẹ',
             current_medications: 'Thuốc huyết áp không đều',
             allergies: 'Không',
@@ -296,9 +296,9 @@ export const patientPresets: PatientPreset[] = [
             occupation: 'Nhân viên kinh doanh',
             nationality: 'Việt Nam',
             address: '77 Nguyễn Văn Linh, Đà Nẵng',
-        chief_complaint: 'Đau sưng khớp bàn chân',
-        medical_history:
-            'Khớp ngón chân cái sưng, đau về đêm, đi lại khó. Gần đây có ăn uống nhiều đạm, chưa đi kiểm tra.',
+            chief_complaint: 'Đau sưng khớp bàn chân',
+            medical_history:
+                'Khớp ngón chân cái sưng, đau về đêm, đi lại khó. Gần đây có ăn uống nhiều đạm, chưa đi kiểm tra.',
             past_medical_history: 'Không bệnh mạn tính đã biết',
             current_medications: 'Không',
             allergies: 'Không',

@@ -94,7 +94,9 @@ function openChat(contactId: string) {
                                         {{ t('navbar.breadcrumb.contact') }}
                                     </h1>
                                     <p class="text-sm text-muted-foreground">
-                                        {{ t('contact.detail.startChatPrompt') }}
+                                        {{
+                                            t('contact.detail.startChatPrompt')
+                                        }}
                                     </p>
                                 </div>
                             </div>
@@ -103,7 +105,10 @@ function openChat(contactId: string) {
                         <div v-if="loading" class="text-muted-foreground">
                             {{ t('common.loading') }}
                         </div>
-                        <div v-else-if="!doctors.length" class="text-muted-foreground">
+                        <div
+                            v-else-if="!doctors.length"
+                            class="text-muted-foreground"
+                        >
                             {{ t('contact.detail.startChatPrompt') }}
                         </div>
                         <div v-else class="grid gap-4 md:grid-cols-2">
@@ -115,22 +120,38 @@ function openChat(contactId: string) {
                             >
                                 <CardHeader class="space-y-2">
                                     <div class="flex items-center gap-2">
-                                        <span class="inline-flex items-center justify-center rounded-xl bg-primary/10 p-2 text-primary">
+                                        <span
+                                            class="inline-flex items-center justify-center rounded-xl bg-primary/10 p-2 text-primary"
+                                        >
                                             <Users2 class="w-4 h-4" />
                                         </span>
                                         <div class="min-w-0">
-                                            <CardTitle class="text-base font-semibold truncate">
+                                            <CardTitle
+                                                class="text-base font-semibold truncate"
+                                            >
                                                 {{ doc.username }}
                                             </CardTitle>
-                                            <p class="text-xs text-muted-foreground truncate">
-                                                {{ doc.address || t('medicalRecord.notAvailableShort') }}
+                                            <p
+                                                class="text-xs text-muted-foreground truncate"
+                                            >
+                                                {{
+                                                    doc.address ||
+                                                    t(
+                                                        'medicalRecord.notAvailableShort'
+                                                    )
+                                                }}
                                             </p>
                                         </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent class="space-y-3">
-                                    <div class="rounded-2xl bg-muted/30 px-3 py-2 text-sm text-muted-foreground line-clamp-2">
-                                        {{ doc.facility || t('medicalRecord.notAvailableShort') }}
+                                    <div
+                                        class="rounded-2xl bg-muted/30 px-3 py-2 text-sm text-muted-foreground line-clamp-2"
+                                    >
+                                        {{
+                                            doc.facility ||
+                                            t('medicalRecord.notAvailableShort')
+                                        }}
                                     </div>
                                     <Button
                                         variant="outline"

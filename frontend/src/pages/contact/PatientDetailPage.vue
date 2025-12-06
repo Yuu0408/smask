@@ -332,7 +332,11 @@ const completionPct = computed(() => {
 function urgencyBadgeClass(urgency?: string | null) {
     if (!urgency) return 'bg-primary/10 text-primary';
     const lower = urgency.toLowerCase();
-    if (lower.includes('urgent') || lower.includes('emerg') || lower.includes('stat')) {
+    if (
+        lower.includes('urgent') ||
+        lower.includes('emerg') ||
+        lower.includes('stat')
+    ) {
         return 'bg-red-100 text-red-700 ring-1 ring-red-200';
     }
     if (lower.includes('high')) {
@@ -407,519 +411,745 @@ function urgencyBadgeClass(urgency?: string | null) {
                 ></div>
             </div>
             <div class="relative h-full min-h-0 overflow-y-auto">
-                <div
-                    class="mx-auto w-full max-w-6xl p-6 space-y-6 mb-10"
-                >
-                <template v-if="view === 'record'">
-                    <div
-                        class="grid gap-6 lg:grid-cols-[2fr_1fr] lg:items-start"
-                    >
-                        <div class="space-y-6">
-                            <Card
-                                class="overflow-hidden border-0 bg-gradient-to-br from-primary/20 via-white to-accent/10 shadow-xl shadow-primary/20"
-                            >
-                                <CardHeader class="space-y-1">
-                                    <CardTitle
-                                        class="text-lg font-semibold text-primary"
-                                    >
-                                        {{ t('medicalRecord.chiefComplaint') }}
-                                    </CardTitle>
-                                    <p class="text-sm text-muted-foreground">
-                                        {{ t('record.meta.updated') }}:
-                                        {{
-                                            detail.medical_record?.updated_at
-                                                ? formatDate(
-                                                      detail.medical_record
-                                                          ?.updated_at
-                                                  )
-                                                : t('medicalRecord.notAvailableShort')
-                                        }}
-                                    </p>
-                                </CardHeader>
-                                <CardContent class="space-y-3 text-foreground">
-                                    <p class="text-base leading-relaxed font-medium">
-                                        {{ chiefComplaint }}
-                                    </p>
-                                    <div
-                                        class="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-inner shadow-primary/10"
-                                    >
-                                        <div
-                                            class="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-1"
+                <div class="mx-auto w-full max-w-6xl p-6 space-y-6 mb-10">
+                    <template v-if="view === 'record'">
+                        <div
+                            class="grid gap-6 lg:grid-cols-[2fr_1fr] lg:items-start"
+                        >
+                            <div class="space-y-6">
+                                <Card
+                                    class="overflow-hidden border-0 bg-gradient-to-br from-primary/20 via-white to-accent/10 shadow-xl shadow-primary/20"
+                                >
+                                    <CardHeader class="space-y-1">
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
                                         >
-                                            {{ t('medicalRecord.symptomProgression') }}
-                                        </div>
-                                        <p class="leading-relaxed text-muted-foreground">
-                                            {{ symptomProgression }}
+                                            {{
+                                                t(
+                                                    'medicalRecord.chiefComplaint'
+                                                )
+                                            }}
+                                        </CardTitle>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            {{ t('record.meta.updated') }}:
+                                            {{
+                                                detail.medical_record
+                                                    ?.updated_at
+                                                    ? formatDate(
+                                                          detail.medical_record
+                                                              ?.updated_at
+                                                      )
+                                                    : t(
+                                                          'medicalRecord.notAvailableShort'
+                                                      )
+                                            }}
                                         </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card class="shadow-lg shadow-primary/10 border border-primary/10">
-                                <CardHeader>
-                                    <CardTitle>{{
-                                        t('medicalRecord.medicalHistory')
-                                    }}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <dl class="divide-y divide-border">
-                                        <div
-                                            class="py-2 grid grid-cols-3 gap-4"
-                                            v-for="item in medicalHistoryItems"
-                                            :key="'mh-' + item.label"
+                                    </CardHeader>
+                                    <CardContent
+                                        class="space-y-3 text-foreground"
+                                    >
+                                        <p
+                                            class="text-base leading-relaxed font-medium"
                                         >
-                                            <dt class="text-sm text-muted-foreground">
-                                                {{ item.label }}
-                                            </dt>
-                                            <dd class="col-span-2 text-sm">
-                                                {{ item.value }}
-                                            </dd>
-                                        </div>
-                                    </dl>
-                                </CardContent>
-                            </Card>
-
-                            <Card class="shadow-lg shadow-primary/10 border border-primary/10">
-                                <CardHeader>
-                                    <CardTitle>{{
-                                        t('medicalRecord.socialInfo')
-                                    }}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <dl class="divide-y divide-border">
+                                            {{ chiefComplaint }}
+                                        </p>
                                         <div
-                                            class="py-2 grid grid-cols-3 gap-4"
-                                            v-for="item in socialItems"
-                                            :key="'si-' + item.label"
+                                            class="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-inner shadow-primary/10"
                                         >
-                                            <dt class="text-sm text-muted-foreground">
-                                                {{ item.label }}
-                                            </dt>
-                                            <dd class="col-span-2 text-sm">
-                                                {{ item.value }}
-                                            </dd>
+                                            <div
+                                                class="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-1"
+                                            >
+                                                {{
+                                                    t(
+                                                        'medicalRecord.symptomProgression'
+                                                    )
+                                                }}
+                                            </div>
+                                            <p
+                                                class="leading-relaxed text-muted-foreground"
+                                            >
+                                                {{ symptomProgression }}
+                                            </p>
                                         </div>
-                                    </dl>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
 
-                            <Card
-                                v-if="
-                                    detail.medical_record
-                                        ?.obstetric_gynecological_history
-                                "
-                                class="shadow-lg shadow-primary/10 border border-primary/10"
-                            >
-                                <CardHeader
-                                    ><CardTitle>{{
-                                        t('medicalRecord.obstetric')
-                                    }}</CardTitle></CardHeader
+                                <Card
+                                    class="shadow-lg shadow-primary/10 border border-primary/10"
                                 >
-                                <CardContent>
-                                    <dl class="divide-y divide-border">
-                                        <div
-                                            class="py-2 grid grid-cols-3 gap-4"
-                                            v-for="item in obgynItems"
-                                            :key="'ob-' + item.label"
-                                        >
-                                            <dt class="text-sm text-muted-foreground">
-                                                {{ item.label }}
-                                            </dt>
-                                            <dd class="col-span-2 text-sm">
-                                                {{ item.value }}
-                                            </dd>
-                                        </div>
-                                    </dl>
-                                </CardContent>
-                            </Card>
-                        </div>
+                                    <CardHeader>
+                                        <CardTitle>{{
+                                            t('medicalRecord.medicalHistory')
+                                        }}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <dl class="divide-y divide-border">
+                                            <div
+                                                class="py-2 grid grid-cols-3 gap-4"
+                                                v-for="item in medicalHistoryItems"
+                                                :key="'mh-' + item.label"
+                                            >
+                                                <dt
+                                                    class="text-sm text-muted-foreground"
+                                                >
+                                                    {{ item.label }}
+                                                </dt>
+                                                <dd class="col-span-2 text-sm">
+                                                    {{ item.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </CardContent>
+                                </Card>
 
-                        <div
-                            class="space-y-4 lg:sticky lg:top-24 lg:self-start lg:w-full lg:max-w-md lg:transition-all lg:duration-500 lg:ease-out"
-                        >
-                            <Card class="shadow-lg shadow-primary/10 border border-primary/10">
-                                <CardHeader
-                                    ><CardTitle>{{
-                                        t('medicalRecord.patientInfo')
-                                    }}</CardTitle></CardHeader
+                                <Card
+                                    class="shadow-lg shadow-primary/10 border border-primary/10"
                                 >
-                                <CardContent>
-                                    <dl class="divide-y divide-border">
-                                        <div
-                                            class="py-2 grid grid-cols-3 gap-4"
-                                            v-for="item in patientInfoItems"
-                                            :key="'pi-' + item.label"
-                                        >
-                                            <dt class="text-sm text-muted-foreground">
-                                                {{ item.label }}
-                                            </dt>
-                                            <dd class="col-span-2 text-sm">
-                                                {{ item.value }}
-                                            </dd>
-                                        </div>
-                                    </dl>
-                                </CardContent>
-                            </Card>
-                            <Button
-                                class="w-full rounded-xl shadow-lg shadow-primary/20"
-                                @click="goChat"
-                            >
-                                {{ t('contact.detail.openChat') }}
-                            </Button>
-                        </div>
-                    </div>
-                </template>
+                                    <CardHeader>
+                                        <CardTitle>{{
+                                            t('medicalRecord.socialInfo')
+                                        }}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <dl class="divide-y divide-border">
+                                            <div
+                                                class="py-2 grid grid-cols-3 gap-4"
+                                                v-for="item in socialItems"
+                                                :key="'si-' + item.label"
+                                            >
+                                                <dt
+                                                    class="text-sm text-muted-foreground"
+                                                >
+                                                    {{ item.label }}
+                                                </dt>
+                                                <dd class="col-span-2 text-sm">
+                                                    {{ item.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </CardContent>
+                                </Card>
 
-                <template v-else-if="view === 'conversation'">
-                    <h2 class="font-semibold">Conversation Snapshot</h2>
-                    <div class="space-y-2">
-                        <ChatMessage
-                            v-for="m in detail.conversation || []"
-                            :key="m.id"
-                            :role="roleForMessage(m.role)"
-                            :content="m.content"
-                            :human-label="selfLabel"
-                            :ai-label="otherLabel"
-                        />
-                    </div>
-                </template>
+                                <Card
+                                    v-if="
+                                        detail.medical_record
+                                            ?.obstetric_gynecological_history
+                                    "
+                                    class="shadow-lg shadow-primary/10 border border-primary/10"
+                                >
+                                    <CardHeader
+                                        ><CardTitle>{{
+                                            t('medicalRecord.obstetric')
+                                        }}</CardTitle></CardHeader
+                                    >
+                                    <CardContent>
+                                        <dl class="divide-y divide-border">
+                                            <div
+                                                class="py-2 grid grid-cols-3 gap-4"
+                                                v-for="item in obgynItems"
+                                                :key="'ob-' + item.label"
+                                            >
+                                                <dt
+                                                    class="text-sm text-muted-foreground"
+                                                >
+                                                    {{ item.label }}
+                                                </dt>
+                                                <dd class="col-span-2 text-sm">
+                                                    {{ item.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </CardContent>
+                                </Card>
+                            </div>
 
-                <template v-else-if="view === 'diagnosis'">
-                    <div class="space-y-6 mb-4">
-                        <div
-                            class="overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-r from-primary/10 via-white to-accent/10 p-6 shadow-lg shadow-primary/20"
-                        >
                             <div
-                                class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+                                class="space-y-4 lg:sticky lg:top-24 lg:self-start lg:w-full lg:max-w-md lg:transition-all lg:duration-500 lg:ease-out"
                             >
-                                <div class="space-y-1">
-                                    <div
-                                        class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary shadow-inner shadow-primary/10"
+                                <Card
+                                    class="shadow-lg shadow-primary/10 border border-primary/10"
+                                >
+                                    <CardHeader
+                                        ><CardTitle>{{
+                                            t('medicalRecord.patientInfo')
+                                        }}</CardTitle></CardHeader
                                     >
-                                        <Stethoscope class="size-4" />
-                                        {{ t('sidebar.diagnosis') }}
-                                    </div>
-                                    <h2 class="text-2xl font-bold text-foreground">
-                                        {{ t('diagnosisPage.title') }}
-                                    </h2>
-                                    <p class="text-sm text-muted-foreground">
-                                        {{
-                                            detail.reasoning_process
-                                                ? t('diagnosisPage.reasoning')
-                                                : t('diagnosisPage.notAvailable')
-                                        }}
-                                    </p>
-                                </div>
-                                <div class="flex gap-3">
-                                    <div
-                                        class="rounded-2xl border border-primary/20 bg-white/70 px-4 py-3 text-sm shadow-sm"
-                                    >
-                                        <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                            {{ t('diagnosisPage.mostLikely') }}
-                                        </p>
-                                        <p class="font-semibold text-primary">
+                                    <CardContent>
+                                        <dl class="divide-y divide-border">
+                                            <div
+                                                class="py-2 grid grid-cols-3 gap-4"
+                                                v-for="item in patientInfoItems"
+                                                :key="'pi-' + item.label"
+                                            >
+                                                <dt
+                                                    class="text-sm text-muted-foreground"
+                                                >
+                                                    {{ item.label }}
+                                                </dt>
+                                                <dd class="col-span-2 text-sm">
+                                                    {{ item.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </CardContent>
+                                </Card>
+                                <Button
+                                    class="w-full rounded-xl shadow-lg shadow-primary/20"
+                                    @click="goChat"
+                                >
+                                    {{ t('contact.detail.openChat') }}
+                                </Button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template v-else-if="view === 'conversation'">
+                        <h2 class="font-semibold">Conversation Snapshot</h2>
+                        <div class="space-y-2">
+                            <ChatMessage
+                                v-for="m in detail.conversation || []"
+                                :key="m.id"
+                                :role="roleForMessage(m.role)"
+                                :content="m.content"
+                                :human-label="selfLabel"
+                                :ai-label="otherLabel"
+                            />
+                        </div>
+                    </template>
+
+                    <template v-else-if="view === 'diagnosis'">
+                        <div class="space-y-6 mb-4">
+                            <div
+                                class="overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-r from-primary/10 via-white to-accent/10 p-6 shadow-lg shadow-primary/20"
+                            >
+                                <div
+                                    class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+                                >
+                                    <div class="space-y-1">
+                                        <div
+                                            class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary shadow-inner shadow-primary/10"
+                                        >
+                                            <Stethoscope class="size-4" />
+                                            {{ t('sidebar.diagnosis') }}
+                                        </div>
+                                        <h2
+                                            class="text-2xl font-bold text-foreground"
+                                        >
+                                            {{ t('diagnosisPage.title') }}
+                                        </h2>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
                                             {{
-                                                detail.diagnosis?.most_likely?.name ||
-                                                t('diagnosisPage.notAvailableShort')
+                                                detail.reasoning_process
+                                                    ? t(
+                                                          'diagnosisPage.reasoning'
+                                                      )
+                                                    : t(
+                                                          'diagnosisPage.notAvailable'
+                                                      )
                                             }}
                                         </p>
                                     </div>
-                                    <div
-                                        class="rounded-2xl border border-primary/20 bg-white/70 px-4 py-3 text-sm shadow-sm"
-                                    >
-                                        <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                            {{ t('diagnosisPage.furtherTests') }}
-                                        </p>
-                                        <p class="font-semibold text-primary">
-                                            {{
-                                                (detail.further_test || []).length ||
-                                                t('diagnosisPage.notAvailableShort')
-                                            }}
-                                        </p>
+                                    <div class="flex gap-3">
+                                        <div
+                                            class="rounded-2xl border border-primary/20 bg-white/70 px-4 py-3 text-sm shadow-sm"
+                                        >
+                                            <p
+                                                class="text-xs uppercase tracking-[0.16em] text-muted-foreground"
+                                            >
+                                                {{
+                                                    t(
+                                                        'diagnosisPage.mostLikely'
+                                                    )
+                                                }}
+                                            </p>
+                                            <p
+                                                class="font-semibold text-primary"
+                                            >
+                                                {{
+                                                    detail.diagnosis
+                                                        ?.most_likely?.name ||
+                                                    t(
+                                                        'diagnosisPage.notAvailableShort'
+                                                    )
+                                                }}
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="rounded-2xl border border-primary/20 bg-white/70 px-4 py-3 text-sm shadow-sm"
+                                        >
+                                            <p
+                                                class="text-xs uppercase tracking-[0.16em] text-muted-foreground"
+                                            >
+                                                {{
+                                                    t(
+                                                        'diagnosisPage.furtherTests'
+                                                    )
+                                                }}
+                                            </p>
+                                            <p
+                                                class="font-semibold text-primary"
+                                            >
+                                                {{
+                                                    (detail.further_test || [])
+                                                        .length ||
+                                                    t(
+                                                        'diagnosisPage.notAvailableShort'
+                                                    )
+                                                }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="grid gap-6 lg:grid-cols-2">
-                            <Card
-                                v-if="detail.reasoning_process"
-                                class="lg:col-span-2 overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
-                            >
-                                <CardHeader class="bg-white/80 backdrop-blur flex items-center gap-3">
-                                    <ClipboardCheck class="size-5 text-primary" />
-                                    <CardTitle class="text-lg font-semibold text-primary">
-                                        {{ t('diagnosisPage.reasoning') }}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div class="pr-1 text-sm leading-relaxed text-foreground/80">
-                                        {{ detail.reasoning_process }}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <div class="grid gap-6 lg:grid-cols-2">
+                                <Card
+                                    v-if="detail.reasoning_process"
+                                    class="lg:col-span-2 overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
+                                >
+                                    <CardHeader
+                                        class="bg-white/80 backdrop-blur flex items-center gap-3"
+                                    >
+                                        <ClipboardCheck
+                                            class="size-5 text-primary"
+                                        />
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
+                                        >
+                                            {{ t('diagnosisPage.reasoning') }}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            class="pr-1 text-sm leading-relaxed text-foreground/80"
+                                        >
+                                            {{ detail.reasoning_process }}
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                            <Card
-                                v-if="detail.diagnosis?.most_likely"
-                                class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary/15 via-white to-primary/5 backdrop-blur"
-                            >
-                                <CardHeader class="bg-white/80 backdrop-blur flex items-center gap-3">
-                                    <AlertTriangle class="size-5 text-primary" />
-                                    <CardTitle class="text-lg font-semibold text-primary">
-                                        {{ t('diagnosisPage.mostLikely') }}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent class="flex h-full flex-col gap-4 justify-start items-center text-left min-h-[360px] px-6">
-                                    <div class="w-full max-w-2xl space-y-3 mx-auto">
-                                        <h3 class="text-xl font-semibold text-foreground leading-tight">
-                                            {{ detail.diagnosis.most_likely.name }}
-                                        </h3>
-                                        <p class="text-sm text-foreground/80 leading-relaxed">
-                                            <strong>{{ t('diagnosisPage.differentiating') }}:</strong>
-                                            {{
-                                                detail.diagnosis.most_likely
-                                                    .differentiating_factor ||
-                                                t('diagnosisPage.notAvailableShort')
-                                            }}
-                                        </p>
-                                        <div class="space-y-2">
-                                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                                                {{ t('diagnosisPage.supporting') }}
+                                <Card
+                                    v-if="detail.diagnosis?.most_likely"
+                                    class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary/15 via-white to-primary/5 backdrop-blur"
+                                >
+                                    <CardHeader
+                                        class="bg-white/80 backdrop-blur flex items-center gap-3"
+                                    >
+                                        <AlertTriangle
+                                            class="size-5 text-primary"
+                                        />
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
+                                        >
+                                            {{ t('diagnosisPage.mostLikely') }}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent
+                                        class="flex h-full flex-col gap-4 justify-start items-center text-left min-h-[360px] px-6"
+                                    >
+                                        <div
+                                            class="w-full max-w-2xl space-y-3 mx-auto"
+                                        >
+                                            <h3
+                                                class="text-xl font-semibold text-foreground leading-tight"
+                                            >
+                                                {{
+                                                    detail.diagnosis.most_likely
+                                                        .name
+                                                }}
+                                            </h3>
+                                            <p
+                                                class="text-sm text-foreground/80 leading-relaxed"
+                                            >
+                                                <strong
+                                                    >{{
+                                                        t(
+                                                            'diagnosisPage.differentiating'
+                                                        )
+                                                    }}:</strong
+                                                >
+                                                {{
+                                                    detail.diagnosis.most_likely
+                                                        .differentiating_factor ||
+                                                    t(
+                                                        'diagnosisPage.notAvailableShort'
+                                                    )
+                                                }}
                                             </p>
-                                            <ul class="space-y-2 text-sm text-foreground">
+                                            <div class="space-y-2">
+                                                <p
+                                                    class="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+                                                >
+                                                    {{
+                                                        t(
+                                                            'diagnosisPage.supporting'
+                                                        )
+                                                    }}
+                                                </p>
+                                                <ul
+                                                    class="space-y-2 text-sm text-foreground"
+                                                >
+                                                    <li
+                                                        v-for="(
+                                                            item, idx
+                                                        ) in detail.diagnosis
+                                                            .most_likely
+                                                            .supporting_evidence"
+                                                        :key="'ml-' + idx"
+                                                        class="rounded-xl bg-white/80 px-3 py-2 shadow-inner shadow-primary/10 ring-1 ring-primary/5"
+                                                    >
+                                                        {{ item }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card
+                                    v-if="
+                                        detail.diagnosis?.possible_diagnoses
+                                            ?.length
+                                    "
+                                    class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
+                                >
+                                    <CardHeader
+                                        class="bg-white/80 backdrop-blur flex items-center gap-3"
+                                    >
+                                        <ClipboardCheck
+                                            class="size-5 text-primary"
+                                        />
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
+                                        >
+                                            {{ t('diagnosisPage.possible') }}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent
+                                        class="flex h-full w-full flex-col gap-4 px-6 min-h-[360px] justify-start items-center text-left"
+                                    >
+                                        <div
+                                            v-for="(diag, idx) in detail
+                                                .diagnosis.possible_diagnoses"
+                                            :key="'pd-' + idx"
+                                            class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
+                                        >
+                                            <h3
+                                                class="font-semibold text-lg leading-tight"
+                                            >
+                                                {{ diag.name }}
+                                            </h3>
+                                            <p
+                                                class="text-sm text-foreground/80 leading-relaxed"
+                                            >
+                                                <strong
+                                                    >{{
+                                                        t(
+                                                            'diagnosisPage.differentiating'
+                                                        )
+                                                    }}:</strong
+                                                >
+                                                {{
+                                                    diag.differentiating_factor ||
+                                                    t(
+                                                        'diagnosisPage.notAvailableShort'
+                                                    )
+                                                }}
+                                            </p>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground mt-1"
+                                            >
+                                                {{
+                                                    t(
+                                                        'diagnosisPage.supporting'
+                                                    )
+                                                }}
+                                            </p>
+                                            <ul
+                                                class="list-disc pl-5 text-sm text-foreground space-y-1"
+                                            >
                                                 <li
-                                                    v-for="(item, idx) in detail.diagnosis
-                                                        .most_likely.supporting_evidence"
-                                                    :key="'ml-' + idx"
-                                                    class="rounded-xl bg-white/80 px-3 py-2 shadow-inner shadow-primary/10 ring-1 ring-primary/5"
+                                                    v-for="(
+                                                        item, i
+                                                    ) in diag.supporting_evidence"
+                                                    :key="'pde-' + i"
                                                 >
                                                     {{ item }}
                                                 </li>
                                             </ul>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
 
-                            <Card
-                                v-if="detail.diagnosis?.possible_diagnoses?.length"
-                                class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
-                            >
-                                <CardHeader class="bg-white/80 backdrop-blur flex items-center gap-3">
-                                    <ClipboardCheck class="size-5 text-primary" />
-                                    <CardTitle class="text-lg font-semibold text-primary">
-                                        {{ t('diagnosisPage.possible') }}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent class="flex h-full w-full flex-col gap-4 px-6 min-h-[360px] justify-start items-center text-left">
-                                    <div
-                                        v-for="(diag, idx) in detail.diagnosis
-                                            .possible_diagnoses"
-                                        :key="'pd-' + idx"
-                                        class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
-                                    >
-                                        <h3 class="font-semibold text-lg leading-tight">{{ diag.name }}</h3>
-                                        <p class="text-sm text-foreground/80 leading-relaxed">
-                                            <strong>{{ t('diagnosisPage.differentiating') }}:</strong>
-                                            {{
-                                                diag.differentiating_factor ||
-                                                t('diagnosisPage.notAvailableShort')
-                                            }}
-                                        </p>
-                                        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground mt-1">
-                                            {{ t('diagnosisPage.supporting') }}
-                                        </p>
-                                        <ul class="list-disc pl-5 text-sm text-foreground space-y-1">
-                                            <li
-                                                v-for="(item, i) in diag.supporting_evidence"
-                                                :key="'pde-' + i"
-                                            >
-                                                {{ item }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card
-                                v-if="detail.diagnosis?.rule_out?.length"
-                                class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
-                            >
-                                <CardHeader class="bg-white/80 backdrop-blur flex items-center gap-3">
-                                    <AlertTriangle class="size-5 text-primary" />
-                                    <CardTitle class="text-lg font-semibold text-primary">
-                                        {{ t('diagnosisPage.ruleOut') }}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent class="flex h-full w-full flex-col gap-3 px-6 min-h-[340px] justify-start items-center text-left">
-                                    <div
-                                        v-for="(diag, idx) in detail.diagnosis
-                                            .rule_out"
-                                        :key="'ro-' + idx"
-                                        class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
-                                    >
-                                        <h3 class="font-semibold text-lg leading-tight">{{ diag.name }}</h3>
-                                        <ul class="list-disc pl-5 text-sm text-foreground space-y-1 mt-1">
-                                            <li
-                                                v-for="(item, i) in diag.supporting_evidence"
-                                                :key="'roe-' + i"
-                                            >
-                                                {{ item }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card
-                                v-if="(detail.further_test || []).length"
-                                class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
-                            >
-                                <CardHeader class="bg-white/80 backdrop-blur flex items-center gap-3">
-                                    <TestTubes class="size-5 text-primary" />
-                                    <CardTitle class="text-lg font-semibold text-primary">
-                                        {{ t('diagnosisPage.furtherTests') }}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent class="flex h-full w-full flex-col gap-3 px-6 min-h-[360px] justify-start items-center text-left">
-                                    <div
-                                        v-for="(test, idx) in detail.further_test"
-                                        :key="'test-' + idx"
-                                        class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
-                                    >
-                                        <div class="flex items-start justify-between gap-2">
-                                            <div>
-                                                <h3 class="font-semibold text-lg leading-tight">
-                                                    {{ test.name }}
-                                                </h3>
-                                                <p class="text-sm text-foreground/80 mt-1 leading-relaxed">
-                                                    {{ test.purpose }}
-                                                </p>
-                                            </div>
-                                            <span
-                                                class="rounded-full px-3 py-1 text-xs font-semibold"
-                                                :class="urgencyBadgeClass(test.urgency)"
-                                            >
-                                                {{
-                                                    test.urgency ||
-                                                    t('diagnosisPage.routine')
-                                                }}
-                                            </span>
-                                        </div>
-                                        <div class="mt-3 flex flex-wrap gap-2">
-                                            <Badge
-                                                v-for="(rel, i) in test.related_condition"
-                                                :key="'rel-' + i"
-                                                class="rounded-md text-xs"
-                                                >{{ rel }}</Badge
-                                            >
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </template>
-
-                <template v-else-if="view === 'todo'">
-                    <div class="space-y-5">
-                        <div class="grid gap-4 sm:grid-cols-3">
-                            <Card class="shadow-lg shadow-primary/10">
-                                <CardHeader class="space-y-1">
-                                    <CardTitle class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                                        {{ t('sidebar.todoList') }}
-                                    </CardTitle>
-                                    <p class="text-sm text-muted-foreground">
-                                        {{ t('todo.title') }}
-                                    </p>
-                                </CardHeader>
-                                <CardContent>
-                                    <div class="text-2xl font-bold text-foreground">
-                                        {{ pendingTodos }}
-                                    </div>
-                                    <p class="text-xs text-muted-foreground">
-                                        Pending
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card class="shadow-lg shadow-primary/10">
-                                <CardHeader class="space-y-1">
-                                    <CardTitle class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                                        {{ t('common.done') }}
-                                    </CardTitle>
-                                    <p class="text-sm text-muted-foreground">
-                                        {{ t('todo.items') }}
-                                    </p>
-                                </CardHeader>
-                                <CardContent>
-                                    <div class="text-2xl font-bold text-foreground">
-                                        {{ completedTodos }}
-                                    </div>
-                                    <p class="text-xs text-muted-foreground">
-                                        Completed
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card class="shadow-lg shadow-primary/10">
-                                <CardHeader class="space-y-2">
-                                    <CardTitle class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                                        Progress
-                                    </CardTitle>
-                                    <p class="text-sm text-muted-foreground">
-                                        {{ t('sidebar.todoList') }}
-                                    </p>
-                                </CardHeader>
-                                <CardContent>
-                                    <div class="text-2xl font-bold text-foreground">
-                                        {{ completionPct }}%
-                                    </div>
-                                    <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-                                        <div
-                                            class="h-full rounded-full bg-primary transition-all duration-500"
-                                            :style="{ width: `${completionPct}%` }"
-                                        ></div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <Card class="shadow-lg shadow-primary/10 border border-primary/10">
-                            <CardHeader class="flex items-center justify-between">
-                                <CardTitle>{{ t('todo.upcomingActions') }}</CardTitle>
-                                <div class="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                                    <ListTodo class="size-4" />
-                                    {{ todoItems.length }} {{ t('todo.items') }}
-                                </div>
-                            </CardHeader>
-                            <CardContent class="space-y-3">
-                                <label
-                                    v-for="t in todoItems"
-                                    :key="t.text"
-                                    class="flex items-center gap-3 rounded-2xl border border-border/70 bg-white/70 p-3 text-sm shadow-sm"
+                                <Card
+                                    v-if="detail.diagnosis?.rule_out?.length"
+                                    class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
                                 >
-                                    <Checkbox :checked="t.is_check" disabled />
-                                    <span
-                                        :class="t.is_check ? 'line-through text-muted-foreground' : ''"
-                                        >{{ t.text }}</span
+                                    <CardHeader
+                                        class="bg-white/80 backdrop-blur flex items-center gap-3"
                                     >
-                                </label>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </template>
+                                        <AlertTriangle
+                                            class="size-5 text-primary"
+                                        />
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
+                                        >
+                                            {{ t('diagnosisPage.ruleOut') }}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent
+                                        class="flex h-full w-full flex-col gap-3 px-6 min-h-[340px] justify-start items-center text-left"
+                                    >
+                                        <div
+                                            v-for="(diag, idx) in detail
+                                                .diagnosis.rule_out"
+                                            :key="'ro-' + idx"
+                                            class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
+                                        >
+                                            <h3
+                                                class="font-semibold text-lg leading-tight"
+                                            >
+                                                {{ diag.name }}
+                                            </h3>
+                                            <ul
+                                                class="list-disc pl-5 text-sm text-foreground space-y-1 mt-1"
+                                            >
+                                                <li
+                                                    v-for="(
+                                                        item, i
+                                                    ) in diag.supporting_evidence"
+                                                    :key="'roe-' + i"
+                                                >
+                                                    {{ item }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                <template v-else-if="view === 'contact'">
-                    <div class="flex items-center gap-3">
-                        <div class="text-sm text-muted-foreground">
-                            {{ t('contact.detail.startChatPrompt') }}
+                                <Card
+                                    v-if="(detail.further_test || []).length"
+                                    class="overflow-hidden border border-primary/10 shadow-lg shadow-primary/15 bg-white/80 backdrop-blur"
+                                >
+                                    <CardHeader
+                                        class="bg-white/80 backdrop-blur flex items-center gap-3"
+                                    >
+                                        <TestTubes
+                                            class="size-5 text-primary"
+                                        />
+                                        <CardTitle
+                                            class="text-lg font-semibold text-primary"
+                                        >
+                                            {{
+                                                t('diagnosisPage.furtherTests')
+                                            }}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent
+                                        class="flex h-full w-full flex-col gap-3 px-6 min-h-[360px] justify-start items-center text-left"
+                                    >
+                                        <div
+                                            v-for="(
+                                                test, idx
+                                            ) in detail.further_test"
+                                            :key="'test-' + idx"
+                                            class="rounded-2xl border border-primary/10 bg-white/85 p-4 shadow-sm space-y-2 w-full max-w-2xl mx-auto"
+                                        >
+                                            <div
+                                                class="flex items-start justify-between gap-2"
+                                            >
+                                                <div>
+                                                    <h3
+                                                        class="font-semibold text-lg leading-tight"
+                                                    >
+                                                        {{ test.name }}
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-foreground/80 mt-1 leading-relaxed"
+                                                    >
+                                                        {{ test.purpose }}
+                                                    </p>
+                                                </div>
+                                                <span
+                                                    class="rounded-full px-3 py-1 text-xs font-semibold"
+                                                    :class="
+                                                        urgencyBadgeClass(
+                                                            test.urgency
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        test.urgency ||
+                                                        t(
+                                                            'diagnosisPage.routine'
+                                                        )
+                                                    }}
+                                                </span>
+                                            </div>
+                                            <div
+                                                class="mt-3 flex flex-wrap gap-2"
+                                            >
+                                                <Badge
+                                                    v-for="(
+                                                        rel, i
+                                                    ) in test.related_condition"
+                                                    :key="'rel-' + i"
+                                                    class="rounded-md text-xs"
+                                                    >{{ rel }}</Badge
+                                                >
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
-                        <Button @click="goChat">{{
-                            t('contact.detail.openChat')
-                        }}</Button>
-                    </div>
-                </template>
+                    </template>
+
+                    <template v-else-if="view === 'todo'">
+                        <div class="space-y-5">
+                            <div class="grid gap-4 sm:grid-cols-3">
+                                <Card class="shadow-lg shadow-primary/10">
+                                    <CardHeader class="space-y-1">
+                                        <CardTitle
+                                            class="text-xs font-semibold uppercase tracking-[0.18em] text-primary"
+                                        >
+                                            {{ t('sidebar.todoList') }}
+                                        </CardTitle>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            {{ t('todo.title') }}
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
+                                            {{ pendingTodos }}
+                                        </div>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            Pending
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card class="shadow-lg shadow-primary/10">
+                                    <CardHeader class="space-y-1">
+                                        <CardTitle
+                                            class="text-xs font-semibold uppercase tracking-[0.18em] text-primary"
+                                        >
+                                            {{ t('common.done') }}
+                                        </CardTitle>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            {{ t('todo.items') }}
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
+                                            {{ completedTodos }}
+                                        </div>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            Completed
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card class="shadow-lg shadow-primary/10">
+                                    <CardHeader class="space-y-2">
+                                        <CardTitle
+                                            class="text-xs font-semibold uppercase tracking-[0.18em] text-primary"
+                                        >
+                                            Progress
+                                        </CardTitle>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            {{ t('sidebar.todoList') }}
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            class="text-2xl font-bold text-foreground"
+                                        >
+                                            {{ completionPct }}%
+                                        </div>
+                                        <div
+                                            class="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted"
+                                        >
+                                            <div
+                                                class="h-full rounded-full bg-primary transition-all duration-500"
+                                                :style="{
+                                                    width: `${completionPct}%`,
+                                                }"
+                                            ></div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            <Card
+                                class="shadow-lg shadow-primary/10 border border-primary/10"
+                            >
+                                <CardHeader
+                                    class="flex items-center justify-between"
+                                >
+                                    <CardTitle>{{
+                                        t('todo.upcomingActions')
+                                    }}</CardTitle>
+                                    <div
+                                        class="inline-flex items-center gap-2 text-sm text-muted-foreground"
+                                    >
+                                        <ListTodo class="size-4" />
+                                        {{ todoItems.length }}
+                                        {{ t('todo.items') }}
+                                    </div>
+                                </CardHeader>
+                                <CardContent class="space-y-3">
+                                    <label
+                                        v-for="t in todoItems"
+                                        :key="t.text"
+                                        class="flex items-center gap-3 rounded-2xl border border-border/70 bg-white/70 p-3 text-sm shadow-sm"
+                                    >
+                                        <Checkbox
+                                            :checked="t.is_check"
+                                            disabled
+                                        />
+                                        <span
+                                            :class="
+                                                t.is_check
+                                                    ? 'line-through text-muted-foreground'
+                                                    : ''
+                                            "
+                                            >{{ t.text }}</span
+                                        >
+                                    </label>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </template>
+
+                    <template v-else-if="view === 'contact'">
+                        <div class="flex items-center gap-3">
+                            <div class="text-sm text-muted-foreground">
+                                {{ t('contact.detail.startChatPrompt') }}
+                            </div>
+                            <Button @click="goChat">{{
+                                t('contact.detail.openChat')
+                            }}</Button>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </template>

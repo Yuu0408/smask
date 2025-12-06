@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// @ts-nocheck
 import { computed, onMounted } from 'vue';
 // Legacy component; store integration disabled.
 // import { useUserStore } from '@/stores/userStore';

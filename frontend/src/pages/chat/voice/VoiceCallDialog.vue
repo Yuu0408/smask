@@ -103,7 +103,9 @@ async function playBlob(blob: Blob) {
     // Stop any current audio
     try {
         currentAudio?.pause();
-    } catch {}
+    } catch (error) {
+        console.warn('Failed to pause current audio', error);
+    }
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
     currentAudio = audio;
@@ -136,15 +138,18 @@ function startListening() {
         // Ensure language reflects current locale at start time
         recognition.lang = speechLang.value;
         recognition.start();
-    } catch (e) {
+    } catch (error) {
         listening.value = false;
+        console.error('Failed to start speech recognition', error);
     }
 }
 
 function stopListening() {
     try {
         recognition?.stop();
-    } catch {}
+    } catch (error) {
+        console.warn('Failed to stop recognition', error);
+    }
 }
 
 onMounted(() => {
@@ -165,7 +170,9 @@ watch(speechLang, (lng) => {
     if (recognition) {
         try {
             recognition.lang = lng;
-        } catch {}
+        } catch (error) {
+            console.warn('Failed to update recognition language', error);
+        }
     }
 });
 

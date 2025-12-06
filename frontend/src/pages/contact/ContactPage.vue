@@ -70,17 +70,25 @@ function openDetail(id: string) {
                                         {{ t('contact.title.patients') }}
                                     </h1>
                                     <p class="text-sm text-muted-foreground">
-                                        {{ t('contact.detail.startChatPrompt') }}
+                                        {{
+                                            t('contact.detail.startChatPrompt')
+                                        }}
                                     </p>
                                 </div>
                             </div>
                         </header>
 
-                        <div v-if="loading" class="text-muted-foreground animate-pulse">
+                        <div
+                            v-if="loading"
+                            class="text-muted-foreground animate-pulse"
+                        >
                             {{ t('common.loading') }}
                         </div>
 
-                        <div v-else-if="!patients.length" class="text-muted-foreground">
+                        <div
+                            v-else-if="!patients.length"
+                            class="text-muted-foreground"
+                        >
                             <div
                                 class="relative overflow-hidden rounded-3xl border border-primary/15 bg-white/80 p-10 text-center shadow-lg shadow-primary/20 backdrop-blur"
                             >
@@ -97,16 +105,15 @@ function openDetail(id: string) {
                                 </div>
                                 <div class="relative space-y-4">
                                     <p class="text-base font-medium">
-                                        {{ t('contact.detail.startChatPrompt') }}
+                                        {{
+                                            t('contact.detail.startChatPrompt')
+                                        }}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div
-                            v-else
-                            class="grid gap-4 md:grid-cols-2"
-                        >
+                        <div v-else class="grid gap-4 md:grid-cols-2">
                             <Card
                                 v-for="p in patients"
                                 :key="p.contact_id"
@@ -118,11 +125,16 @@ function openDetail(id: string) {
                                         {{ p.full_name }}
                                     </CardTitle>
                                     <p class="text-xs text-muted-foreground">
-                                        {{ t('contact.field.age') }}: {{ p.age }}
+                                        {{ t('contact.field.age') }}:
+                                        {{ p.age }}
                                     </p>
                                 </CardHeader>
-                                <CardContent class="text-sm text-muted-foreground">
-                                    <div class="rounded-2xl bg-muted/30 px-3 py-2">
+                                <CardContent
+                                    class="text-sm text-muted-foreground"
+                                >
+                                    <div
+                                        class="rounded-2xl bg-muted/30 px-3 py-2"
+                                    >
                                         {{ p.address }}
                                     </div>
                                 </CardContent>
