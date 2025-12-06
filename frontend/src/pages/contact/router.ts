@@ -2,6 +2,11 @@
 
 const contactRoute: RouteRecordRaw[] = [
     {
+        path: 'doctors',
+        name: 'contact.doctors',
+        component: () => import('./DoctorsPage.vue'),
+    },
+    {
         path: 'patients',
         name: 'contact.patients',
         component: () => import('./ContactPage.vue'),

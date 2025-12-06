@@ -103,19 +103,28 @@
                 "prefix": "Hút thuốc từ",
                 "to": "đến tuổi",
                 "cigs": "trung bình mỗi ngày hút",
-                "cigsUnit": "điếu"
+                "cigsUnit": "điếu",
+                "years": "(số năm tự động tính)"
             },
             "smokingCurrent": {
                 "prefix": "Hút thuốc từ",
                 "toNow": "đến nay",
                 "cigs": "trung bình mỗi ngày hút",
-                "cigsUnit": "điếu"
+                "cigsUnit": "điếu",
+                "years": "(số năm tự động tính)"
             }
         },
         "warning": "Vui lòng điền đầy đủ các trường bắt buộc trước khi đóng biểu mẫu.",
         "submit": {
             "default": "Gửi",
             "submitting": "Đang gửi..."
+        },
+        "devTool": {
+            "title": "Công cụ phát triển",
+            "description": "Mẫu nhanh phục vụ thử nghiệm.",
+            "quickTemplates": "Mẫu nhanh",
+            "selectPlaceholder": "Chọn một mẫu",
+            "fill": "Điền mẫu"
         },
         "validation": {
             "required": "Trường này là bắt buộc"
@@ -136,11 +145,11 @@
         }
     },
     "settings": {
-        "title": "Settings",
-        "language": "Language",
-        "theme": "Theme",
-        "light": "Light",
-        "dark": "Dark"
+        "title": "Cài đặt",
+        "language": "Ngôn ngữ",
+        "theme": "Giao diện",
+        "light": "Sáng",
+        "dark": "Tối"
     },
     "chatInput": {
         "placeholder": "Nhập tin nhắn của bạn…"
@@ -158,7 +167,7 @@
         "reasoning": "Lý luận",
         "mostLikely": "Chẩn đoán có khả năng cao nhất",
         "possible": "Các chẩn đoán có thể",
-        "ruleOut": "Loại trừ các bệnh",
+        "ruleOut": "Các bệnh cần được loại trừ",
         "furtherTests": "Xét nghiệm bổ sung được khuyến nghị",
         "differentiating": "Yếu tố phân biệt",
         "supporting": "Bằng chứng hỗ trợ",
@@ -239,9 +248,20 @@
     "page.home.card.title.todo": "Xem việc cần làm",
     "page.home.card.button.start": "Bắt đầu",
     "page.home.card.button.open": "Mở",
+    "page.home.badge": "Trợ lý AI lâm sàng",
     "page.home.why.title": "Tại sao lại dùng Medee?",
     "page.home.why.description": "Chúng tôi là Medee – một đội ngũ kết hợp giữa Y tế và Công nghệ, nơi kinh nghiệm lâm sàng thực tiễn gặp gỡ sự sáng tạo bền bỉ. Mục tiêu của chúng tôi là xây dựng các giải pháp AI thiết thực cho y tế, giải quyết những bài toán hằng ngày, đồng thời nâng cao chất lượng và an toàn trong chăm sóc sức khỏe.",
     "page.home.footer": "© 2025 Medee. Bảo lưu mọi quyền.",
+    "page.home.quickActions.title": "Thao tác nhanh",
+    "page.home.quickActions.subtitle": "Vào thẳng tính năng, ít thao tác hơn.",
+    "page.home.preview.title": "Hội thoại được dẫn dắt",
+    "page.home.preview.subtitle": "Bác sĩ ảo Medee",
+    "page.home.preview.message1": "Mình sẽ hỏi vài câu ngắn để hiểu rõ triệu chứng của bạn.",
+    "page.home.preview.message2": "Tôi bị tức ngực từ hôm qua.",
+    "page.home.preview.message3": "Bạn có khó thở hoặc đau lan ra tay hay hàm không?",
+    "page.home.preview.choice1": "Không khó thở",
+    "page.home.preview.choice2": "Khó thở nhẹ",
+    "page.home.preview.choice3": "Đau lan ra tay trái",
     "history.title": "Lịch sử hội thoại",
     "history.empty": "Chưa có cuộc hội thoại nào.",
     "history.lastActivity": "Hoạt động gần nhất:",
@@ -271,6 +291,25 @@
     "doctor.sidebar.header.title": "Bảng điều khiển bác sĩ",
     "doctor.sidebar.group.patients": "Bệnh nhân",
     "doctor.sidebar.allPatients": "Tất cả bệnh nhân",
+    "chat.session.label": "Phiên trò chuyện",
+    "chat.session.title": "Tư vấn Medee",
+    "chat.session.live": "Đang hoạt động",
+    "chat.session.record": "Hồ sơ",
+    "chat.session.noRecord": "Chưa liên kết",
+    "chat.session.stage": "Giai đoạn",
+    "chat.session.liveTriage": "Sàng lọc trực tiếp",
+    "chat.session.goals.title": "Mục tiêu đối thoại",
+    "chat.session.goals.item1": "Loại trừ dấu hiệu báo động sớm",
+    "chat.session.goals.item2": "Ghi nhận tiến trình triệu chứng và yếu tố khởi phát",
+    "chat.guardrails.title": "Nguyên tắc an toàn",
+    "chat.guardrails.item1": "Giữ giọng điệu bình tĩnh, khách quan và cảm thông.",
+    "chat.guardrails.item2": "Chỉ hỏi một câu ngắn gọn mỗi lượt.",
+    "chat.guardrails.item3": "Tóm tắt phát hiện trước khi đưa bước tiếp theo.",
+    "chat.panel.title": "Đối thoại lâm sàng",
+    "chat.panel.badge": "Thích ứng",
+    "chat.prompts.title": "Gợi ý dẫn dắt",
+    "chat.safety.title": "Lưu ý an toàn",
+    "chat.safety.body": "Trợ lý không thay thế cấp cứu. Cần chuyển tuyến ngay nếu triệu chứng nặng hoặc xấu đi nhanh chóng.",
     "contact.title.patients": "Bệnh nhân",
     "contact.field.age": "Tuổi",
     "contact.field.address": "Địa chỉ",
@@ -281,14 +320,25 @@
     "contact.detail.startChatPrompt": "Bắt đầu trò chuyện bác sĩ – bệnh nhân",
     "page.login.title": "Chào mừng đến với Medee",
     "page.login.subtitle": "Trợ lý giúp bạn chẩn đoán sức khỏe, quản lý hồ sơ y tế và theo dõi các việc cần làm.",
+    "page.login.label.role": "Đăng nhập với vai trò",
     "page.login.label.role_login": "Đăng nhập với vai trò",
     "page.login.label.role_register": "Đăng ký với vai trò",
     "page.login.role.patient": "Bệnh nhân",
     "page.login.role.doctor": "Bác sĩ",
     "page.login.form.login_title": "Đăng nhập Medee",
     "page.login.form.register_title": "Tạo tài khoản Medee",
+    "page.login.example.title": "Ví dụ hội thoại",
+    "page.login.example.subtitle": "Cách Medee đặt từng câu hỏi ngắn gọn và bình tĩnh.",
+    "page.login.example.messages.ai1": "Chào bạn, mình là Medee. Mình sẽ hỏi vài câu để hiểu rõ triệu chứng của bạn.",
+    "page.login.example.messages.human1": "Tôi bị tức ngực từ hôm qua.",
+    "page.login.example.messages.ai2": "Bạn có khó thở, đau lan ra tay hoặc choáng váng không?",
+    "page.login.example.choice1": "Đau tăng khi đi lại.",
+    "page.login.example.choice2": "Không lan ra tay hoặc hàm.",
+    "page.login.example.choice3": "Có, hơi khó thở nhẹ.",
+    "page.login.secureAccess": "Truy cập an toàn",
     "page.login.button.login": "Đăng nhập",
     "page.login.button.register": "Đăng ký",
+    "page.login.button.loggingIn": "Đang đăng nhập...",
     "page.login.button.loading": "Đang tải...",
     "page.login.label.username": "Tên đăng nhập",
     "page.login.label.password": "Mật khẩu",
@@ -310,6 +360,12 @@
     "sidebar.content.button.history": "Lịch sử",
     "sidebar.content.label.conversations": "Hội thoại",
     "sidebar.content.label.contacts": "Liên hệ",
+    "sidebar.activeIntake.title": "Trò chuyện đang diễn ra",
+    "sidebar.activeIntake.continue": "Tiếp tục",
+    "sidebar.group.workspace": "Khu làm việc",
+    "sidebar.group.followUp": "Theo dõi",
+    "sidebar.group.careTeam": "Nhóm chăm sóc",
+    "sidebar.workspace.continueChat": "Tiếp tục trò chuyện",
     "badge.beta": "Thử nghiệm",
     "sidebar.main.conversation.button.new-chat": "Trò chuyện mới",
     "voice": {
@@ -327,7 +383,26 @@
     },
     "chat": {
         "placeholder": {
-            "loading": "Đang suy nghĩ..."
+            "loading": "Đang suy nghĩ...",
+            "waiting": "Medee đang suy nghĩ câu trả lời…",
+            "stage": {
+                "formClarification": "Medee đang rà soát lại thông tin của bạn…",
+                "basicQuestioning": "Medee đang chuẩn bị câu hỏi tiếp theo…",
+                "reasoning": "Medee đang xâu chuỗi những gì bạn chia sẻ…",
+                "ruleOut": "Medee đang loại trừ các rủi ro có thể có…",
+                "closing": "Medee đang tóm tắt bước tiếp theo cho bạn…",
+                "legacyDiagnosis": "Medee đang xem lại bản chẩn đoán thử…"
+            }
         }
-    }
+    },
+    "record.subtitle": "Tóm tắt lâm sàng của bệnh nhân hiện tại",
+    "record.meta.recordId": "Mã hồ sơ",
+    "record.meta.created": "Tạo lúc",
+    "record.meta.updated": "Cập nhật",
+    "record.meta.age": "Tuổi",
+    "history.subtitle": "Các cuộc trò chuyện lâm sàng và tóm tắt y khoa gần đây.",
+    "history.stats.total": "Số phiên",
+    "history.stats.latest": "Cập nhật gần nhất",
+    "history.stats.active": "Chủ đề mới nhất",
+    "history.currentChat": "Cuộc chat hiện tại"
 }

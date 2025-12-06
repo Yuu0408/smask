@@ -15,6 +15,18 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAuthed = computed(() => !!user.value && !!accessToken.value);
 
+    function normalizeUser(data: any): User {
+        const meta: any = data?.metadata || data?.user_metadata || {};
+        return {
+            ...(user.value || {}),
+            ...data,
+            currentRecordId: data?.record_id ?? data?.currentRecordId,
+            address: meta.address ?? data?.address,
+            facility: meta.facility ?? data?.facility,
+            metadata: meta,
+        };
+    }
+
     async function login(payload: loginRequest) {
         status.value = 'authenticating';
         const username = payload.username;
@@ -26,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
                 { withCredentials: true }
             );
             accessToken.value = data.accessToken;
-            user.value = data.user;
+            user.value = normalizeUser(data.user);
             status.value = 'authenticated';
         } catch (e) {
             logout();
@@ -40,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
             withCredentials: true,
         });
         accessToken.value = data.accessToken;
-        user.value = data.user;
+        user.value = normalizeUser(data.user);
     }
 
     async function getMe() {
@@ -50,13 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
                 Authorization: `Bearer ${accessToken.value}`,
             },
         });
-        if (user.value) {
-            user.value.id = data.id;
-            user.value.currentRecordId = data.record_id;
-            user.value.username = data.username;
-            user.value.is_active = data.is_active;
-            user.value.role = data.role;
-        }
+        user.value = normalizeUser(data);
     }
 
     async function register(payload: registerRequest) {
@@ -70,7 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
             { withCredentials: true }
         );
         accessToken.value = data.accessToken;
-        user.value = data.user;
+        user.value = normalizeUser(data.user);
         status.value = 'authenticated';
     }
 

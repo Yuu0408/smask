@@ -10,7 +10,6 @@ import { useDialog } from '@/plugins/dialog-manager/use-dialog';
 import MedicalRecordDialog from '@/pages/chat/medical-record/MedicalRecordDialog.vue';
 import type { Conversation, Message } from '@/types/message';
 import { useAuthStore } from '@/stores/auth';
-import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
 import { useI18n } from 'vue-i18n';
 import type { ChatStage } from '@/types/chat';
 
@@ -94,6 +93,8 @@ const bottomRef = ref<HTMLDivElement | null>(null);
 
 async function handleSend(text: string) {
     if (!text.trim() || !activeConversation.value) return;
+    // Hide any quick replies as soon as user sends a message
+    multipleChoices.value = [];
     const conv = activeConversation.value;
 
     // push human message
@@ -105,8 +106,7 @@ async function handleSend(text: string) {
 
     // push placeholder AI message
     const aiPlaceholderId = crypto.randomUUID();
-    const placeholderText =
-        stagePlaceholder(currentStage.value) || 'AI is preparing your response...';
+    const placeholderText = stagePlaceholder(currentStage.value);
     conv.messages.push({
         id: aiPlaceholderId,
         role: 'ai',
@@ -165,68 +165,147 @@ watch(
     }
 );
 
-const stageFriendlyLabels: Record<ChatStage, string> = {
-    FORM_CLARIFICATION: 'Validating form details',
-    BASIC_QUESTIONING: 'Asking symptom basics',
-    REASONING: 'Analyzing findings',
-    RULE_OUT: 'Ruling out risks',
-    CLOSING: 'Summarizing next steps',
-    LEGACY_DIAGNOSIS: 'Reviewing diagnosis',
+const stagePlaceholderKeys: Record<ChatStage, string> = {
+    FORM_CLARIFICATION: 'chat.placeholder.stage.formClarification',
+    BASIC_QUESTIONING: 'chat.placeholder.stage.basicQuestioning',
+    REASONING: 'chat.placeholder.stage.reasoning',
+    RULE_OUT: 'chat.placeholder.stage.ruleOut',
+    CLOSING: 'chat.placeholder.stage.closing',
+    NEXT_STEP: 'chat.placeholder.stage.closing',
+    LEGACY_DIAGNOSIS: 'chat.placeholder.stage.legacyDiagnosis',
 };
 
 function stagePlaceholder(stage: ChatStage | null) {
-    if (!stage) return 'AI is preparing your response...';
-    const friendly = stageFriendlyLabels[stage] ?? stage;
-    return `${friendly} (${stage})...`;
+    const waitingText = t('chat.placeholder.waiting');
+    const loadingText = t('chat.placeholder.loading');
+    const baseFallback =
+        (waitingText && waitingText !== 'chat.placeholder.waiting' && waitingText) ||
+        (loadingText && loadingText !== 'chat.placeholder.loading' && loadingText) ||
+        'AI is preparing your response...';
+    if (!stage) return baseFallback;
+    const key = stagePlaceholderKeys[stage];
+    if (!key) return baseFallback;
+    const localized = t(key);
+    // vue-i18n returns the key itself if missing; guard to keep a friendly fallback.
+    return !localized || localized === key ? baseFallback : localized;
 }
 </script>
 
 <template>
-    <div v-if="showEmpty" class="flex-1 flex items-center justify-center p-8">
-        <div class="text-center space-y-3">
-            <div class="text-lg font-medium">
-                {{ t('chat.empty.noConversation') }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-                {{ t('chat.empty.startQuestion') }}
-            </div>
-            <Button @click="openDialog({ component: MedicalRecordDialog })">{{
-                t('chat.empty.newChat')
-            }}</Button>
-        </div>
-    </div>
-    <!-- Full width scroll host -->
-    <div v-else class="flex-1 overflow-y-auto">
-        <div class="mx-auto w-full max-w-2xl px-4 pb-24 pt-6">
-            <ChatMessage
-                v-for="m in activeConversation?.messages || []"
-                :key="m.id"
-                :role="m.role"
-                :content="m.content"
-                :pending="m.pending"
-            />
-        </div>
-        <div ref="bottomRef"></div>
-    </div>
-
-    <!-- Sticky input at bottom; centered column -->
     <div
-        class="sticky bottom-0 w-full bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        class="flex min-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex-col overflow-hidden"
     >
-        <div class="w-full flex justify-center mt-2">
-            <ChatMultipleChoices
-                v-if="multipleChoices.length"
-                :choices="multipleChoices"
-                @select="onChoice"
-            />
+        <div
+            v-if="showEmpty"
+            class="flex flex-1 items-center justify-center p-10"
+        >
+            <div
+                class="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-white via-primary/5 to-accent/10 p-10 text-center shadow-xl shadow-primary/10 backdrop-blur"
+            >
+                <div
+                    class="pointer-events-none absolute -left-10 top-0 size-40 rounded-full bg-primary/15 blur-3xl"
+                />
+                <div class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                    {{ t('sidebar.header.app.name') }}
+                    <span class="text-muted-foreground">AI</span>
+                </div>
+                <div class="mt-4 text-2xl font-semibold">
+                    {{ t('chat.empty.noConversation') }}
+                </div>
+                <div class="mt-2 text-sm text-muted-foreground max-w-md">
+                    {{ t('chat.empty.startQuestion') }}
+                </div>
+                <Button
+                    class="mt-6 rounded-xl px-6 shadow-lg shadow-primary/20"
+                    @click="openDialog({ component: MedicalRecordDialog })"
+                    >{{ t('chat.empty.newChat') }}</Button
+                >
+            </div>
         </div>
 
-        <div class="mx-auto w-full max-w-2xl px-4 pb-3">
-            <ChatInput :loading="sending" @send="handleSend" />
-            <p
-                class="mt-2 text-center text-[10px] text-muted-foreground"
-                v-html="t('chat.input.hint')"
-            ></p>
+        <div v-else class="flex flex-1 flex-col overflow-hidden min-h-0">
+            <div class="relative flex-1 overflow-hidden min-h-0">
+                <div
+                    class="pointer-events-none absolute inset-0 opacity-60"
+                    aria-hidden="true"
+                >
+                    <div
+                        class="absolute -left-16 top-10 size-80 rounded-full bg-primary/15 blur-3xl"
+                    />
+                    <div
+                        class="absolute right-0 bottom-10 size-72 rounded-full bg-accent/20 blur-3xl"
+                    />
+                </div>
+                <div class="relative h-full w-full px-0 py-0 min-h-0 flex">
+                    <section
+                        class="relative grid h-full min-h-full flex-1 grid-rows-[1fr_auto] overflow-hidden rounded-none border-0 bg-white/90 shadow-lg shadow-primary/10 backdrop-blur"
+                    >
+                        <div
+                            class="relative min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
+                        >
+                            <ChatMessage
+                                v-for="m in activeConversation?.messages || []"
+                                :key="m.id"
+                                :role="m.role"
+                                :content="m.content"
+                                :pending="m.pending"
+                            />
+                            <div ref="bottomRef" class="h-4"></div>
+                        </div>
+
+                        <div class="relative px-4 pb-3 pt-3 bg-transparent">
+                            <div
+                                v-if="multipleChoices.length"
+                                class="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-transparent via-white/70 to-white opacity-90"
+                                aria-hidden="true"
+                            />
+                            <div
+                                v-if="multipleChoices.length"
+                                class="relative z-10 grid gap-2"
+                                :class="multipleChoices.length > 2 ? 'grid-cols-2' : 'grid-cols-1'"
+                            >
+                                <div class="absolute -left-1 -top-6 text-primary">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="size-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path
+                                            d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                                        />
+                                        <path d="M20 3v4" />
+                                        <path d="M22 5h-4" />
+                                        <path d="M4 17v2" />
+                                        <path d="M5 18H3" />
+                                    </svg>
+                                </div>
+                                <button
+                                    v-for="idea in multipleChoices"
+                                    :key="idea"
+                                    type="button"
+                                    class="rounded-xl border border-primary/15 bg-gradient-to-r from-primary/5 via-white to-accent/10 px-3 py-2 text-left text-sm font-medium text-primary shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:bg-primary hover:text-primary-foreground hover:bg-none"
+                                    @click="onChoice(idea)"
+                                >
+                                    {{ idea }}
+                                </button>
+                            </div>
+
+                            <div class="mt-3">
+                                <ChatInput :loading="sending" @send="handleSend" />
+                                <p
+                                    class="mt-2 text-center text-[10px] text-muted-foreground"
+                                    v-html="t('chat.input.hint')"
+                                ></p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 </template>

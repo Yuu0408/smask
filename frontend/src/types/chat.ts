@@ -39,6 +39,7 @@ export type ChatStage =
     | 'REASONING'
     | 'RULE_OUT'
     | 'CLOSING'
+    | 'NEXT_STEP'
     | 'LEGACY_DIAGNOSIS';
 
 export interface TodoItem {

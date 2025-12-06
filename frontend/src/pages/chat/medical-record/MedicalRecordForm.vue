@@ -1,8 +1,19 @@
 ﻿<script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
-import { Check, Loader2 } from 'lucide-vue-next';
+import {
+    Activity,
+    Check,
+    ClipboardList,
+    ChevronLeft,
+    ChevronRight,
+    FileText,
+    HeartPulse,
+    Loader2,
+    Stethoscope,
+    Users,
+} from 'lucide-vue-next';
 
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
@@ -346,7 +357,13 @@ const applyPreset = () => {
         toast.error('Vui lòng chọn mẫu cần điền');
         return;
     }
-    form.setValues(preset.data as any);
+    const data = { ...preset.data } as any;
+    if (data.hasOwnProperty('recent_sexual_activity')) {
+        const val = data.recent_sexual_activity;
+        data.recent_sexual_activity =
+            val === true ? 'true' : val === false ? 'false' : null;
+    }
+    form.setValues(data);
     toast.success(`Đã điền sẵn thông tin mẫu: ${preset.label}`);
 };
 
@@ -365,6 +382,86 @@ const applyPreset = () => {
 //         return undefined;
 //     }
 // });
+
+const labelOrFallback = (shortKey: string, fullKey: string) => {
+    const short = t(shortKey);
+    return short !== shortKey ? short : t(fullKey);
+};
+
+const steps = computed(() => [
+    {
+        key: 'patient',
+        label: labelOrFallback(
+            'patientForm.sections.patientInfoShort',
+            'patientForm.sections.patientInfo'
+        ),
+        show: true,
+    },
+    {
+        key: 'obgyn',
+        label: labelOrFallback(
+            'patientForm.sections.obgynHistoryShort',
+            'patientForm.sections.obgynHistory'
+        ),
+        show: form.values.gender === 'Female',
+    },
+    {
+        key: 'social',
+        label: labelOrFallback(
+            'patientForm.sections.socialInfoShort',
+            'patientForm.sections.socialInfo'
+        ),
+        show: true,
+    },
+    {
+        key: 'history',
+        label: labelOrFallback(
+            'patientForm.sections.medicalHistoryShort',
+            'patientForm.sections.medicalHistory'
+        ),
+        show: true,
+    },
+    {
+        key: 'reason',
+        label: labelOrFallback(
+            'patientForm.sections.reasonForVisitShort',
+            'patientForm.sections.reasonForVisit'
+        ),
+        show: true,
+    },
+]);
+
+const visibleSteps = computed(() => steps.value.filter((step) => step.show));
+const currentStepIndex = ref(0);
+const currentStepKey = computed(
+    () => visibleSteps.value[currentStepIndex.value]?.key ?? ''
+);
+
+watch(
+    visibleSteps,
+    (val) => {
+        if (!val.length) {
+            currentStepIndex.value = 0;
+            return;
+        }
+        currentStepIndex.value = Math.min(
+            currentStepIndex.value,
+            val.length - 1
+        );
+    },
+    { deep: true }
+);
+
+const goToStep = (index: number) => {
+    if (index < 0 || index >= visibleSteps.value.length) return;
+    currentStepIndex.value = index;
+};
+const goPrevStep = () => goToStep(currentStepIndex.value - 1);
+const goNextStep = () => goToStep(currentStepIndex.value + 1);
+const isFirstStep = computed(() => currentStepIndex.value === 0);
+const isLastStep = computed(
+    () => currentStepIndex.value >= visibleSteps.value.length - 1
+);
 
 // const smokingYearsApprox = computed(() => {
 //     const v: any = form?.values || {};
@@ -528,7 +625,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             });
         } else {
             router.push({
-                name: 'current-conversation',
+                name: 'chat.conversation',
             });
         }
         form.resetForm();
@@ -551,918 +648,1336 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 <template>
     <form
-        class="pb-4 max-h-[72vh] overflow-auto max-w-full space-y-6 lg:grid lg:space-y-0 lg:grid-cols-1 lg:gap-x-4 overflow-y-auto overflow-x-clip"
+        class="relative w-full max-w-full flex flex-col overflow-hidden space-y-3 px-1 max-h-[80vh] min-h-[60vh]"
         @submit="onSubmit"
     >
         <div
-            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            class="sticky top-0 z-20 -mx-1 px-1 pb-4 backdrop-blur-md bg-white/95 border-b border-slate-100"
         >
-            <p class="text-sm text-muted-foreground">
-                (Dev) Chọn và điền nhanh mẫu bệnh thường gặp.
-            </p>
-            <div class="flex items-center gap-2">
-                <Select v-model="selectedPreset">
-                    <SelectTrigger class="w-56">
-                        <SelectValue placeholder="Chọn mẫu" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem
-                            v-for="preset in patientPresets"
-                            :key="preset.value"
-                            :value="preset.value"
-                        >
-                            {{ preset.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    @click="applyPreset"
+            <div
+                class="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-white to-white px-4 py-4 shadow-sm"
+            >
+                <div
+                    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                    Điền mẫu
-                </Button>
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="h-12 w-12 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30"
+                        >
+                            <Stethoscope class="w-5 h-5" />
+                        </div>
+                        <div class="space-y-1">
+                            <p
+                                class="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary"
+                            >
+                                {{ $t('patientForm.devTool.title') }}
+                            </p>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                {{ $t('patientForm.devTool.description') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="w-full sm:w-auto flex flex-col gap-2 sm:items-end"
+                    >
+                        <span
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >{{
+                                $t('patientForm.devTool.quickTemplates')
+                            }}</span
+                        >
+                        <div
+                            class="flex w-full flex-col gap-2 sm:flex-row sm:items-center"
+                        >
+                            <Select v-model="selectedPreset" class="w-full">
+                                <SelectTrigger
+                                    class="w-full sm:w-56 shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+                                >
+                                    <SelectValue
+                                        :placeholder="
+                                            $t(
+                                                'patientForm.devTool.selectPlaceholder'
+                                            )
+                                        "
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem
+                                        v-for="preset in patientPresets"
+                                        :key="preset.value"
+                                        :value="preset.value"
+                                    >
+                                        {{ preset.label }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                class="shadow-sm sm:w-auto"
+                                @click="applyPreset"
+                            >
+                                {{ $t('patientForm.devTool.fill') }}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Patient Information -->
-        <section>
-            <h3 class="text-lg font-semibold mb-4">
-                {{ $t('patientForm.sections.patientInfo') }}
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <!-- Full Name -->
-                <FormField v-slot="{ componentField }" name="full_name">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.fullName') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t('patientForm.placeholder.fullName')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Birthday -->
-                <FormField v-slot="{ field }" name="birthday">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.birthday') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                type="date"
-                                v-bind="field"
-                                :modelValue="field.value"
-                                @update:modelValue="field.onChange"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Gender -->
-                <FormField v-slot="{ field }" name="gender">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.gender') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="Male">{{
-                                    $t('patientForm.options.male')
-                                }}</SelectItem>
-                                <SelectItem value="Female">{{
-                                    $t('patientForm.options.female')
-                                }}</SelectItem>
-                                <SelectItem value="Other">{{
-                                    $t('patientForm.options.other')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-                <!-- Occupation -->
-                <FormField v-slot="{ componentField }" name="occupation">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.occupation') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t('patientForm.placeholder.occupation')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Nationality -->
-                <FormField v-slot="{ componentField }" name="nationality">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.nationality') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t('patientForm.placeholder.nationality')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Address -->
-                <FormField v-slot="{ componentField }" name="address">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.address') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t('patientForm.placeholder.address')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-            </div>
-
-            <hr class="border-t border-dashed border-gray-300 my-6" />
-        </section>
-
-        <!-- OB/GYN History -->
-        <section v-if="form.values.gender === 'Female'">
-            <h3 class="text-lg font-semibold mb-4">
-                {{ $t('patientForm.sections.obgynHistory') }}
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <FormField
-                    v-slot="{ componentField }"
-                    name="menstruation_status"
-                >
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.menstruationStatus') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t(
-                                        'patientForm.placeholder.menstruationStatus'
-                                    )
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <FormField v-slot="{ componentField }" name="menstrual_cycle">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.menstrualCycle') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Input
-                                :placeholder="
-                                    $t('patientForm.placeholder.menstrualCycle')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <FormField v-slot="{ field }" name="recent_sexual_activity">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.recentSexualActivity') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="true">{{
-                                    $t('patientForm.options.yes')
-                                }}</SelectItem>
-                                <SelectItem value="false">{{
-                                    $t('patientForm.options.no')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-            </div>
-
-            <hr class="border-t border-dashed border-gray-300 my-6" />
-        </section>
-
-        <!-- Social Information -->
-        <section>
-            <h3 class="text-lg font-semibold">
-                {{ $t('patientForm.sections.socialInfo') }}
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 py-5">
-                <!-- Alcohol -->
-                <FormField v-slot="{ field }" name="alcohol_consumption">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.alcoholConsumption') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="never">{{
-                                    $t('patientForm.options.never')
-                                }}</SelectItem>
-                                <SelectItem value="occasionally">{{
-                                    $t('patientForm.options.occasionally')
-                                }}</SelectItem>
-                                <SelectItem value="frequently">{{
-                                    $t('patientForm.options.frequently')
-                                }}</SelectItem>
-                                <SelectItem value="daily">{{
-                                    $t('patientForm.options.daily')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Alcohol inline details -->
+        <div class="flex-1 min-h-0 space-y-4">
+            <div
+                class="relative flex items-center justify-center gap-3 px-3 sm:px-4 flex-nowrap overflow-x-auto w-full"
+                v-if="visibleSteps.length"
+            >
                 <div
-                    v-if="form.values.alcohol_consumption === 'occasionally'"
-                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                    class="absolute left-6 right-6 top-1/2 -z-10 hidden sm:block"
+                    aria-hidden="true"
                 >
-                    <span>{{
-                        $t('patientForm.inline.alcoholOccasional.prefix')
-                    }}</span>
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.alcohol_per_month_times"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_per_month_times',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.alcoholOccasional.times')
-                    }}</span>
-                    <Input
-                        class="w-20"
-                        type="number"
-                        :modelValue="form.values.alcohol_per_time_ml"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_per_time_ml',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.alcoholOccasional.ml')
-                    }}</span>
-                    <Input
-                        class="w-40"
-                        :modelValue="form.values.alcohol_drink_type"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_drink_type',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
+                    <div class="h-px w-full border-t border-primary/30" />
                 </div>
-
-                <div
-                    v-if="form.values.alcohol_consumption === 'frequently'"
-                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+                <button
+                    v-for="(step, index) in visibleSteps"
+                    :key="step.key"
+                    type="button"
+                    class="flex items-center gap-2 text-xs transition whitespace-nowrap"
+                    @click="goToStep(index)"
                 >
-                    <span>{{
-                        $t('patientForm.inline.alcoholFrequent.prefix')
-                    }}</span>
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.alcohol_per_week_times"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_per_week_times',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.alcoholFrequent.times')
-                    }}</span>
-                    <Input
-                        class="w-20"
-                        type="number"
-                        :modelValue="form.values.alcohol_avg_per_day_ml"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_avg_per_day_ml',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.alcoholFrequent.ml')
-                    }}</span>
-                    <Input
-                        class="w-40"
-                        :modelValue="form.values.alcohol_drink_type"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_drink_type',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                </div>
-
-                <div
-                    v-if="form.values.alcohol_consumption === 'daily'"
-                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
-                >
-                    <span>{{
-                        $t('patientForm.inline.alcoholDaily.prefix')
-                    }}</span>
-                    <Input
-                        class="w-20"
-                        type="number"
-                        :modelValue="form.values.alcohol_avg_per_day_ml"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_avg_per_day_ml',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{ $t('patientForm.inline.alcoholDaily.ml') }}</span>
-                    <Input
-                        class="w-40"
-                        :modelValue="form.values.alcohol_drink_type"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'alcohol_drink_type',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                </div>
-
-                <!-- Smoking -->
-                <FormField v-slot="{ field }" name="smoking_habit">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.smokingHabit') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="never">{{
-                                    $t('patientForm.options.never')
-                                }}</SelectItem>
-                                <SelectItem value="used_to_quit">{{
-                                    $t('patientForm.options.usedToQuit')
-                                }}</SelectItem>
-                                <SelectItem value="current">{{
-                                    $t('patientForm.options.currentSmoking')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Smoking inline details -->
-                <div
-                    v-if="form.values.smoking_habit === 'used_to_quit'"
-                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
-                >
-                    <span>{{
-                        $t('patientForm.inline.smokingQuit.prefix')
-                    }}</span>
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.smoking_start_age"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'smoking_start_age',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{ $t('patientForm.inline.smokingQuit.to') }}</span>
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.smoking_end_age"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'smoking_end_age',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
                     <span
-                        >• {{ $t('patientForm.inline.smokingQuit.cigs') }}</span
+                        class="flex h-6 w-6 items-center justify-center rounded-full border font-semibold"
+                        :class="
+                            currentStepIndex === index
+                                ? 'border-primary bg-white text-primary'
+                                : 'border-slate-200 bg-slate-50 text-slate-700'
+                        "
                     >
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.smoking_cigarettes_per_day"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'smoking_cigarettes_per_day',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.smokingQuit.cigsUnit')
-                    }}</span>
-                </div>
+                        {{ index + 1 }}
+                    </span>
+                </button>
+            </div>
 
-                <div
-                    v-if="form.values.smoking_habit === 'current'"
-                    class="md:col-span-2 -mt-2 text-sm flex flex-wrap items-center gap-2"
+            <div class="relative w-full px-2 sm:px-4 pb-6 overflow-hidden">
+                <button
+                    type="button"
+                    class="absolute left-0 sm:left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-slate-200 bg-white p-2 shadow-sm disabled:opacity-40"
+                    :disabled="isFirstStep"
+                    @click="goPrevStep"
                 >
-                    <span>{{
-                        $t('patientForm.inline.smokingCurrent.prefix')
-                    }}</span>
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.smoking_start_age"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'smoking_start_age',
-                                    String(v ?? '')
-                                )
-                        "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.smokingCurrent.toNow')
-                    }}</span>
-                    <span
-                        >•
-                        {{ $t('patientForm.inline.smokingCurrent.cigs') }}</span
+                    <ChevronLeft class="w-5 h-5 text-slate-700" />
+                </button>
+                <button
+                    type="button"
+                    class="absolute right-0 sm:right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-slate-200 bg-white p-2 shadow-sm disabled:opacity-40"
+                    :disabled="isLastStep"
+                    @click="goNextStep"
+                >
+                    <ChevronRight class="w-5 h-5 text-slate-700" />
+                </button>
+
+                <div class="overflow-hidden px-4 sm:px-8">
+                    <!-- Patient Information -->
+                    <section
+                        v-show="currentStepKey === 'patient'"
+                        class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-sm space-y-5 h-[45vh] max-h-[460px] min-h-[280px] overflow-y-auto"
                     >
-                    <Input
-                        class="w-16"
-                        type="number"
-                        :modelValue="form.values.smoking_cigarettes_per_day"
-                        @update:modelValue="
-                            (v) =>
-                                form.setFieldValue(
-                                    'smoking_cigarettes_per_day',
-                                    String(v ?? '')
-                                )
+                        <div
+                            class="flex items-center justify-between pb-3 border-b border-slate-100"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"
+                                >
+                                    <ClipboardList class="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-primary"
+                                    >
+                                        {{
+                                            $t(
+                                                'patientForm.sections.patientInfo'
+                                            )
+                                        }}
+                                    </h3>
+                                </div>
+                            </div>
+                            <span
+                                class="hidden text-xs text-slate-500 sm:inline"
+                                >{{
+                                    $t('patientForm.validation.required')
+                                }}</span
+                            >
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Full Name -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="full_name"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{ $t('patientForm.fields.fullName') }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.fullName'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Birthday -->
+                            <FormField v-slot="{ field }" name="birthday">
+                                <FormItem>
+                                    <FormLabel>
+                                        {{ $t('patientForm.fields.birthday') }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="date"
+                                            v-bind="field"
+                                            :modelValue="field.value"
+                                            @update:modelValue="field.onChange"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Gender -->
+                            <FormField v-slot="{ field }" name="gender">
+                                <FormItem>
+                                    <FormLabel>
+                                        {{ $t('patientForm.fields.gender') }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Male">{{
+                                                $t('patientForm.options.male')
+                                            }}</SelectItem>
+                                            <SelectItem value="Female">{{
+                                                $t('patientForm.options.female')
+                                            }}</SelectItem>
+                                            <SelectItem value="Other">{{
+                                                $t('patientForm.options.other')
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                            <!-- Occupation -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="occupation"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t('patientForm.fields.occupation')
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.occupation'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Nationality -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="nationality"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t('patientForm.fields.nationality')
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.nationality'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Address -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="address"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{ $t('patientForm.fields.address') }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.address'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                        </div>
+                    </section>
+
+                    <!-- OB/GYN History -->
+                    <section
+                        v-show="
+                            currentStepKey === 'obgyn' &&
+                            form.values.gender === 'Female'
                         "
-                    />
-                    <span>{{
-                        $t('patientForm.inline.smokingCurrent.cigsUnit')
-                    }}</span>
+                        class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-sm space-y-5 h-[45vh] max-h-[460px] min-h-[280px] overflow-y-auto"
+                    >
+                        <div
+                            class="flex items-center justify-between pb-3 border-b border-slate-100"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"
+                                >
+                                    <HeartPulse class="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-primary"
+                                    >
+                                        {{
+                                            $t(
+                                                'patientForm.sections.obgynHistory'
+                                            )
+                                        }}
+                                    </h3>
+                                </div>
+                            </div>
+                            <span
+                                class="hidden text-xs text-slate-500 sm:inline"
+                                >{{
+                                    $t('patientForm.validation.required')
+                                }}</span
+                            >
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="menstruation_status"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.menstruationStatus'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.menstruationStatus'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="menstrual_cycle"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.menstrualCycle'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.menstrualCycle'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <FormField
+                                v-slot="{ field }"
+                                name="recent_sexual_activity"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.recentSexualActivity'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="true">{{
+                                                $t('patientForm.options.yes')
+                                            }}</SelectItem>
+                                            <SelectItem value="false">{{
+                                                $t('patientForm.options.no')
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                        </div>
+                    </section>
+
+                    <!-- Social Information -->
+                    <section
+                        v-show="currentStepKey === 'social'"
+                        class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-sm space-y-5 h-[45vh] max-h-[460px] min-h-[280px] overflow-y-auto"
+                    >
+                        <div
+                            class="flex items-center justify-between pb-3 border-b border-slate-100"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"
+                                >
+                                    <Users class="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-primary"
+                                    >
+                                        {{
+                                            $t(
+                                                'patientForm.sections.socialInfo'
+                                            )
+                                        }}
+                                    </h3>
+                                </div>
+                            </div>
+                            <span
+                                class="hidden text-xs text-slate-500 sm:inline"
+                                >{{
+                                    $t('patientForm.validation.required')
+                                }}</span
+                            >
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-3">
+                            <!-- Alcohol -->
+                            <FormField
+                                v-slot="{ field }"
+                                name="alcohol_consumption"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.alcoholConsumption'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="never">{{
+                                                $t('patientForm.options.never')
+                                            }}</SelectItem>
+                                            <SelectItem value="occasionally">{{
+                                                $t(
+                                                    'patientForm.options.occasionally'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="frequently">{{
+                                                $t(
+                                                    'patientForm.options.frequently'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="daily">{{
+                                                $t('patientForm.options.daily')
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Alcohol inline details -->
+                            <div
+                                v-if="
+                                    form.values.alcohol_consumption ===
+                                    'occasionally'
+                                "
+                                class="md:col-span-2 -mt-1 text-sm flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-inner shadow-slate-100/70"
+                            >
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.alcoholOccasional.prefix'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.alcohol_per_month_times
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_per_month_times',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.alcoholOccasional.times'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-20"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.alcohol_per_time_ml
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_per_time_ml',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.alcoholOccasional.ml'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-40"
+                                    :modelValue="form.values.alcohol_drink_type"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_drink_type',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                            </div>
+
+                            <div
+                                v-if="
+                                    form.values.alcohol_consumption ===
+                                    'frequently'
+                                "
+                                class="md:col-span-2 -mt-1 text-sm flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-inner shadow-slate-100/70"
+                            >
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.alcoholFrequent.prefix'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.alcohol_per_week_times
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_per_week_times',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.alcoholFrequent.times'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-20"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.alcohol_avg_per_day_ml
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_avg_per_day_ml',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t('patientForm.inline.alcoholFrequent.ml')
+                                }}</span>
+                                <Input
+                                    class="w-40"
+                                    :modelValue="form.values.alcohol_drink_type"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_drink_type',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                            </div>
+
+                            <div
+                                v-if="
+                                    form.values.alcohol_consumption === 'daily'
+                                "
+                                class="md:col-span-2 -mt-1 text-sm flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-inner shadow-slate-100/70"
+                            >
+                                <span>{{
+                                    $t('patientForm.inline.alcoholDaily.prefix')
+                                }}</span>
+                                <Input
+                                    class="w-20"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.alcohol_avg_per_day_ml
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_avg_per_day_ml',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t('patientForm.inline.alcoholDaily.ml')
+                                }}</span>
+                                <Input
+                                    class="w-40"
+                                    :modelValue="form.values.alcohol_drink_type"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'alcohol_drink_type',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                            </div>
+
+                            <!-- Smoking -->
+                            <FormField v-slot="{ field }" name="smoking_habit">
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.smokingHabit'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="never">{{
+                                                $t('patientForm.options.never')
+                                            }}</SelectItem>
+                                            <SelectItem value="used_to_quit">{{
+                                                $t(
+                                                    'patientForm.options.usedToQuit'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="current">{{
+                                                $t(
+                                                    'patientForm.options.currentSmoking'
+                                                )
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Smoking inline details -->
+                            <div
+                                v-if="
+                                    form.values.smoking_habit === 'used_to_quit'
+                                "
+                                class="md:col-span-2 -mt-1 text-sm flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-inner shadow-slate-100/70"
+                            >
+                                <span>{{
+                                    $t('patientForm.inline.smokingQuit.prefix')
+                                }}</span>
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="form.values.smoking_start_age"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'smoking_start_age',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t('patientForm.inline.smokingQuit.to')
+                                }}</span>
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="form.values.smoking_end_age"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'smoking_end_age',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span
+                                    >•
+                                    {{
+                                        $t(
+                                            'patientForm.inline.smokingQuit.cigs'
+                                        )
+                                    }}</span
+                                >
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.smoking_cigarettes_per_day
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'smoking_cigarettes_per_day',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.smokingQuit.cigsUnit'
+                                    )
+                                }}</span>
+                            </div>
+
+                            <div
+                                v-if="form.values.smoking_habit === 'current'"
+                                class="md:col-span-2 -mt-1 text-sm flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-inner shadow-slate-100/70"
+                            >
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.smokingCurrent.prefix'
+                                    )
+                                }}</span>
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="form.values.smoking_start_age"
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'smoking_start_age',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.smokingCurrent.toNow'
+                                    )
+                                }}</span>
+                                <span
+                                    >•
+                                    {{
+                                        $t(
+                                            'patientForm.inline.smokingCurrent.cigs'
+                                        )
+                                    }}</span
+                                >
+                                <Input
+                                    class="w-16"
+                                    type="number"
+                                    :modelValue="
+                                        form.values.smoking_cigarettes_per_day
+                                    "
+                                    @update:modelValue="
+                                        (v) =>
+                                            form.setFieldValue(
+                                                'smoking_cigarettes_per_day',
+                                                String(v ?? '')
+                                            )
+                                    "
+                                />
+                                <span>{{
+                                    $t(
+                                        'patientForm.inline.smokingCurrent.cigsUnit'
+                                    )
+                                }}</span>
+                            </div>
+
+                            <!-- Living situation -->
+                            <FormField
+                                v-slot="{ field }"
+                                name="living_situation"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.livingSituation'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="alone">{{
+                                                $t(
+                                                    'patientForm.options.liveAlone'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="family">{{
+                                                $t(
+                                                    'patientForm.options.liveWithFamily'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="assisted">{{
+                                                $t(
+                                                    'patientForm.options.assistedLiving'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="other">{{
+                                                $t(
+                                                    'patientForm.options.otherLiving'
+                                                )
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Daily independence -->
+                            <FormField
+                                v-slot="{ field }"
+                                name="daily_activity_independence"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.dailyActivityIndependence'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="yes">{{
+                                                $t('patientForm.options.yes')
+                                            }}</SelectItem>
+                                            <SelectItem value="partially">{{
+                                                $t(
+                                                    'patientForm.options.partially'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem
+                                                value="needs_assistance"
+                                                >{{
+                                                    $t(
+                                                        'patientForm.options.needsAssistance'
+                                                    )
+                                                }}</SelectItem
+                                            >
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Travel -->
+                            <FormField
+                                v-slot="{ field }"
+                                name="recent_travel_history"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.recentTravelHistory'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        :modelValue="field.value"
+                                        @update:modelValue="field.onChange"
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    :placeholder="
+                                                        $t(
+                                                            'patientForm.options.select'
+                                                        )
+                                                    "
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="no">{{
+                                                $t('patientForm.options.no')
+                                            }}</SelectItem>
+                                            <SelectItem value="14_days">{{
+                                                $t(
+                                                    'patientForm.options.travel14'
+                                                )
+                                            }}</SelectItem>
+                                            <SelectItem value="1_month">{{
+                                                $t(
+                                                    'patientForm.options.travelMonth'
+                                                )
+                                            }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                        </div>
+                    </section>
+
+                    <!-- Medical History -->
+                    <section
+                        v-show="currentStepKey === 'history'"
+                        class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-sm space-y-5 h-[45vh] max-h-[460px] min-h-[280px] overflow-y-auto"
+                    >
+                        <div
+                            class="flex items-center justify-between pb-3 border-b border-slate-100"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"
+                                >
+                                    <FileText class="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-primary"
+                                    >
+                                        {{
+                                            $t(
+                                                'patientForm.sections.medicalHistory'
+                                            )
+                                        }}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-6">
+                            <!-- Past Medical History -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="past_medical_history"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.pastMedicalHistory'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows="3"
+                                            class="min-h-[100px]"
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.pastMedicalHistory'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Current Medications -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="current_medications"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.currentMedications'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows="3"
+                                            class="min-h-[100px]"
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.medication'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Allergies -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="allergies"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{ $t('patientForm.fields.allergies') }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows="3"
+                                            class="min-h-[100px]"
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.allergy'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+
+                            <!-- Family Medical History -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="family_medical_history"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.familyMedicalHistory'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows="3"
+                                            class="min-h-[100px]"
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.familyMedicalHistory'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                        </div>
+                    </section>
+
+                    <!-- Reason for Visit -->
+                    <section
+                        v-show="currentStepKey === 'reason'"
+                        class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-sm space-y-5 h-[45vh] max-h-[460px] min-h-[280px] overflow-y-auto"
+                    >
+                        <div
+                            class="flex items-center gap-3 pb-3 border-b border-slate-100"
+                        >
+                            <div
+                                class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"
+                            >
+                                <Activity class="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-primary">
+                                    {{
+                                        $t(
+                                            'patientForm.sections.reasonForVisit'
+                                        )
+                                    }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4">
+                            <!-- Chief Complaint -->
+                            <FormField
+                                v-slot="{ componentField }"
+                                name="chief_complaint"
+                            >
+                                <FormItem>
+                                    <FormLabel>
+                                        {{
+                                            $t(
+                                                'patientForm.fields.chiefComplaint'
+                                            )
+                                        }}
+                                        <span class="text-destructive">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows="3"
+                                            class="min-h-[100px]"
+                                            :placeholder="
+                                                $t(
+                                                    'patientForm.placeholder.chiefComplaint'
+                                                )
+                                            "
+                                            v-bind="componentField"
+                                        />
+                                    </FormControl>
+                                    <div class="lg:min-h-6">
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            </FormField>
+                        </div>
+
+                        <!-- Symptom Progression -->
+                        <FormField
+                            v-slot="{ componentField }"
+                            name="medical_history"
+                        >
+                            <FormItem>
+                                <FormLabel>
+                                    {{
+                                        $t('patientForm.fields.medicalHistory')
+                                    }}
+                                    <span class="text-destructive">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        rows="3"
+                                        class="min-h-[100px]"
+                                        :placeholder="
+                                            $t(
+                                                'patientForm.placeholder.medicalHistory'
+                                            )
+                                        "
+                                        v-bind="componentField"
+                                    />
+                                </FormControl>
+                                <div class="lg:min-h-6">
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        </FormField>
+                    </section>
                 </div>
-
-                <!-- Living situation -->
-                <FormField v-slot="{ field }" name="living_situation">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.livingSituation') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="alone">{{
-                                    $t('patientForm.options.liveAlone')
-                                }}</SelectItem>
-                                <SelectItem value="family">{{
-                                    $t('patientForm.options.liveWithFamily')
-                                }}</SelectItem>
-                                <SelectItem value="assisted">{{
-                                    $t('patientForm.options.assistedLiving')
-                                }}</SelectItem>
-                                <SelectItem value="other">{{
-                                    $t('patientForm.options.otherLiving')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Daily independence -->
-                <FormField
-                    v-slot="{ field }"
-                    name="daily_activity_independence"
-                >
-                    <FormItem>
-                        <FormLabel>
-                            {{
-                                $t(
-                                    'patientForm.fields.dailyActivityIndependence'
-                                )
-                            }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="yes">{{
-                                    $t('patientForm.options.yes')
-                                }}</SelectItem>
-                                <SelectItem value="partially">{{
-                                    $t('patientForm.options.partially')
-                                }}</SelectItem>
-                                <SelectItem value="needs_assistance">{{
-                                    $t('patientForm.options.needsAssistance')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Travel -->
-                <FormField v-slot="{ field }" name="recent_travel_history">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.recentTravelHistory') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <Select
-                            :modelValue="field.value"
-                            @update:modelValue="field.onChange"
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        :placeholder="
-                                            $t('patientForm.options.select')
-                                        "
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="no">{{
-                                    $t('patientForm.options.no')
-                                }}</SelectItem>
-                                <SelectItem value="14_days">{{
-                                    $t('patientForm.options.travel14')
-                                }}</SelectItem>
-                                <SelectItem value="1_month">{{
-                                    $t('patientForm.options.travelMonth')
-                                }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
             </div>
-
-            <hr class="border-t border-dashed border-gray-300 my-6" />
-        </section>
-
-        <!-- Medical History -->
-        <section>
-            <h3 class="text-lg font-semibold mb-4">
-                {{ $t('patientForm.sections.medicalHistory') }}
-            </h3>
-
-            <div class="flex flex-col gap-6">
-                <!-- Past Medical History -->
-                <FormField
-                    v-slot="{ componentField }"
-                    name="past_medical_history"
-                >
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.pastMedicalHistory') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Textarea
-                                rows="3"
-                                class="min-h-[100px]"
-                                :placeholder="
-                                    $t(
-                                        'patientForm.placeholder.pastMedicalHistory'
-                                    )
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Current Medications -->
-                <FormField
-                    v-slot="{ componentField }"
-                    name="current_medications"
-                >
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.currentMedications') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Textarea
-                                rows="3"
-                                class="min-h-[100px]"
-                                :placeholder="
-                                    $t('patientForm.placeholder.medication')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Allergies -->
-                <FormField v-slot="{ componentField }" name="allergies">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.allergies') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Textarea
-                                rows="3"
-                                class="min-h-[100px]"
-                                :placeholder="
-                                    $t('patientForm.placeholder.allergy')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-
-                <!-- Family Medical History -->
-                <FormField
-                    v-slot="{ componentField }"
-                    name="family_medical_history"
-                >
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.familyMedicalHistory') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Textarea
-                                rows="3"
-                                class="min-h-[100px]"
-                                :placeholder="
-                                    $t(
-                                        'patientForm.placeholder.familyMedicalHistory'
-                                    )
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-            </div>
-
-            <hr class="border-t border-dashed border-gray-300 my-6" />
-        </section>
-
-        <!-- Reason for Visit -->
-        <section>
-            <h3 class="text-lg font-semibold mb-4">
-                {{ $t('patientForm.sections.reasonForVisit') }}
-            </h3>
-
-            <div class="grid grid-cols-1 gap-4 pb-5">
-                <!-- Chief Complaint -->
-                <FormField v-slot="{ componentField }" name="chief_complaint">
-                    <FormItem>
-                        <FormLabel>
-                            {{ $t('patientForm.fields.chiefComplaint') }}
-                            <span class="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                            <Textarea
-                                rows="3"
-                                class="min-h-[100px]"
-                                :placeholder="
-                                    $t('patientForm.placeholder.chiefComplaint')
-                                "
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <div class="lg:min-h-6">
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                </FormField>
-            </div>
-
-            <!-- Symptom Progression -->
-            <FormField v-slot="{ componentField }" name="medical_history">
-                <FormItem>
-                    <FormLabel>
-                        {{ $t('patientForm.fields.medicalHistory') }}
-                        <span class="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                        <Textarea
-                            rows="3"
-                            class="min-h-[100px]"
-                            :placeholder="
-                                $t('patientForm.placeholder.medicalHistory')
-                            "
-                            v-bind="componentField"
-                        />
-                    </FormControl>
-                    <div class="lg:min-h-6">
-                        <FormMessage />
-                    </div>
-                </FormItem>
-            </FormField>
-        </section>
+        </div>
 
         <!-- Submit -->
-        <div class="flex justify-center">
-            <Button
-                :disabled="!canSubmit"
-                type="submit"
-                class="w-full md:w-auto"
-            >
-                <Loader2
-                    v-if="loading.submit"
-                    class="animate-spin w-4 h-4 mr-2"
-                />
-                <Check v-else class="w-4 h-4 mr-2" />
-                {{
-                    loading.submit
-                        ? $t('patientForm.submit.submitting')
-                        : $t('patientForm.submit.default')
-                }}
-            </Button>
+        <div class="pb-2 px-2 sm:px-4">
+            <div class="flex justify-center w-full">
+                <Button
+                    :disabled="!canSubmit"
+                    type="submit"
+                    class="w-full md:w-auto shadow-lg shadow-primary/30 px-6 max-w-xl"
+                >
+                    <Loader2
+                        v-if="loading.submit"
+                        class="animate-spin w-4 h-4 mr-2"
+                    />
+                    <Check v-else class="w-4 h-4 mr-2" />
+                    {{
+                        loading.submit
+                            ? $t('patientForm.submit.submitting')
+                            : $t('patientForm.submit.default')
+                    }}
+                </Button>
+            </div>
         </div>
     </form>
 </template>

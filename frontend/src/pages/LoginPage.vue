@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
@@ -23,6 +23,9 @@ import {
     CardFooter,
 } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Sparkles, User } from 'lucide-vue-next';
+import ChatMultipleChoices from '@/components/ChatMultipleChoices.vue';
+import ChatInput from '@/components/ChatInput.vue';
 
 type Role = 'patient' | 'doctor';
 type Mode = 'login' | 'register';
@@ -52,6 +55,43 @@ const formTitle = computed(() =>
         : (t('page.login.form.register_title') as string) ||
           'Create your Medee account'
 );
+
+type PreviewMessage = { role: 'ai' | 'human'; text: string };
+const sampleMessages = computed<PreviewMessage[]>(() => [
+    { role: 'ai', text: t('page.login.example.messages.ai1') as string },
+    { role: 'human', text: t('page.login.example.messages.human1') as string },
+    { role: 'ai', text: t('page.login.example.messages.ai2') as string },
+]);
+
+const sampleChoices = [
+    t('page.login.example.choice1') as string,
+    t('page.login.example.choice2') as string,
+    t('page.login.example.choice3') as string,
+];
+
+const slides = [
+    { key: 'icon', type: 'icon' as const },
+    { key: 'chat', type: 'chat' as const },
+];
+
+const currentSlide = ref(0);
+let slideTimer: number | undefined;
+
+onMounted(() => {
+    slideTimer = window.setInterval(() => {
+        currentSlide.value = (currentSlide.value + 1) % slides.length;
+    }, 6000);
+});
+
+onUnmounted(() => {
+    if (slideTimer) {
+        clearInterval(slideTimer);
+    }
+});
+
+function goToSlide(idx: number) {
+    currentSlide.value = idx;
+}
 
 function resetError() {
     error.value = null;
@@ -134,77 +174,168 @@ async function handleSubmit() {
 
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-sky-50 via-white to-indigo-50"
+        class="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/8 via-white to-accent/10"
     >
-        <!-- Top bar -->
         <div
-            class="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between"
+            class="pointer-events-none absolute inset-0 opacity-70"
+            aria-hidden="true"
         >
-            <div class="flex items-center gap-2">
-                <span class="text-lg font-semibold tracking-tight text-sky-800"
-                    >Medee</span
-                >
-            </div>
-            <div class="flex items-center gap-1">
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    :class="{ 'bg-sky-100 text-sky-700': locale === 'en' }"
-                    @click="setLocale('en')"
-                    >EN</Button
-                >
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    :class="{ 'bg-sky-100 text-sky-700': locale === 'vi' }"
-                    @click="setLocale('vi')"
-                    >VI</Button
-                >
-            </div>
+            <div
+                class="absolute -left-32 top-10 size-96 rounded-full bg-primary/15 blur-3xl"
+            />
+            <div
+                class="absolute right-10 top-24 size-80 rounded-full bg-accent/20 blur-3xl"
+            />
         </div>
 
-        <!-- Main content -->
-        <div class="mx-auto max-w-6xl px-4 pb-10">
-            <div class="grid items-center gap-8 lg:grid-cols-2">
-                <!-- Left: brand + hero -->
-                <div class="hidden lg:block">
-                    <h1
-                        class="text-4xl font-bold tracking-tight text-slate-900"
+        <div class="relative mx-auto max-w-6xl px-4 py-14 space-y-12">
+            <div
+                class="flex items-center justify-between rounded-2xl border border-primary/10 bg-white/60 px-4 py-3 shadow-sm backdrop-blur"
+            >
+                <div class="flex items-center gap-2">
+                    <span class="text-lg font-semibold tracking-tight text-primary"
+                        >Medee</span
                     >
-                        {{ t('page.login.title') }}
-                    </h1>
-                    <p class="mt-4 text-slate-600 text-lg leading-relaxed">
-                        {{ t('page.login.subtitle') }}
-                    </p>
-                    <div class="relative mt-8">
-                        <div
-                            class="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-tr from-sky-100 to-indigo-100 blur-2xl"
-                            aria-hidden="true"
-                        ></div>
-                        <img
-                            src="/medee3.jpg"
-                            alt="Healthcare illustration"
-                            class="rounded-xl border shadow-lg ring-1 ring-black/5"
-                        />
+                    <span
+                        class="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary"
+                        >Clinical AI</span
+                    >
+                </div>
+                <div class="flex items-center gap-1">
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        :class="{ 'bg-primary/15 text-primary': locale === 'en' }"
+                        @click="setLocale('en')"
+                        >EN</Button
+                    >
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        :class="{ 'bg-primary/15 text-primary': locale === 'vi' }"
+                        @click="setLocale('vi')"
+                        >VI</Button
+                    >
+                </div>
+            </div>
+
+            <div class="text-center space-y-4 pt-2">
+                <h1 class="text-4xl font-bold leading-tight tracking-tight text-slate-900">
+                    {{ t('page.login.title') }}
+                </h1>
+                <p class="text-lg leading-relaxed text-slate-600 max-w-3xl mx-auto">
+                    {{ t('page.login.subtitle') }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-12 items-center md:grid-cols-2">
+                <div class="flex justify-center">
+                    <div
+                        class="relative w-full max-w-xl overflow-hidden rounded-3xl border border-primary/15 bg-white/95 shadow-xl shadow-primary/10 backdrop-blur min-h-[440px]"
+                    >
+                        <Transition name="slide-wipe" mode="out-in">
+                            <div
+                                v-if="slides[currentSlide].type === 'icon'"
+                                key="icon"
+                                class="absolute inset-0 flex h-full min-h-[440px] items-center justify-center p-6"
+                            >
+                                <img
+                                    src="/medee3.jpg"
+                                    alt="Medee"
+                                    class="h-[340px] w-auto rounded-2xl border border-primary/15 shadow-2xl shadow-primary/10 object-contain bg-white/70"
+                                    draggable="false"
+                                />
+                            </div>
+                            <div
+                                v-else
+                                key="chat"
+                                class="absolute inset-0 flex h-full min-h-[440px] flex-col space-y-3 p-5"
+                            >
+                                <div class="flex items-center justify-end">
+                                    <span
+                                        class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+                                    >
+                                        <Sparkles class="size-4" />
+                                        {{ t('chat.session.live') }}
+                                    </span>
+                                </div>
+                                <div class="space-y-3">
+                                    <div
+                                        v-for="(msg, idx) in sampleMessages"
+                                        :key="idx"
+                                        class="flex items-start gap-2"
+                                        :class="msg.role === 'human' ? 'justify-end' : 'justify-start'"
+                                    >
+                                        <div v-if="msg.role === 'ai'" class="flex-shrink-0 pt-1">
+                                            <div
+                                                class="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-accent/20 text-primary shadow-sm"
+                                            >
+                                                <User class="size-4" aria-hidden="true" />
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="max-w-[78%] rounded-2xl border px-4 py-3 text-sm shadow-sm"
+                                            :class="
+                                                msg.role === 'human'
+                                                    ? 'bg-primary text-primary-foreground border-primary/20 shadow-primary/20 shadow-lg'
+                                                    : 'bg-white text-foreground border-primary/10'
+                                            "
+                                        >
+                                            {{ msg.text }}
+                                        </div>
+                                        <div v-if="msg.role === 'human'" class="flex-shrink-0 pt-1">
+                                            <div
+                                                class="flex size-9 items-center justify-center rounded-xl bg-muted text-foreground shadow-sm"
+                                            >
+                                                <User class="size-4" aria-hidden="true" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pointer-events-none opacity-80">
+                                        <ChatMultipleChoices :choices="sampleChoices" />
+                                    </div>
+
+                                    <div class="pointer-events-none opacity-80">
+                                        <ChatInput :loading="false" />
+                                    </div>
+                                </div>
+                            </div>
+                        </Transition>
+
+                        <div class="absolute inset-x-0 bottom-3 flex justify-center gap-2 z-10">
+                            <button
+                                v-for="(slide, idx) in slides"
+                                :key="slide.key"
+                                type="button"
+                                class="h-2.5 w-2.5 rounded-full transition"
+                                :class="currentSlide === idx ? 'bg-primary' : 'bg-muted'"
+                                @click="goToSlide(idx)"
+                            ></button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right: auth card -->
-                <div class="flex items-center justify-center mt-20">
+                <div class="flex items-start justify-center">
                     <Card
-                        class="w-full max-w-md shadow-xl border-0 ring-1 ring-black/5"
+                        class="w-full max-w-md overflow-hidden rounded-3xl border border-primary/15 bg-white/95 shadow-2xl shadow-primary/15 backdrop-blur"
                     >
-                        <CardHeader>
-                            <CardTitle class="text-center text-2xl">{{
+                        <form @submit.prevent="handleSubmit">
+                        <CardHeader class="space-y-1 border-b border-border/70">
+                            <p
+                                class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+                            >
+                                {{ t('page.login.secureAccess') }}
+                            </p>
+                            <CardTitle class="text-2xl font-semibold">{{
                                 formTitle
                             }}</CardTitle>
                         </CardHeader>
 
-                        <CardContent class="space-y-6">
-                            <!-- Role (Patient / Doctor) -->
+                        <CardContent class="space-y-6 pt-6">
                             <div class="space-y-2">
                                 <Label
-                                    class="text-sm font-medium text-gray-700"
+                                    class="text-sm font-medium text-foreground"
                                 >
                                     {{
                                         mode === 'login'
@@ -230,7 +361,6 @@ async function handleSubmit() {
                                         }}</TabsTrigger>
                                     </TabsList>
 
-                                    <!-- Patient form -->
                                     <TabsContent
                                         value="patient"
                                         class="mt-4 space-y-4"
@@ -262,7 +392,6 @@ async function handleSubmit() {
                                             />
                                         </div>
 
-                                        <!-- Only show confirm on register -->
                                         <div
                                             v-if="mode === 'register'"
                                             class="space-y-2"
@@ -285,7 +414,6 @@ async function handleSubmit() {
                                         </div>
                                     </TabsContent>
 
-                                    <!-- Doctor form -->
                                     <TabsContent
                                         value="doctor"
                                         class="mt-4 space-y-4"
@@ -316,8 +444,6 @@ async function handleSubmit() {
                                                 @input="resetError"
                                             />
                                         </div>
-
-                                        <!-- Example: add doctor-only fields here later (e.g., license number) -->
 
                                         <div
                                             v-if="mode === 'register'"
@@ -401,12 +527,11 @@ async function handleSubmit() {
                             </p>
                         </CardContent>
 
-                        <CardFooter class="grid grid-rows-2 gap-2 mt-2">
+                        <CardFooter class="grid grid-rows-2 gap-2 border-t border-border/70 bg-white/70 p-4">
                             <Button
-                                type="button"
-                                class="w-full"
+                                type="submit"
+                                class="w-full rounded-xl shadow-md shadow-primary/15"
                                 :disabled="loading"
-                                @click="handleSubmit"
                             >
                                 <span v-if="!loading">
                                     {{
@@ -421,11 +546,10 @@ async function handleSubmit() {
                             </Button>
 
                             <Button
+                                type="button"
                                 variant="secondary"
-                                @click="
-                                    mode =
-                                        mode === 'login' ? 'register' : 'login'
-                                "
+                                class="rounded-xl"
+                                @click="mode = mode === 'login' ? 'register' : 'login'"
                             >
                                 <span>
                                     {{
@@ -436,9 +560,26 @@ async function handleSubmit() {
                                 </span>
                             </Button>
                         </CardFooter>
+                        </form>
                     </Card>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.slide-wipe-enter-active,
+.slide-wipe-leave-active {
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+.slide-wipe-enter-from {
+    transform: translateX(20%);
+    opacity: 0;
+}
+.slide-wipe-leave-to {
+    transform: translateX(-20%);
+    opacity: 0;
+}
+</style>
+

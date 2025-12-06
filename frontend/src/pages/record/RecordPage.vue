@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
@@ -45,6 +45,32 @@ function formatDate(dateStr?: string | null): string {
         month: 'long',
         day: 'numeric',
     });
+}
+
+function formatDateTime(dateStr?: string | null): string {
+    if (!dateStr) return t('medicalRecord.notAvailableShort');
+    const date = new Date(dateStr);
+    const loc = locale.value === 'vi' ? 'vi-VN' : 'en-US';
+    return date.toLocaleString(loc, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function calculateAge(dateStr?: string | null): number | null {
+    if (!dateStr) return null;
+    const birth = new Date(dateStr);
+    if (Number.isNaN(birth.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    return age;
 }
 
 function translateGender(value?: string): string {
@@ -133,6 +159,33 @@ const patientInfoItems = computed(() => {
         },
     ];
 });
+
+const patientName = computed(
+    () =>
+        record.value?.data?.patient_info?.full_name ||
+        t('medicalRecord.notAvailableShort')
+);
+
+const patientAge = computed(() =>
+    calculateAge(record.value?.data?.patient_info?.birthday)
+);
+
+const chiefComplaint = computed(
+    () =>
+        record.value?.data?.medical_history?.chief_complaint ||
+        t('history.noMessagesYet')
+);
+
+const symptomProgression = computed(
+    () =>
+        record.value?.data?.medical_history?.medical_history ||
+        t('medicalRecord.notAvailableShort')
+);
+
+const recordMeta = computed(() => ({
+    created: formatDateTime(record.value?.created_at),
+    updated: formatDateTime(record.value?.updated_at),
+}));
 
 const obgynItems = computed(() => {
     const d = record.value?.data?.obstetric_gynecological_history as
@@ -227,9 +280,9 @@ const socialItems = computed(() => {
                 (sd.end_age != null && sd.start_age != null
                     ? sd.end_age - sd.start_age
                     : undefined);
-            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → ${t('patientForm.smokingDetails.endAge')}: ${sd.end_age ?? '-'}${years != null ? ` (~${years})` : ''}, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
+            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} \u001a ${t('patientForm.smokingDetails.endAge')}: ${sd.end_age ?? '-'}${years != null ? ` (~${years})` : ''}, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
         } else if (d.smoking_habit === 'current') {
-            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} → now, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
+            desc = `${t('patientForm.smokingDetails.startAge')}: ${sd.start_age ?? '-'} \u001a now, ${t('patientForm.smokingDetails.cigarettesPerDay')}: ${sd.cigarettes_per_day ?? '-'}`;
         }
         items.splice(3, 0, { label: t('medicalRecord.smoking'), value: desc });
     }
@@ -249,14 +302,6 @@ const medicalHistoryItems = computed(() => {
         | undefined;
     if (!d) return [] as Array<{ label: string; value: string }>;
     return [
-        {
-            label: t('medicalRecord.chiefComplaint'),
-            value: d.chief_complaint || t('medicalRecord.notAvailableShort'),
-        },
-        {
-            label: t('medicalRecord.symptomProgression'),
-            value: d.medical_history || t('medicalRecord.notAvailableShort'),
-        },
         {
             label: t('medicalRecord.pastMedicalHistory'),
             value:
@@ -278,134 +323,275 @@ const medicalHistoryItems = computed(() => {
         },
     ];
 });
+
 </script>
 
 <template>
-    <div class="p-8 space-y-8 overflow-auto">
-        <div class="flex items-center gap-3">
-            <BookText class="w-8 h-8 text-primary" />
-            <h1 class="text-3xl font-bold tracking-tight">
-                {{ t('record.title') }}
-            </h1>
-        </div>
-        <div v-if="loading" class="text-muted-foreground animate-pulse">
-            {{ t('record.loading') }}
-        </div>
-        <div v-else-if="!record" class="text-muted-foreground">
-            <div class="flex flex-col items-center gap-3 py-10">
-                <div class="text-base">{{ t('record.empty') }}</div>
-                <Button
-                    variant="default"
-                    @click="openDialog({ component: MedicalRecordDialog })"
-                >
-                    {{ t('todo.startConversation') }}
-                </Button>
+    <div
+        class="flex min-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex-col overflow-hidden"
+    >
+        <div class="relative flex-1 min-h-0 overflow-hidden">
+            <div
+                class="pointer-events-none absolute inset-0 opacity-70"
+                aria-hidden="true"
+            >
+                <div
+                    class="absolute -left-24 top-0 size-96 rounded-full bg-primary/15 blur-3xl"
+                ></div>
+                <div
+                    class="absolute right-[-4rem] bottom-0 size-80 rounded-full bg-accent/20 blur-3xl"
+                ></div>
+            </div>
+            <div class="relative h-full min-h-0 w-full flex flex-col overflow-hidden">
+                <div class="flex-1 min-h-0 overflow-y-auto">
+                    <div
+                        class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8"
+                    >
+                        <header
+                            class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+                        >
+                        <div class="space-y-2">
+                            <div
+                                class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary"
+                            >
+                                <BookText class="size-4" />
+                                {{ t('record.title') }}
+                            </div>
+                            <div class="space-y-1">
+                                <h1
+                                    class="text-3xl font-bold tracking-tight text-foreground"
+                                >
+                                    {{ patientName }}
+                                </h1>
+                            </div>
+                            <div
+                                class="flex flex-wrap gap-3 text-xs text-muted-foreground"
+                            >
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 shadow-sm shadow-primary/20 backdrop-blur"
+                                >
+                                    <span
+                                        class="size-2 rounded-full bg-primary"
+                                    ></span>
+                                    {{ t('record.meta.created') }}:
+                                    <span class="font-medium text-foreground">
+                                        {{ recordMeta.created }}
+                                    </span>
+                                </span>
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 shadow-sm shadow-primary/20 backdrop-blur"
+                                >
+                                    <BookText class="h-4 w-4 text-primary" />
+                                    {{ t('record.meta.updated') }}:
+                                    <span class="font-medium text-foreground">
+                                        {{ recordMeta.updated }}
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div v-if="loading" class="text-muted-foreground animate-pulse">
+                        {{ t('record.loading') }}
+                    </div>
+
+                    <div v-else-if="!record" class="text-muted-foreground">
+                        <div
+                            class="relative overflow-hidden rounded-3xl border border-primary/15 bg-white/80 p-10 text-center shadow-lg shadow-primary/20 backdrop-blur"
+                        >
+                            <div
+                                class="pointer-events-none absolute inset-0 opacity-40"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    class="absolute -left-12 top-0 size-72 rounded-full bg-primary/10 blur-3xl"
+                                ></div>
+                                <div
+                                    class="absolute right-0 bottom-0 size-64 rounded-full bg-accent/10 blur-3xl"
+                                ></div>
+                            </div>
+                            <div class="relative space-y-4">
+                                <p class="text-base font-medium">
+                                    {{ t('record.empty') }}
+                                </p>
+                                <Button
+                                    variant="default"
+                                    class="rounded-xl shadow-md shadow-primary/20"
+                                    @click="openDialog({ component: MedicalRecordDialog })"
+                                >
+                                    {{ t('todo.startConversation') }}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else
+                        class="grid gap-6 lg:grid-cols-[1.25fr_0.95fr] lg:items-start"
+                    >
+                        <div class="space-y-6">
+                            <Card
+                                class="overflow-hidden border-0 bg-gradient-to-br from-primary/20 via-white to-accent/10 shadow-xl shadow-primary/20"
+                            >
+                                <CardHeader class="space-y-1">
+                                    <CardTitle
+                                        class="text-lg font-semibold text-primary"
+                                    >
+                                        {{ t('medicalRecord.chiefComplaint') }}
+                                    </CardTitle>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ t('record.meta.updated') }}:
+                                        {{ recordMeta.updated }}
+                                    </p>
+                                </CardHeader>
+                                <CardContent class="space-y-3 text-foreground">
+                                    <p class="text-base leading-relaxed font-medium">
+                                        {{ chiefComplaint }}
+                                    </p>
+                                    <div class="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-inner shadow-primary/10">
+                                        <div class="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                                            {{ t('medicalRecord.symptomProgression') }}
+                                        </div>
+                                        <p class="leading-relaxed text-muted-foreground">
+                                            {{ symptomProgression }}
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card
+                                v-if="socialItems.length"
+                                class="shadow-lg shadow-primary/10"
+                            >
+                                <CardHeader>
+                                    <CardTitle>{{
+                                        t('medicalRecord.socialInfo')
+                                    }}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <dl class="divide-y divide-border/70">
+                                        <div
+                                            v-for="item in socialItems"
+                                            :key="item.label"
+                                            class="grid grid-cols-3 gap-4 py-3"
+                                        >
+                                            <dt
+                                                class="text-sm font-medium text-muted-foreground"
+                                            >
+                                                {{ item.label }}
+                                            </dt>
+                                            <dd class="col-span-2 text-sm">
+                                                {{ item.value }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </CardContent>
+                            </Card>
+
+                            <Card
+                                v-if="medicalHistoryItems.length"
+                                class="shadow-lg shadow-primary/10"
+                            >
+                                <CardHeader>
+                                    <CardTitle>{{
+                                        t('medicalRecord.medicalHistory')
+                                    }}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <dl class="divide-y divide-border/70">
+                                        <div
+                                            v-for="item in medicalHistoryItems"
+                                            :key="item.label"
+                                            class="grid grid-cols-3 gap-4 py-3"
+                                        >
+                                            <dt
+                                                class="text-sm font-medium text-muted-foreground"
+                                            >
+                                                {{ item.label }}
+                                            </dt>
+                                            <dd class="col-span-2 text-sm">
+                                                {{ item.value }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </CardContent>
+                            </Card>
+
+                            <Card
+                                v-if="obgynItems.length"
+                                class="shadow-lg shadow-primary/10"
+                            >
+                                <CardHeader>
+                                    <CardTitle>{{
+                                        t('medicalRecord.obstetric')
+                                    }}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <dl class="divide-y divide-border/70">
+                                        <div
+                                            v-for="item in obgynItems"
+                                            :key="item.label"
+                                            class="grid grid-cols-3 gap-4 py-3"
+                                        >
+                                            <dt
+                                                class="text-sm font-medium text-muted-foreground"
+                                            >
+                                                {{ item.label }}
+                                            </dt>
+                                            <dd class="col-span-2 text-sm">
+                                                {{ item.value }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <div
+                            class="space-y-4 lg:sticky lg:top-24 lg:self-start lg:w-full lg:max-w-md lg:transition-all lg:duration-700 lg:ease-out lg:delay-75"
+                        >
+                            <div class="space-y-4">
+                                <Card class="shadow-lg shadow-primary/10">
+                                    <CardHeader>
+                                        <CardTitle>{{ t('medicalRecord.patientInfo') }}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <dl class="divide-y divide-border/70">
+                                            <div
+                                                v-for="item in patientInfoItems"
+                                                :key="item.label"
+                                                class="grid grid-cols-3 gap-4 py-3"
+                                            >
+                                                <dt
+                                                    class="text-sm font-medium text-muted-foreground"
+                                                >
+                                                    {{ item.label }}
+                                                </dt>
+                                                <dd class="col-span-2 text-sm">
+                                                    {{ item.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </CardContent>
+                                </Card>
+                                <Button
+                                    class="w-full rounded-xl shadow-lg shadow-primary/20"
+                                    :disabled="!record"
+                                    @click="
+                                        openDialog({
+                                            component: SendContactDialog,
+                                            props: { recordId: record?.record_id },
+                                        })
+                                    "
+                                >
+                                    {{ t('record.send') }}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div v-else class="grid gap-8">
-            <!-- Reusable info block -->
-            <Card>
-                <CardHeader>
-                    <CardTitle>{{ t('medicalRecord.patientInfo') }}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <dl class="divide-y divide-border">
-                        <div
-                            v-for="item in patientInfoItems"
-                            :key="item.label"
-                            class="py-3 grid grid-cols-3 gap-4"
-                        >
-                            <dt
-                                class="text-sm font-medium text-muted-foreground"
-                            >
-                                {{ item.label }}
-                            </dt>
-                            <dd class="col-span-2 text-sm">{{ item.value }}</dd>
-                        </div>
-                    </dl>
-                </CardContent>
-            </Card>
-
-            <Card v-if="obgynItems.length">
-                <CardHeader>
-                    <CardTitle>{{ t('medicalRecord.obstetric') }}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <dl class="divide-y divide-border">
-                        <div
-                            v-for="item in obgynItems"
-                            :key="item.label"
-                            class="py-3 grid grid-cols-3 gap-4"
-                        >
-                            <dt
-                                class="text-sm font-medium text-muted-foreground"
-                            >
-                                {{ item.label }}
-                            </dt>
-                            <dd class="col-span-2 text-sm">{{ item.value }}</dd>
-                        </div>
-                    </dl>
-                </CardContent>
-            </Card>
-
-            <Card v-if="socialItems.length">
-                <CardHeader>
-                    <CardTitle>{{ t('medicalRecord.socialInfo') }}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <dl class="divide-y divide-border">
-                        <div
-                            v-for="item in socialItems"
-                            :key="item.label"
-                            class="py-3 grid grid-cols-3 gap-4"
-                        >
-                            <dt
-                                class="text-sm font-medium text-muted-foreground"
-                            >
-                                {{ item.label }}
-                            </dt>
-                            <dd class="col-span-2 text-sm">{{ item.value }}</dd>
-                        </div>
-                    </dl>
-                </CardContent>
-            </Card>
-
-            <Card v-if="medicalHistoryItems.length">
-                <CardHeader>
-                    <CardTitle>{{
-                        t('medicalRecord.medicalHistory')
-                    }}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <dl class="divide-y divide-border">
-                        <div
-                            v-for="item in medicalHistoryItems"
-                            :key="item.label"
-                            class="py-3 grid grid-cols-3 gap-4"
-                        >
-                            <dt
-                                class="text-sm font-medium text-muted-foreground"
-                            >
-                                {{ item.label }}
-                            </dt>
-                            <dd class="col-span-2 text-sm">{{ item.value }}</dd>
-                        </div>
-                    </dl>
-                </CardContent>
-            </Card>
-            <div class="flex justify-end">
-                <Button
-                    @click="
-                        openDialog({
-                            component: SendContactDialog,
-                            props: { recordId: record?.record_id },
-                        })
-                    "
-                >
-                    {{ t('record.send') }}
-                </Button>
-            </div>
         </div>
     </div>
 </template>
